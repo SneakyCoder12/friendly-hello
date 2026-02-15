@@ -1,27 +1,23 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
+import Navbar from '@/components/Navbar';
+import Hero from '@/components/Hero';
+import NoticeBanner from '@/components/NoticeBanner';
+import PlateListings from '@/components/PlateListings';
+import MobileNumbers from '@/components/MobileNumbers';
+import PlateGeneratorSection from '@/components/PlateGenerator';
+import Footer from '@/components/Footer';
 
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
-
-export default App;
+export default function App() {
+  return (
+    <div className="flex flex-col min-h-screen">
+      <Navbar />
+      <Hero />
+      <NoticeBanner />
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 space-y-32" id="plates">
+        <PlateListings />
+        <MobileNumbers />
+        <PlateGeneratorSection />
+      </main>
+      <Footer />
+    </div>
+  );
+}
