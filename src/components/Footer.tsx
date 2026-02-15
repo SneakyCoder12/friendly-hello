@@ -1,8 +1,11 @@
 import { LayoutGrid, Facebook, Camera, AtSign } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Footer() {
+  const { t } = useLanguage();
+
   return (
-    <footer className="bg-white border-t border-gray-200 mt-auto pt-20 pb-10">
+    <footer className="bg-card border-t border-border mt-auto pt-20 pb-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
           <div className="col-span-1 md:col-span-2 pr-0 md:pr-12">
@@ -10,43 +13,38 @@ export default function Footer() {
               <div className="h-10 w-10 bg-primary/10 rounded-lg flex items-center justify-center border border-primary/20">
                 <LayoutGrid className="h-5 w-5 text-primary" />
               </div>
-              <span className="font-display font-black text-2xl text-text-main">AL NUAMI</span>
+              <span className="font-display font-black text-2xl text-foreground">AL NUAMI</span>
             </div>
-            <p className="text-gray-500 leading-relaxed text-sm">
-              The premier destination for buying and selling distinguished license plates and VIP mobile numbers in the United Arab Emirates. Experience secure, transparent, and exclusive auctions.
+            <p className="text-muted-foreground leading-relaxed text-sm">
+              {t('footerDesc')}
             </p>
           </div>
           <div>
-            <h4 className="font-bold text-text-main mb-6 text-sm uppercase tracking-wider">Marketplace</h4>
-            <ul className="space-y-4 text-sm text-gray-500 font-medium">
-              <li><a className="hover:text-primary transition-colors" href="#">Abu Dhabi Plates</a></li>
-              <li><a className="hover:text-primary transition-colors" href="#">Dubai Plates</a></li>
-              <li><a className="hover:text-primary transition-colors" href="#">Mobile Numbers</a></li>
-              <li><a className="hover:text-primary transition-colors" href="#">Private Listings</a></li>
+            <h4 className="font-bold text-foreground mb-6 text-sm uppercase tracking-wider">{t('marketplaceTitle')}</h4>
+            <ul className="space-y-4 text-sm text-muted-foreground font-medium">
+              <li><a className="hover:text-primary transition-colors" href="/marketplace">Abu Dhabi Plates</a></li>
+              <li><a className="hover:text-primary transition-colors" href="/marketplace">Dubai Plates</a></li>
+              <li><a className="hover:text-primary transition-colors" href="/marketplace">Sharjah Plates</a></li>
             </ul>
           </div>
           <div>
-            <h4 className="font-bold text-text-main mb-6 text-sm uppercase tracking-wider">Support</h4>
-            <ul className="space-y-4 text-sm text-gray-500 font-medium">
-              <li><a className="hover:text-primary transition-colors" href="#">Contact Us</a></li>
-              <li><a className="hover:text-primary transition-colors" href="#">Terms of Service</a></li>
-              <li><a className="hover:text-primary transition-colors" href="#">Privacy Policy</a></li>
-              <li><a className="hover:text-primary transition-colors" href="#">FAQ</a></li>
+            <h4 className="font-bold text-foreground mb-6 text-sm uppercase tracking-wider">{t('supportTitle')}</h4>
+            <ul className="space-y-4 text-sm text-muted-foreground font-medium">
+              <li><a className="hover:text-primary transition-colors" href="#">{t('contactUs')}</a></li>
+              <li><a className="hover:text-primary transition-colors" href="#">{t('terms')}</a></li>
+              <li><a className="hover:text-primary transition-colors" href="#">{t('privacy')}</a></li>
+              <li><a className="hover:text-primary transition-colors" href="#">{t('faq')}</a></li>
             </ul>
           </div>
         </div>
-        <div className="border-t border-gray-100 pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-xs text-gray-400 font-medium">© 2025 AL NUAMI UAE. All rights reserved.</p>
+        <div className="border-t border-border pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
+          <p className="text-xs text-muted-foreground font-medium">{t('copyright')}</p>
           <div className="flex gap-4">
-            <a className="h-10 w-10 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 hover:bg-primary hover:text-white transition-all duration-300" href="#">
-              <Facebook className="h-4 w-4" />
-            </a>
-            <a className="h-10 w-10 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 hover:bg-primary hover:text-white transition-all duration-300" href="#">
-              <Camera className="h-4 w-4" />
-            </a>
-            <a className="h-10 w-10 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 hover:bg-primary hover:text-white transition-all duration-300" href="#">
-              <AtSign className="h-4 w-4" />
-            </a>
+            {[Facebook, Camera, AtSign].map((Icon, i) => (
+              <a key={i} className="h-10 w-10 rounded-full bg-surface border border-border flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all duration-300" href="#">
+                <Icon className="h-4 w-4" />
+              </a>
+            ))}
           </div>
         </div>
       </div>
