@@ -6,23 +6,23 @@
   --primary: 174 75% 26%;
   --primary-hover: 174 78% 21%;
   --primary-foreground: 0 0% 100%;
-  --background: 220 15% 8%;
-  --foreground: 0 0% 95%;
-  --card: 220 15% 12%;
-  --border: 220 10% 20%;
-  --surface: 220 15% 15%;
-  --surface-accent: 220 14% 18%;
-  --muted-foreground: 220 10% 55%;
+  --background: 0 0% 100%;
+  --foreground: 0 0% 10%;
+  --card: 0 0% 100%;
+  --border: 0 0% 90%;
+  --surface: 0 0% 98%;
+  --surface-accent: 0 0% 96%;
+  --muted-foreground: 0 0% 45%;
   --ring: 174 75% 26%;
 
   /* Legacy tokens kept for existing components */
-  --background-light: 220 15% 8%;
-  --background-pure: 220 15% 10%;
-  --surface-light: 220 15% 12%;
-  --text-main: 0 0% 95%;
-  --text-secondary: 220 10% 55%;
+  --background-light: 0 0% 100%;
+  --background-pure: 0 0% 100%;
+  --surface-light: 0 0% 100%;
+  --text-main: 0 0% 10%;
+  --text-secondary: 0 0% 45%;
   --accent-blue: 215 26% 27%;
-  --border-light: 220 10% 20%;
+  --border-light: 0 0% 90%;
 }
 
 body {

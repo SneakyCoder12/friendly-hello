@@ -14,7 +14,7 @@ export default function EmirateSection({ section, listings }: Props) {
         <div className="flex items-center gap-5">
           <img
             alt={`${section.name} Logo`}
-            className={`${section.emirateKey === 'ajman' ? 'h-9' : 'h-16'} w-auto object-contain flex-shrink-0 brightness-0 invert opacity-80`}
+            className={`${section.emirateKey === 'ajman' ? 'h-9' : 'h-16'} w-auto object-contain flex-shrink-0`}
             src={section.logo}
           />
           <div>
