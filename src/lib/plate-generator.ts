@@ -62,9 +62,11 @@ const CONFIGS: Record<string, EmirateConfig> = {
     components: [
       {
         type: 'code',
-        xRatio: 0.12,
+        letterSpacingRatio: 0.0001,
+        baselineOffsetRatio: 0.04,
+        xRatio: 0.13,
         align: 'center',
-        fontSizeRatio: 0.13,
+        fontSizeRatio: 0.12,
         emboss: true
       },
       {

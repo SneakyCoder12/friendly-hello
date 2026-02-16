@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { Phone, MessageCircle, Shield, ArrowLeft, Share2 } from 'lucide-react';
+import { Phone, MessageCircle, Shield, ArrowLeft, Share2, Car, X as XIcon } from 'lucide-react';
 import { usePlateImage } from '@/hooks/usePlateGenerator';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -40,6 +40,7 @@ export default function PlateDetailPage() {
     const [seller, setSeller] = useState<SellerProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [showCarPreview, setShowCarPreview] = useState(false);
 
     useEffect(() => {
         if (!plateId) return;
@@ -168,6 +169,65 @@ export default function PlateDetailPage() {
                                 <div className="animate-pulse bg-gray-200 rounded w-full h-[200px]" />
                             )}
                         </div>
+
+                        {/* View on Car Button */}
+                        {dataUrl && (
+                            <button
+                                onClick={() => setShowCarPreview(true)}
+                                className="mt-4 w-full flex items-center justify-center gap-2 py-3.5 rounded-xl border border-gray-200 bg-white text-gray-800 font-bold text-sm hover:bg-gray-50 hover:border-gray-300 hover:shadow-md transition-all duration-200 group"
+                            >
+                                <Car className="h-5 w-5 text-gray-500 group-hover:text-gray-800 transition-colors" />
+                                View on Car
+                            </button>
+                        )}
+
+                        {/* Car Preview Modal */}
+                        {showCarPreview && dataUrl && (
+                            <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" onClick={() => setShowCarPreview(false)}>
+                                {/* Backdrop */}
+                                <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+
+                                {/* Modal Content */}
+                                <div className="relative w-full max-w-4xl" onClick={e => e.stopPropagation()}>
+                                    {/* Close Button */}
+                                    <button
+                                        onClick={() => setShowCarPreview(false)}
+                                        className="absolute top-4 right-4 z-10 h-10 w-10 rounded-full bg-black/60 border border-white/20 flex items-center justify-center text-white hover:bg-black/80 transition-all"
+                                    >
+                                        <XIcon className="h-5 w-5" />
+                                    </button>
+
+                                    {/* Car with Plate */}
+                                    <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+                                        <img
+                                            src="/Preview-Plate.png"
+                                            alt="Car Preview"
+                                            className="w-full h-auto"
+                                        />
+                                        {/* Plate overlay — positioned on the front bumper white area */}
+                                        <img
+                                            src={dataUrl}
+                                            alt={`${emirateDisplay} ${code} ${number} on car`}
+                                            className="absolute"
+                                            style={{
+                                                width: '14%',
+                                                top: '76%',
+                                                left: '58%',
+                                                transform: 'translate(-50%, -50%) perspective(800px) rotateY(-2deg)',
+                                                imageRendering: '-webkit-optimize-contrast',
+                                            } as React.CSSProperties}
+                                        />
+                                    </div>
+
+                                    {/* Label */}
+                                    <div className="mt-4 text-center">
+                                        <p className="text-white/80 text-sm font-medium">
+                                            {emirateDisplay} · {code} {number}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Plate Details */}
                         <div className="mt-6 grid grid-cols-3 gap-4">

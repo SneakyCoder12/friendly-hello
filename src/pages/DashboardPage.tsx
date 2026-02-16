@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
-import { Loader2, Plus, Pencil, Trash2, Eye, EyeOff, CheckCircle, Search, X, Shield } from 'lucide-react';
+import { Loader2, Plus, Pencil, Trash2, Eye, EyeOff, CheckCircle, Search, X, Shield, Smartphone } from 'lucide-react';
 import PhoneInput from '@/components/PhoneInput';
 
 const EMIRATES = ['Abu Dhabi', 'Dubai', 'Sharjah', 'Ajman', 'Umm Al Quwain', 'Ras Al Khaimah', 'Fujairah'];
@@ -67,6 +67,28 @@ export default function DashboardPage() {
 
   // Delete
   const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  // Mobile Numbers
+  interface MobileNumber {
+    id: string;
+    phone_number: string;
+    carrier: string;
+    price: number | null;
+    description: string | null;
+    status: string;
+    contact_phone: string | null;
+    created_at: string;
+  }
+  const [mobileNumbers, setMobileNumbers] = useState<MobileNumber[]>([]);
+  const [showMobileForm, setShowMobileForm] = useState(false);
+  const [mobileForm, setMobileForm] = useState({
+    phone_number: '',
+    carrier: 'du' as 'du' | 'etisalat',
+    price: '',
+    description: '',
+    contact_phone: '',
+  });
+  const [mobileDeleteId, setMobileDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     if (profile) setProfileForm({ full_name: profile.full_name || '', phone_number: profile.phone_number || '' });
@@ -196,6 +218,79 @@ export default function DashboardPage() {
     }).eq('id', user.id);
     if (error) toast.error(error.message);
     else { toast.success('Profile updated'); setEditingProfile(false); refreshProfile(); }
+  };
+
+  // ── Mobile Numbers ──
+  const fetchMobileNumbers = async () => {
+    if (!user) return;
+    const { data, error } = await supabase
+      .from('mobile_numbers')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+    if (error) console.error(error);
+    else setMobileNumbers((data || []) as unknown as MobileNumber[]);
+  };
+
+  useEffect(() => { fetchMobileNumbers(); }, [user]);
+
+  const initMobileForm = () => {
+    setMobileForm({
+      phone_number: '',
+      carrier: 'du',
+      price: '',
+      description: '',
+      contact_phone: profile?.phone_number || '',
+    });
+    setShowMobileForm(true);
+  };
+
+  const validateUAEMobile = (num: string): boolean => {
+    const digits = num.replace(/\D/g, '');
+    // Accept: 971XXXXXXXXX (12 digits) or 05XXXXXXXX (10 digits)
+    if (/^971\d{9}$/.test(digits)) return true;
+    if (/^05\d{8}$/.test(digits)) return true;
+    return false;
+  };
+
+  const saveMobileNumber = async () => {
+    if (!user) return;
+    if (!mobileForm.phone_number.trim()) { toast.error('Phone number is required'); return; }
+    if (!validateUAEMobile(mobileForm.phone_number)) {
+      toast.error('Enter a valid UAE number (e.g. 971 50 123 4567 or 050 123 4567)');
+      return;
+    }
+    setSaving(true);
+    const { error } = await supabase.from('mobile_numbers').insert({
+      phone_number: mobileForm.phone_number.trim(),
+      carrier: mobileForm.carrier,
+      price: mobileForm.price ? Number(mobileForm.price) : null,
+      description: mobileForm.description || null,
+      contact_phone: mobileForm.contact_phone || null,
+      user_id: user.id,
+    });
+    if (error) toast.error(error.message);
+    else {
+      toast.success('Mobile number listed!');
+      setShowMobileForm(false);
+      fetchMobileNumbers();
+    }
+    setSaving(false);
+  };
+
+  const handleMobileDelete = async () => {
+    if (!mobileDeleteId) return;
+    const { error } = await supabase.from('mobile_numbers').delete().eq('id', mobileDeleteId);
+    if (error) toast.error(error.message);
+    else { toast.success('Number deleted'); fetchMobileNumbers(); }
+    setMobileDeleteId(null);
+  };
+
+  const toggleMobileStatus = async (mn: MobileNumber) => {
+    const nextStatus = mn.status === 'active' ? 'sold' : 'active';
+    const { error } = await supabase.from('mobile_numbers').update({ status: nextStatus }).eq('id', mn.id);
+    if (error) toast.error(error.message);
+    else fetchMobileNumbers();
   };
 
   const statusColor = (s: string) => {
@@ -464,6 +559,173 @@ export default function DashboardPage() {
               </div>
             )}
           </>
+        )}
+
+        {/* ─── VIP Mobile Numbers Section ─── */}
+        <div className="mt-12 pt-8 border-t border-border">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <Smartphone className="h-6 w-6 text-primary" />
+              <h2 className="text-2xl font-display font-bold text-foreground">My Mobile Numbers</h2>
+            </div>
+            <button onClick={initMobileForm}
+              className="bg-primary text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-primary-hover transition-all">
+              <Plus className="h-4 w-4" /> Add Number
+            </button>
+          </div>
+
+          {/* Mobile Add Form */}
+          {showMobileForm && (
+            <div className="bg-card border border-border rounded-2xl p-6 mb-8">
+              <h3 className="text-sm font-bold text-foreground mb-5">List a VIP Mobile Number</h3>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                {/* Carrier */}
+                <div>
+                  <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Carrier</label>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setMobileForm(f => ({ ...f, carrier: 'du' }))}
+                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border text-sm font-bold transition-all ${mobileForm.carrier === 'du'
+                          ? 'bg-blue-50 border-blue-300 text-blue-700 ring-2 ring-blue-200 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-300'
+                          : 'bg-surface border-border text-muted-foreground hover:border-gray-400'
+                        }`}
+                    >
+                      <img src="/du-logo.png" alt="Du" className="h-5 w-5 object-contain" />
+                      Du
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMobileForm(f => ({ ...f, carrier: 'etisalat' }))}
+                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border text-sm font-bold transition-all ${mobileForm.carrier === 'etisalat'
+                          ? 'bg-emerald-50 border-emerald-300 text-emerald-700 ring-2 ring-emerald-200 dark:bg-emerald-900/30 dark:border-emerald-500 dark:text-emerald-300'
+                          : 'bg-surface border-border text-muted-foreground hover:border-gray-400'
+                        }`}
+                    >
+                      <img src="/Eand_Logo.svg" alt="Etisalat" className="h-5 w-5 object-contain" />
+                      Etisalat
+                    </button>
+                  </div>
+                </div>
+
+                {/* Phone Number */}
+                <div>
+                  <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">VIP Number</label>
+                  <input
+                    value={mobileForm.phone_number}
+                    onChange={e => setMobileForm(f => ({ ...f, phone_number: e.target.value }))}
+                    className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    placeholder="e.g. 050 123 4567 or 971501234567"
+                  />
+                  <p className="text-[10px] text-muted-foreground mt-1">Format: 971XXXXXXXXX or 05XXXXXXXX</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                {/* Price */}
+                <div>
+                  <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Price (AED)</label>
+                  <input
+                    type="number"
+                    value={mobileForm.price}
+                    onChange={e => setMobileForm(f => ({ ...f, price: e.target.value }))}
+                    className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    placeholder="32,000"
+                  />
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Description</label>
+                  <input
+                    value={mobileForm.description}
+                    onChange={e => setMobileForm(f => ({ ...f, description: e.target.value }))}
+                    className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    placeholder="Optional description"
+                  />
+                </div>
+
+                {/* Contact Phone (auto-filled) */}
+                <div>
+                  <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Your Contact Phone</label>
+                  <input
+                    value={mobileForm.contact_phone}
+                    onChange={e => setMobileForm(f => ({ ...f, contact_phone: e.target.value }))}
+                    className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    placeholder="Auto-filled from profile"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button onClick={saveMobileNumber} disabled={saving}
+                  className="bg-primary text-primary-foreground px-6 py-2.5 rounded-xl text-sm font-bold disabled:opacity-50 flex items-center gap-2 hover:bg-primary-hover transition-all">
+                  {saving && <Loader2 className="h-4 w-4 animate-spin" />} List Number
+                </button>
+                <button onClick={() => setShowMobileForm(false)}
+                  className="bg-surface border border-border px-6 py-2.5 rounded-xl text-sm font-bold text-foreground hover:bg-surface-accent transition-colors">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Mobile Numbers List */}
+          {mobileNumbers.length === 0 ? (
+            <div className="bg-card border border-border rounded-2xl p-10 text-center">
+              <Smartphone className="h-10 w-10 mx-auto text-muted-foreground/40 mb-3" />
+              <p className="text-muted-foreground text-sm">No mobile numbers listed yet</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {mobileNumbers.map(mn => (
+                <div key={mn.id} className="bg-card border border-border rounded-2xl p-5 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center overflow-hidden border ${mn.carrier === 'etisalat' ? 'border-emerald-200 bg-emerald-50' : 'border-blue-200 bg-blue-50'
+                      }`}>
+                      <img
+                        src={mn.carrier === 'etisalat' ? '/Eand_Logo.svg' : '/du-logo.png'}
+                        alt={mn.carrier}
+                        className="h-6 w-6 object-contain"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-foreground font-bold font-mono tracking-wider">{mn.phone_number}</p>
+                      <p className="text-muted-foreground text-xs capitalize">{mn.carrier} • {mn.price ? `AED ${mn.price.toLocaleString()}` : 'No price'}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => toggleMobileStatus(mn)}
+                      className={`h-8 w-8 rounded-lg flex items-center justify-center transition-colors ${mn.status === 'active' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'
+                        }`}
+                      title={mn.status === 'active' ? 'Mark as sold' : 'Mark as active'}
+                    >
+                      {mn.status === 'active' ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                    </button>
+                    <button onClick={() => setMobileDeleteId(mn.id)}
+                      className="h-8 w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-red-400 hover:text-red-300 transition-colors">
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Mobile Delete Modal */}
+        {mobileDeleteId && (
+          <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+            <div className="bg-card border border-border rounded-2xl p-6 max-w-sm w-full">
+              <p className="text-foreground font-medium mb-4">Delete this mobile number listing?</p>
+              <div className="flex gap-3 justify-end">
+                <button onClick={() => setMobileDeleteId(null)} className="px-4 py-2 rounded-xl bg-surface border border-border text-sm font-bold text-foreground">{t('cancel')}</button>
+                <button onClick={handleMobileDelete} className="px-4 py-2 rounded-xl bg-red-500 text-white text-sm font-bold">{t('yes')}, Delete</button>
+              </div>
+            </div>
+          </div>
         )}
 
         {/* Delete Modal */}
