@@ -7,6 +7,21 @@ const NUMBERS = [
   { carrier: 'Du', number: '055 999 9999', price: 'Call for Price', starred: true, color: 'blue' },
 ];
 
+function CarrierLogo({ carrier, color }: { carrier: string; color: string }) {
+  if (carrier === 'Etisalat') {
+    return (
+      <span className="inline-flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider">
+        <span className="text-xs">e&</span>
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider">
+      <span className="text-xs font-black" style={{ color: '#003b71' }}>du</span>
+    </span>
+  );
+}
+
 export default function MobileNumbers() {
   return (
     <section id="numbers">
@@ -34,15 +49,7 @@ export default function MobileNumbers() {
             className="bg-card backdrop-blur-md border border-border rounded-xl p-8 hover:bg-surface hover:shadow-xl transition-all cursor-pointer group shadow-sm hover:border-primary/30"
           >
             <div className="flex justify-between items-center mb-6">
-              <span
-                className={`text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider ${
-                  item.color === 'green'
-                    ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
-                    : 'bg-blue-500/10 border border-blue-500/20 text-blue-400'
-                }`}
-              >
-                {item.carrier}
-              </span>
+              <CarrierLogo carrier={item.carrier} color={item.color} />
               {item.starred && <Star className="h-5 w-5 text-amber-400 fill-amber-400" />}
             </div>
             <p className="text-2xl font-black tracking-widest text-foreground mb-2 font-mono transition-colors group-hover:text-primary">

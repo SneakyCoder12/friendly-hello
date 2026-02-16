@@ -3,12 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
-import { Loader2, Mail, Lock, User, Phone, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
+import PhoneInput from '@/components/PhoneInput';
 
 export default function SignupPage() {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: '', password: '', confirmPassword: '', fullName: '', phone: '' });
+  const [form, setForm] = useState({ email: '', password: '', confirmPassword: '', fullName: '', phone: '+971' });
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -25,7 +26,7 @@ export default function SignupPage() {
       return;
     }
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email: form.email,
       password: form.password,
       options: {
@@ -36,7 +37,10 @@ export default function SignupPage() {
     if (error) {
       toast.error(error.message);
     } else {
-      // Update phone number in profile after signup
+      // Save phone number to profile after signup
+      if (data.user && form.phone.length > 4) {
+        await supabase.from('profiles').update({ phone_number: form.phone }).eq('id', data.user.id);
+      }
       toast.success(t('signupSuccess'));
       navigate('/login');
     }
@@ -71,11 +75,7 @@ export default function SignupPage() {
           </div>
           <div>
             <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('phoneNumber')}</label>
-            <div className="relative">
-              <Phone className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <input type="tel" value={form.phone} onChange={(e) => update('phone', e.target.value)}
-                className="w-full bg-surface border border-border rounded-xl ps-10 pe-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
-            </div>
+            <PhoneInput value={form.phone} onChange={(v) => update('phone', v)} />
           </div>
           <div>
             <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('password')}</label>
@@ -87,6 +87,7 @@ export default function SignupPage() {
                 {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
+            <p className="text-xs text-muted-foreground mt-1.5">Password must be at least 6 characters</p>
           </div>
           <div>
             <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('confirmPassword')}</label>

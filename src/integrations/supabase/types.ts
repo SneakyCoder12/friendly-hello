@@ -16,6 +16,8 @@ export type Database = {
     Tables: {
       listings: {
         Row: {
+          contact_email: string | null
+          contact_phone: string | null
           created_at: string
           description: string | null
           emirate: string
@@ -28,6 +30,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          contact_email?: string | null
+          contact_phone?: string | null
           created_at?: string
           description?: string | null
           emirate: string
@@ -40,6 +44,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          contact_email?: string | null
+          contact_phone?: string | null
           created_at?: string
           description?: string | null
           emirate?: string
@@ -56,6 +62,7 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
+          email: string | null
           full_name: string | null
           id: string
           phone_number: string | null
@@ -63,6 +70,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          email?: string | null
           full_name?: string | null
           id: string
           phone_number?: string | null
@@ -70,6 +78,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          email?: string | null
           full_name?: string | null
           id?: string
           phone_number?: string | null

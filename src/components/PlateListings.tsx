@@ -9,6 +9,7 @@ interface SupabaseListing {
   emirate: string;
   plate_style: string | null;
   price: number | null;
+  profiles: { phone_number: string | null } | null;
 }
 
 const EMIRATE_KEY_MAP: Record<string, string> = {
@@ -29,16 +30,16 @@ export default function PlateListings() {
     (async () => {
       const { data, error } = await supabase
         .from('listings')
-        .select('id, plate_number, emirate, plate_style, price')
+        .select('id, plate_number, emirate, plate_style, price, profiles!listings_user_id_fkey(phone_number)')
         .eq('status', 'active')
         .order('created_at', { ascending: false })
-        .limit(28); // 4 per emirate max
+        .limit(28);
 
       if (error) {
         console.error(error);
       } else {
         const grouped: Record<string, SupabaseListing[]> = {};
-        (data || []).forEach((l) => {
+        ((data || []) as unknown as SupabaseListing[]).forEach((l) => {
           const key = EMIRATE_KEY_MAP[l.emirate] || l.emirate;
           if (!grouped[key]) grouped[key] = [];
           if (grouped[key].length < 4) grouped[key].push(l);

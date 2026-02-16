@@ -4,24 +4,32 @@ import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
 import { Loader2, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import PhoneInput from '@/components/PhoneInput';
 
 export default function LoginPage() {
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const [loginMode, setLoginMode] = useState<'email' | 'phone'>('email');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('+971');
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      toast.error(error.message);
+    
+    if (loginMode === 'email') {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) toast.error(error.message);
+      else { toast.success(t('success')); navigate('/dashboard'); }
     } else {
-      toast.success(t('success'));
-      navigate('/dashboard');
+      // For phone login, we use OTP flow
+      const { error } = await supabase.auth.signInWithOtp({ phone });
+      if (error) toast.error(error.message);
+      else toast.success('OTP sent to your phone. Check your messages.');
     }
     setLoading(false);
   };
@@ -36,48 +44,77 @@ export default function LoginPage() {
           <p className="text-muted-foreground mt-2">{t('login')}</p>
         </div>
         <form onSubmit={handleLogin} className="bg-card border border-border rounded-2xl p-8 space-y-5 shadow-card">
-          <div>
-            <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('email')}</label>
-            <div className="relative">
-              <Mail className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-surface border border-border rounded-xl ps-10 pe-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                placeholder="you@example.com"
-              />
+          {loginMode === 'email' ? (
+            <div>
+              <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('email')}</label>
+              <div className="relative">
+                <Mail className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-surface border border-border rounded-xl ps-10 pe-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  placeholder="you@example.com"
+                />
+              </div>
             </div>
-          </div>
-          <div>
-            <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('password')}</label>
-            <div className="relative">
-              <Lock className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <input
-                type={showPw ? 'text' : 'password'}
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-surface border border-border rounded-xl ps-10 pe-10 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                placeholder="••••••••"
-              />
-              <button type="button" onClick={() => setShowPw(!showPw)} className="absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
+          ) : (
+            <div>
+              <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('phoneNumber')}</label>
+              <PhoneInput value={phone} onChange={setPhone} required />
             </div>
-          </div>
-          <div className="flex justify-end">
-            <Link to="/forgot-password" className="text-xs text-primary hover:underline font-medium">{t('forgotPassword')}</Link>
-          </div>
+          )}
+
+          {loginMode === 'email' && (
+            <div>
+              <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('password')}</label>
+              <div className="relative">
+                <Lock className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input
+                  type={showPw ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-surface border border-border rounded-xl ps-10 pe-10 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  placeholder="••••••••"
+                />
+                <button type="button" onClick={() => setShowPw(!showPw)} className="absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                  {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1.5">Password must be at least 6 characters</p>
+            </div>
+          )}
+
+          {loginMode === 'email' && (
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={rememberMe} onChange={e => setRememberMe(e.target.checked)}
+                  className="h-4 w-4 rounded border-border accent-primary" />
+                <span className="text-xs text-muted-foreground font-medium">Remember me</span>
+              </label>
+              <Link to="/forgot-password" className="text-xs text-primary hover:underline font-medium">{t('forgotPassword')}</Link>
+            </div>
+          )}
+
           <button
             type="submit"
             disabled={loading}
             className="w-full bg-primary text-primary-foreground hover:bg-primary-hover py-3 rounded-xl font-bold text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-            {t('login')}
+            {loginMode === 'email' ? t('login') : 'Send OTP'}
           </button>
+
+          <button
+            type="button"
+            onClick={() => setLoginMode(loginMode === 'email' ? 'phone' : 'email')}
+            className="w-full text-center text-sm text-primary font-bold hover:underline"
+          >
+            {loginMode === 'email' ? 'Login with Phone Number' : 'Login with Email'}
+          </button>
+
           <p className="text-center text-sm text-muted-foreground">
             {t('noAccount')}{' '}
             <Link to="/signup" className="text-primary font-bold hover:underline">{t('signup')}</Link>

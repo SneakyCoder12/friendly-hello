@@ -8,6 +8,7 @@ interface SupabaseListing {
   emirate: string;
   plate_style: string | null;
   price: number | null;
+  profiles?: { phone_number: string | null } | null;
 }
 
 interface Props {
@@ -38,8 +39,7 @@ export default function EmirateSection({ section, listings }: Props) {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {hasListings ? (
-          listings.map((listing) => {
-            // Parse plate_number: could be "A 333" or just "12345"
+          listings.slice(0, 4).map((listing) => {
             const parts = listing.plate_number.split(' ');
             const code = parts.length > 1 ? parts[0] : '';
             const number = parts.length > 1 ? parts.slice(1).join(' ') : parts[0];
@@ -50,7 +50,9 @@ export default function EmirateSection({ section, listings }: Props) {
                 code={code}
                 number={number}
                 price={listing.price ? `AED ${listing.price.toLocaleString()}` : undefined}
-                plateUrl={`/plate/${section.emirateKey}-${code}-${number}`}
+                plateUrl={`/plate/${listing.id}`}
+                sellerPhone={listing.profiles?.phone_number}
+                plateNumber={listing.plate_number}
               />
             );
           })

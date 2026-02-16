@@ -1,10 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Search, Phone, MessageCircle, ChevronLeft, ChevronRight, Loader2, X } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Loader2, X } from 'lucide-react';
+import PlateCard from '@/components/PlateCard';
 
 const EMIRATES = ['Abu Dhabi', 'Dubai', 'Sharjah', 'Ajman', 'Umm Al Quwain', 'Ras Al Khaimah', 'Fujairah'];
+const EMIRATE_KEY_MAP: Record<string, string> = {
+  'Abu Dhabi': 'abudhabi', 'Dubai': 'dubai', 'Sharjah': 'sharjah', 'Ajman': 'ajman',
+  'Umm Al Quwain': 'umm_al_quwain', 'Ras Al Khaimah': 'rak', 'Fujairah': 'fujairah',
+};
 const PAGE_SIZE = 12;
 
 interface ListingWithSeller {
@@ -32,17 +37,12 @@ export default function MarketplacePage() {
   const [page, setPage] = useState(0);
   const [total, setTotal] = useState(0);
 
-  // Read ?emirate= from URL on mount
   useEffect(() => {
     const paramEmirate = searchParams.get('emirate');
     if (paramEmirate) {
-      // Match against known emirate names (case-insensitive)
       const match = EMIRATES.find(e => e.toLowerCase() === paramEmirate.toLowerCase());
-      if (match) {
-        setEmirateFilter(match);
-      } else {
-        setEmirateFilter(paramEmirate);
-      }
+      if (match) setEmirateFilter(match);
+      else setEmirateFilter(paramEmirate);
     }
   }, [searchParams]);
 
@@ -55,18 +55,10 @@ export default function MarketplacePage() {
       .order('created_at', { ascending: false })
       .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
 
-    if (search.trim()) {
-      query = query.ilike('plate_number', `%${search.trim()}%`);
-    }
-    if (emirateFilter) {
-      query = query.eq('emirate', emirateFilter);
-    }
-    if (minPrice) {
-      query = query.gte('price', Number(minPrice));
-    }
-    if (maxPrice) {
-      query = query.lte('price', Number(maxPrice));
-    }
+    if (search.trim()) query = query.ilike('plate_number', `%${search.trim()}%`);
+    if (emirateFilter) query = query.eq('emirate', emirateFilter);
+    if (minPrice) query = query.gte('price', Number(minPrice));
+    if (maxPrice) query = query.lte('price', Number(maxPrice));
 
     const { data, count, error } = await query;
     if (error) console.error(error);
@@ -80,15 +72,7 @@ export default function MarketplacePage() {
   useEffect(() => { fetchListings(); }, [fetchListings]);
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
-
-  const resetFilters = () => {
-    setSearch('');
-    setEmirateFilter('');
-    setMinPrice('');
-    setMaxPrice('');
-    setPage(0);
-  };
-
+  const resetFilters = () => { setSearch(''); setEmirateFilter(''); setMinPrice(''); setMaxPrice(''); setPage(0); };
   const hasFilters = search || emirateFilter || minPrice || maxPrice;
 
   return (
@@ -127,39 +111,32 @@ export default function MarketplacePage() {
           )}
         </div>
 
-        {/* Listings Grid */}
+        {/* Listings Grid — now using PlateCard with flip */}
         {loading ? (
           <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
         ) : listings.length === 0 ? (
           <div className="text-center py-20 text-muted-foreground">{t('noResults')}</div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-            {listings.map(listing => (
-              <Link
-                key={listing.id}
-                to={`/plate/${listing.id}`}
-                className="block bg-card border border-border rounded-2xl overflow-hidden shadow-card hover:border-primary/30 hover:shadow-lg transition-all duration-300 group"
-              >
-                <div className="h-[160px] bg-surface flex items-center justify-center p-6">
-                  <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-xl px-8 py-5 border-2 border-zinc-600 shadow-lg w-full text-center group-hover:scale-105 transition-transform duration-300">
-                    <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest mb-1">{listing.emirate}</p>
-                    <p className="text-3xl font-mono font-black text-white tracking-wider">{listing.plate_number}</p>
-                    {listing.plate_style && <p className="text-[10px] text-zinc-500 mt-1">{listing.plate_style}</p>}
-                  </div>
-                </div>
-                <div className="p-4 border-t border-border">
-                  <div className="flex justify-between items-end">
-                    <div>
-                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold mb-1">{t('price')}</p>
-                      <p className="text-xl font-bold text-foreground font-mono">
-                        {listing.price ? `AED ${listing.price.toLocaleString()}` : 'Contact'}
-                      </p>
-                    </div>
-                    <p className="text-[10px] text-muted-foreground group-hover:text-primary transition-colors">View Details →</p>
-                  </div>
-                </div>
-              </Link>
-            ))}
+            {listings.map(listing => {
+              const parts = listing.plate_number.split(' ');
+              const code = parts.length > 1 ? parts[0] : '';
+              const number = parts.length > 1 ? parts.slice(1).join(' ') : parts[0];
+              const emirateKey = EMIRATE_KEY_MAP[listing.emirate] || listing.emirate.toLowerCase().replace(/\s+/g, '_');
+
+              return (
+                <PlateCard
+                  key={listing.id}
+                  emirate={emirateKey}
+                  code={code}
+                  number={number}
+                  price={listing.price ? `AED ${listing.price.toLocaleString()}` : undefined}
+                  plateUrl={`/plate/${listing.id}`}
+                  sellerPhone={listing.profiles?.phone_number}
+                  plateNumber={listing.plate_number}
+                />
+              );
+            })}
           </div>
         )}
 

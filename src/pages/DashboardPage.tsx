@@ -4,10 +4,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
-import { Loader2, Plus, Pencil, Trash2, Eye, EyeOff, CheckCircle } from 'lucide-react';
+import { Loader2, Plus, Pencil, Trash2, Eye, EyeOff, CheckCircle, Search, X, Shield } from 'lucide-react';
+import PhoneInput from '@/components/PhoneInput';
 
 const EMIRATES = ['Abu Dhabi', 'Dubai', 'Sharjah', 'Ajman', 'Umm Al Quwain', 'Ras Al Khaimah', 'Fujairah'];
-const STATUSES = ['active', 'sold', 'hidden'] as const;
 
 interface Listing {
   id: string;
@@ -20,35 +20,62 @@ interface Listing {
   created_at: string;
 }
 
+interface BulkRow {
+  plate_number: string;
+  emirate: string;
+  plate_style: string;
+  price: string;
+  description: string;
+  contact_email: string;
+  contact_phone: string;
+}
+
+const emptyRow = (prev?: BulkRow, email?: string, phone?: string): BulkRow => ({
+  plate_number: '',
+  emirate: prev?.emirate || 'Dubai',
+  plate_style: '',
+  price: '',
+  description: '',
+  contact_email: email || prev?.contact_email || '',
+  contact_phone: phone || prev?.contact_phone || '',
+});
+
 export default function DashboardPage() {
   const { user, profile, isAdmin, refreshProfile } = useAuth();
   const { t } = useLanguage();
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [editId, setEditId] = useState<string | null>(null);
-  const [form, setForm] = useState({
-    plate_number: '', emirate: 'Dubai', plate_style: '', price: '', description: '',
-  });
   const [saving, setSaving] = useState(false);
-  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  // Bulk rows
+  const [rows, setRows] = useState<BulkRow[]>([]);
+  const [showForm, setShowForm] = useState(false);
+
+  // Listing filters
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [listPage, setListPage] = useState(0);
+  const PAGE_SIZE = 20;
+
+  // Edit single
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState({ plate_number: '', emirate: 'Dubai', plate_style: '', price: '', description: '' });
 
   // Profile edit
   const [profileForm, setProfileForm] = useState({ full_name: '', phone_number: '' });
   const [editingProfile, setEditingProfile] = useState(false);
 
+  // Delete
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
   useEffect(() => {
-    if (profile) {
-      setProfileForm({ full_name: profile.full_name || '', phone_number: profile.phone_number || '' });
-    }
+    if (profile) setProfileForm({ full_name: profile.full_name || '', phone_number: profile.phone_number || '' });
   }, [profile]);
 
   const fetchListings = async () => {
     if (!user) return;
     const { data, error } = await supabase
-      .from('listings')
-      .select('*')
-      .eq('user_id', user.id)
+      .from('listings').select('*').eq('user_id', user.id)
       .order('created_at', { ascending: false });
     if (error) toast.error(error.message);
     else setListings(data || []);
@@ -57,45 +84,58 @@ export default function DashboardPage() {
 
   useEffect(() => { fetchListings(); }, [user]);
 
-  const updateField = (field: string, value: string) => setForm(p => ({ ...p, [field]: value }));
-
-  const resetForm = () => {
-    setForm({ plate_number: '', emirate: 'Dubai', plate_style: '', price: '', description: '' });
-    setEditId(null);
-    setShowForm(false);
+  // Bulk form
+  const initBulkForm = () => {
+    setRows([emptyRow(undefined, user?.email || '', profile?.phone_number || '')]);
+    setShowForm(true);
   };
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const addRow = () => {
+    if (rows.length >= 20) { toast.error('Maximum 20 rows at once'); return; }
+    setRows(prev => [...prev, emptyRow(prev[prev.length - 1], user?.email || '', profile?.phone_number || '')]);
+  };
+
+  const updateRow = (idx: number, field: keyof BulkRow, value: string) => {
+    setRows(prev => prev.map((r, i) => i === idx ? { ...r, [field]: value } : r));
+  };
+
+  const removeRow = (idx: number) => {
+    if (rows.length <= 1) return;
+    setRows(prev => prev.filter((_, i) => i !== idx));
+  };
+
+  const handleBulkSave = async () => {
     if (!user) return;
-    if (!form.plate_number.trim()) { toast.error('Plate number is required'); return; }
+    const valid = rows.filter(r => r.plate_number.trim());
+    if (!valid.length) { toast.error('Add at least one plate number'); return; }
 
     setSaving(true);
-    const payload = {
-      plate_number: form.plate_number.trim(),
-      emirate: form.emirate,
-      plate_style: form.plate_style || null,
-      price: form.price ? Number(form.price) : null,
-      description: form.description || null,
+    const payload = valid.map(r => ({
+      plate_number: r.plate_number.trim(),
+      emirate: r.emirate,
+      plate_style: r.plate_style || null,
+      price: r.price ? Number(r.price) : null,
+      description: r.description || null,
+      contact_email: r.contact_email || null,
+      contact_phone: r.contact_phone || null,
       user_id: user.id,
-    };
+      status: 'active' as const,
+    }));
 
-    if (editId) {
-      const { error } = await supabase.from('listings').update(payload).eq('id', editId);
-      if (error) toast.error(error.message);
-      else { toast.success('Listing updated'); resetForm(); fetchListings(); }
-    } else {
-      const { error } = await supabase.from('listings').insert(payload);
-      if (error) {
-        if (error.message.includes('idx_unique_plate_per_emirate')) toast.error('This plate number already exists in this emirate');
-        else toast.error(error.message);
-      } else { toast.success('Listing created'); resetForm(); fetchListings(); }
+    const { error } = await supabase.from('listings').insert(payload);
+    if (error) toast.error(error.message);
+    else {
+      toast.success(`${payload.length} listings created successfully!`);
+      setShowForm(false);
+      setRows([]);
+      fetchListings();
     }
     setSaving(false);
   };
 
+  // Edit single listing
   const startEdit = (listing: Listing) => {
-    setForm({
+    setEditForm({
       plate_number: listing.plate_number,
       emirate: listing.emirate,
       plate_style: listing.plate_style || '',
@@ -103,7 +143,22 @@ export default function DashboardPage() {
       description: listing.description || '',
     });
     setEditId(listing.id);
-    setShowForm(true);
+  };
+
+  const handleEditSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || !editId) return;
+    setSaving(true);
+    const { error } = await supabase.from('listings').update({
+      plate_number: editForm.plate_number.trim(),
+      emirate: editForm.emirate,
+      plate_style: editForm.plate_style || null,
+      price: editForm.price ? Number(editForm.price) : null,
+      description: editForm.description || null,
+    }).eq('id', editId);
+    if (error) toast.error(error.message);
+    else { toast.success('Listing updated'); setEditId(null); fetchListings(); }
+    setSaving(false);
   };
 
   const handleDelete = async () => {
@@ -137,13 +192,29 @@ export default function DashboardPage() {
     return 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20';
   };
 
+  // Filtered listings
+  const filtered = listings.filter(l => {
+    if (statusFilter !== 'all' && l.status !== statusFilter) return false;
+    if (searchQuery && !l.plate_number.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    return true;
+  });
+  const pagedListings = filtered.slice(listPage * PAGE_SIZE, (listPage + 1) * PAGE_SIZE);
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-6xl mx-auto px-4 py-8 pt-24">
         {/* Profile Section */}
         <div className="bg-card border border-border rounded-2xl p-6 mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-display font-bold text-foreground">{t('profile')}</h2>
+            <div className="flex items-center gap-3">
+              <h2 className="text-xl font-display font-bold text-foreground">{t('profile')}</h2>
+              {isAdmin && (
+                <span className="flex items-center gap-1 bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full border border-primary/20">
+                  <Shield className="h-3 w-3" /> Admin
+                </span>
+              )}
+            </div>
             {isAdmin && (
               <Link to="/dashboard/admin" className="text-sm font-bold text-primary hover:underline">
                 {t('adminPanel')} →
@@ -155,9 +226,7 @@ export default function DashboardPage() {
               <input value={profileForm.full_name} onChange={e => setProfileForm(p => ({ ...p, full_name: e.target.value }))}
                 className="bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
                 placeholder={t('fullName')} />
-              <input value={profileForm.phone_number} onChange={e => setProfileForm(p => ({ ...p, phone_number: e.target.value }))}
-                className="bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                placeholder={t('phoneNumber')} />
+              <PhoneInput value={profileForm.phone_number} onChange={v => setProfileForm(p => ({ ...p, phone_number: v }))} showValidation={false} />
               <div className="flex gap-2 col-span-full">
                 <button onClick={saveProfile} className="bg-primary text-primary-foreground px-6 py-2 rounded-xl text-sm font-bold">{t('save')}</button>
                 <button onClick={() => setEditingProfile(false)} className="bg-surface border border-border px-6 py-2 rounded-xl text-sm font-bold text-foreground">{t('cancel')}</button>
@@ -167,7 +236,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-foreground font-medium">{profile?.full_name || 'No name set'}</p>
-                <p className="text-muted-foreground text-sm">{user?.email}</p>
+                <p className="text-muted-foreground text-sm font-medium">{user?.email}</p>
                 <p className="text-muted-foreground text-sm">{profile?.phone_number || 'No phone set'}</p>
               </div>
               <button onClick={() => setEditingProfile(true)} className="text-primary text-sm font-bold hover:underline">Edit</button>
@@ -175,92 +244,140 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Listings */}
+        {/* Listings Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-display font-bold text-foreground">{t('myListings')}</h2>
-          <button onClick={() => { resetForm(); setShowForm(true); }}
+          <button onClick={initBulkForm}
             className="bg-primary text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-primary-hover transition-all">
-            <Plus className="h-4 w-4" /> {t('addListing')}
+            <Plus className="h-4 w-4" /> Add Listings
           </button>
         </div>
 
-        {/* Form */}
+        {/* Bulk Form */}
         {showForm && (
-          <form onSubmit={handleSave} className="bg-card border border-border rounded-2xl p-6 mb-8 space-y-4">
-            <h3 className="font-display font-bold text-foreground">{editId ? t('editListing') : t('addListing')}</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">{t('plateNumber')}</label>
-                <input required value={form.plate_number} onChange={e => updateField('plate_number', e.target.value)}
-                  className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">{t('emirate')}</label>
-                <select value={form.emirate} onChange={e => updateField('emirate', e.target.value)}
-                  className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
-                  {EMIRATES.map(em => <option key={em} value={em}>{em}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">{t('plateStyle')}</label>
-                <input value={form.plate_style} onChange={e => updateField('plate_style', e.target.value)}
-                  className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">{t('price')} (AED)</label>
-                <input type="number" value={form.price} onChange={e => updateField('price', e.target.value)}
-                  className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
-              </div>
+          <div className="bg-card border border-border rounded-2xl p-6 mb-8">
+            <h3 className="font-display font-bold text-foreground mb-4">Add New Listings</h3>
+            <div className="space-y-3 max-h-[60vh] overflow-y-auto">
+              {rows.map((row, idx) => (
+                <div key={idx} className="grid grid-cols-12 gap-2 items-start bg-surface rounded-xl p-3 border border-border/50">
+                  <input value={row.plate_number} onChange={e => updateRow(idx, 'plate_number', e.target.value)} placeholder="Plate #"
+                    className="col-span-2 bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  <select value={row.emirate} onChange={e => updateRow(idx, 'emirate', e.target.value)}
+                    className="col-span-2 bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
+                    {EMIRATES.map(em => <option key={em} value={em}>{em}</option>)}
+                  </select>
+                  <input value={row.plate_style} onChange={e => updateRow(idx, 'plate_style', e.target.value)} placeholder="Code"
+                    className="col-span-1 bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  <input type="number" value={row.price} onChange={e => updateRow(idx, 'price', e.target.value)} placeholder="Price"
+                    className="col-span-2 bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  <input value={row.description} onChange={e => updateRow(idx, 'description', e.target.value)} placeholder="Description"
+                    className="col-span-4 bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  <button onClick={() => removeRow(idx)} className="col-span-1 h-9 flex items-center justify-center text-red-400 hover:text-red-300 transition-colors"
+                    disabled={rows.length <= 1}>
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              ))}
             </div>
-            <div>
-              <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">{t('description')}</label>
-              <textarea value={form.description} onChange={e => updateField('description', e.target.value)} rows={3}
-                className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none" />
-            </div>
-            <div className="flex gap-3">
-              <button type="submit" disabled={saving}
+            <div className="flex items-center gap-3 mt-4">
+              <button onClick={addRow} className="bg-surface border border-border px-4 py-2 rounded-xl text-sm font-bold text-foreground hover:bg-surface-accent transition-colors flex items-center gap-1">
+                <Plus className="h-4 w-4" /> Add Another
+              </button>
+              <div className="flex-1" />
+              <button onClick={() => setShowForm(false)} className="bg-surface border border-border px-6 py-2.5 rounded-xl text-sm font-bold text-foreground">{t('cancel')}</button>
+              <button onClick={handleBulkSave} disabled={saving}
                 className="bg-primary text-primary-foreground px-6 py-2.5 rounded-xl text-sm font-bold disabled:opacity-50 flex items-center gap-2">
+                {saving && <Loader2 className="h-4 w-4 animate-spin" />} Save All ({rows.filter(r => r.plate_number.trim()).length})
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Form */}
+        {editId && (
+          <form onSubmit={handleEditSave} className="bg-card border border-border rounded-2xl p-6 mb-8 space-y-4">
+            <h3 className="font-display font-bold text-foreground">{t('editListing')}</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <input required value={editForm.plate_number} onChange={e => setEditForm(p => ({ ...p, plate_number: e.target.value }))}
+                className="bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Plate Number" />
+              <select value={editForm.emirate} onChange={e => setEditForm(p => ({ ...p, emirate: e.target.value }))}
+                className="bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
+                {EMIRATES.map(em => <option key={em} value={em}>{em}</option>)}
+              </select>
+              <input value={editForm.plate_style} onChange={e => setEditForm(p => ({ ...p, plate_style: e.target.value }))}
+                className="bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Plate Style" />
+              <input type="number" value={editForm.price} onChange={e => setEditForm(p => ({ ...p, price: e.target.value }))}
+                className="bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Price (AED)" />
+            </div>
+            <textarea value={editForm.description} onChange={e => setEditForm(p => ({ ...p, description: e.target.value }))} rows={2}
+              className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none" placeholder="Description" />
+            <div className="flex gap-3">
+              <button type="submit" disabled={saving} className="bg-primary text-primary-foreground px-6 py-2.5 rounded-xl text-sm font-bold disabled:opacity-50 flex items-center gap-2">
                 {saving && <Loader2 className="h-4 w-4 animate-spin" />} {t('save')}
               </button>
-              <button type="button" onClick={resetForm}
-                className="bg-surface border border-border px-6 py-2.5 rounded-xl text-sm font-bold text-foreground">{t('cancel')}</button>
+              <button type="button" onClick={() => setEditId(null)} className="bg-surface border border-border px-6 py-2.5 rounded-xl text-sm font-bold text-foreground">{t('cancel')}</button>
             </div>
           </form>
         )}
 
-        {/* Listing table */}
+        {/* Listing Filters */}
+        <div className="flex flex-wrap items-center gap-3 mb-4">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <input value={searchQuery} onChange={e => { setSearchQuery(e.target.value); setListPage(0); }}
+              className="w-full bg-surface border border-border rounded-xl ps-10 pe-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+              placeholder="Search plate numbers..." />
+          </div>
+          {['all', 'active', 'sold', 'hidden'].map(s => (
+            <button key={s} onClick={() => { setStatusFilter(s); setListPage(0); }}
+              className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors ${statusFilter === s ? 'bg-primary text-primary-foreground' : 'bg-surface border border-border text-foreground hover:bg-surface-accent'}`}>
+              {s === 'all' ? 'All' : s}
+            </button>
+          ))}
+        </div>
+
+        {/* Listing Table */}
         {loading ? (
           <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
-        ) : listings.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">No listings yet. Create your first one!</div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground">No listings found.</div>
         ) : (
-          <div className="space-y-3">
-            {listings.map(listing => (
-              <div key={listing.id} className="bg-card border border-border rounded-xl p-4 flex items-center justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-1">
-                    <span className="font-mono font-bold text-foreground text-lg">{listing.plate_number}</span>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${statusColor(listing.status)}`}>
-                      {listing.status.toUpperCase()}
-                    </span>
+          <>
+            <div className="space-y-3">
+              {pagedListings.map(listing => (
+                <div key={listing.id} className="bg-card border border-border rounded-xl p-4 flex items-center justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3 mb-1">
+                      <span className="inline-flex items-center bg-surface border border-border rounded-lg px-3 py-1 font-mono font-bold text-foreground text-sm">{listing.plate_number}</span>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${statusColor(listing.status)}`}>{listing.status.toUpperCase()}</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{listing.emirate} {listing.price ? `• AED ${listing.price.toLocaleString()}` : ''}</p>
                   </div>
-                  <p className="text-sm text-muted-foreground">{listing.emirate} {listing.price ? `• AED ${listing.price.toLocaleString()}` : ''}</p>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => toggleStatus(listing)} className="h-8 w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                      title={listing.status === 'active' ? 'Mark as sold' : 'Mark as active'}>
+                      {listing.status === 'active' ? <CheckCircle className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                    <button onClick={() => startEdit(listing)} className="h-8 w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                    <button onClick={() => setDeleteId(listing.id)} className="h-8 w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-red-400 hover:text-red-300 transition-colors">
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <button onClick={() => toggleStatus(listing)} className="h-8 w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-                    title={listing.status === 'active' ? 'Mark as sold' : 'Mark as active'}>
-                    {listing.status === 'active' ? <CheckCircle className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                  <button onClick={() => startEdit(listing)} className="h-8 w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
-                    <Pencil className="h-4 w-4" />
-                  </button>
-                  <button onClick={() => setDeleteId(listing.id)} className="h-8 w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-red-400 hover:text-red-300 transition-colors">
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
+              ))}
+            </div>
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-4 mt-6">
+                <button onClick={() => setListPage(p => Math.max(0, p - 1))} disabled={listPage === 0}
+                  className="px-3 py-1.5 rounded-lg bg-surface border border-border text-sm font-bold text-foreground disabled:opacity-30">Prev</button>
+                <span className="text-sm text-muted-foreground font-mono">Page {listPage + 1} of {totalPages}</span>
+                <button onClick={() => setListPage(p => Math.min(totalPages - 1, p + 1))} disabled={listPage >= totalPages - 1}
+                  className="px-3 py-1.5 rounded-lg bg-surface border border-border text-sm font-bold text-foreground disabled:opacity-30">Next</button>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
 
         {/* Delete Modal */}
@@ -270,9 +387,7 @@ export default function DashboardPage() {
               <p className="text-foreground font-medium mb-4">{t('deleteConfirm')}</p>
               <div className="flex gap-3 justify-end">
                 <button onClick={() => setDeleteId(null)} className="px-4 py-2 rounded-xl bg-surface border border-border text-sm font-bold text-foreground">{t('cancel')}</button>
-                <button onClick={handleDelete} className="px-4 py-2 rounded-xl bg-red-500 text-white text-sm font-bold">
-                  {t('yes')}, Delete
-                </button>
+                <button onClick={handleDelete} className="px-4 py-2 rounded-xl bg-red-500 text-white text-sm font-bold">{t('yes')}, Delete</button>
               </div>
             </div>
           </div>

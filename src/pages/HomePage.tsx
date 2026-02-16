@@ -14,6 +14,7 @@ export default function HomePage() {
         <PlateListings />
         <RequestBanner />
         <MobileNumbers />
+        <RequestBanner />
       </main>
       <Footer />
     </>
