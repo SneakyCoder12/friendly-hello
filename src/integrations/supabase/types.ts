@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      favorites: {
+        Row: {
+          id: string
+          user_id: string
+          listing_type: string
+          listing_id: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          listing_type: string
+          listing_id: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          listing_type?: string
+          listing_id?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       listings: {
         Row: {
           contact_email: string | null

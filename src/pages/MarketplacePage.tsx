@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Search, ChevronLeft, ChevronRight, Loader2, X } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Loader2, X, Sparkles } from 'lucide-react';
 import PlateCard from '@/components/PlateCard';
 
 const EMIRATES = ['Abu Dhabi', 'Dubai', 'Sharjah', 'Ajman', 'Umm Al Quwain', 'Ras Al Khaimah', 'Fujairah'];
@@ -78,8 +78,39 @@ export default function MarketplacePage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 py-8 pt-24">
+
+        {/* ─── Elegant White Banner ─── */}
+        <div className="relative rounded-3xl overflow-hidden mb-10 bg-gradient-to-br from-gray-50 via-white to-gray-50 border border-gray-200 shadow-sm">
+          {/* Decorative circles */}
+          <div className="absolute -top-20 -right-20 w-60 h-60 rounded-full bg-gradient-to-br from-amber-100/50 to-orange-100/30 blur-3xl" />
+          <div className="absolute -bottom-20 -left-20 w-60 h-60 rounded-full bg-gradient-to-tr from-amber-100/40 to-yellow-100/20 blur-3xl" />
+          {/* Fine dot pattern */}
+          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, #000 0.5px, transparent 0.5px)', backgroundSize: '18px 18px' }} />
+
+          <div className="relative px-8 md:px-14 py-12 md:py-16 flex flex-col md:flex-row items-center gap-8">
+            <div className="flex-1 text-center md:text-start">
+              <div className="flex items-center gap-2 mb-3 justify-center md:justify-start">
+                <Sparkles className="h-4 w-4 text-amber-500" />
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Premium Collection</span>
+              </div>
+              <h1 className="text-3xl md:text-4xl font-display font-black text-gray-900 tracking-tight mb-3">
+                Number Plate Marketplace
+              </h1>
+              <p className="text-gray-500 text-sm md:text-base leading-relaxed max-w-lg">
+                Explore exclusive UAE number plates across all Emirates. Find your dream plate today.
+              </p>
+              <Link to="/mobile-numbers" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-gray-700 hover:text-gray-900 transition-colors border border-gray-200 rounded-full px-5 py-2.5 bg-white hover:bg-gray-50 shadow-sm">
+                Browse VIP Phone Numbers →
+              </Link>
+            </div>
+            <div className="flex-shrink-0 h-20 w-40 rounded-2xl bg-white border border-gray-200 flex items-center justify-center shadow-sm">
+              <img src="/dubai-plate.png" alt="UAE Plate" className="h-12 w-auto object-contain" />
+            </div>
+          </div>
+        </div>
+
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-display font-bold text-foreground">{t('activeListings')}</h1>
+          <h2 className="text-2xl font-display font-bold text-foreground">{t('activeListings')}</h2>
           <span className="text-sm text-muted-foreground font-mono">{total} plates</span>
         </div>
 

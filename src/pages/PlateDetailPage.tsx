@@ -208,12 +208,13 @@ export default function PlateDetailPage() {
                                         <img
                                             src={dataUrl}
                                             alt={`${emirateDisplay} ${code} ${number} on car`}
-                                            className="absolute"
+                                            className="absolute drop-shadow-lg"
                                             style={{
                                                 width: '14%',
                                                 top: '76%',
                                                 left: '58%',
-                                                transform: 'translate(-50%, -50%) perspective(800px) rotateY(-2deg)',
+                                                transform: 'translate(-50%, -50%) perspective(600px) rotateX(4deg) rotateY(-3deg) rotateZ(-1deg)',
+                                                filter: 'brightness(0.92) contrast(1.05)',
                                                 imageRendering: '-webkit-optimize-contrast',
                                             } as React.CSSProperties}
                                         />

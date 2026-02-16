@@ -18,6 +18,8 @@ const SignupPage = lazy(() => import('@/pages/SignupPage'));
 const ForgotPasswordPage = lazy(() => import('@/pages/ForgotPasswordPage'));
 const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
 const AdminPage = lazy(() => import('@/pages/AdminPage'));
+const MobileNumbersPage = lazy(() => import('@/pages/MobileNumbersPage'));
+const MobileNumberDetailPage = lazy(() => import('@/pages/MobileNumberDetailPage'));
 
 function Loading() {
   return (
@@ -38,6 +40,8 @@ export default function App() {
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/marketplace" element={<MarketplacePage />} />
+                <Route path="/mobile-numbers" element={<MobileNumbersPage />} />
+                <Route path="/mobile-number/:numberId" element={<MobileNumberDetailPage />} />
                 <Route path="/plate/:plateId" element={<PlateDetailPage />} />
                 <Route path="/request" element={<RequestPage />} />
                 <Route path="/contact" element={<ContactPage />} />

@@ -103,7 +103,7 @@ export default function Navbar() {
                       <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-5">Prestigious Numbers</h3>
                       <div className="space-y-3">
                         <Link
-                          to="/marketplace?category=etisalat"
+                          to="/mobile-numbers?carrier=etisalat"
                           className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors duration-200"
                         >
                           <div className="h-10 w-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center overflow-hidden shadow-sm">
@@ -111,11 +111,11 @@ export default function Navbar() {
                           </div>
                           <div>
                             <p className="text-sm font-semibold text-gray-800">Etisalat</p>
-                            <p className="text-[10px] text-gray-400">Premium Numbers</p>
+                            <p className="text-[10px] text-gray-400">VIP Numbers</p>
                           </div>
                         </Link>
                         <Link
-                          to="/marketplace?category=du"
+                          to="/mobile-numbers?carrier=du"
                           className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors duration-200"
                         >
                           <div className="h-10 w-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center overflow-hidden shadow-sm">
@@ -123,7 +123,7 @@ export default function Navbar() {
                           </div>
                           <div>
                             <p className="text-sm font-semibold text-gray-800">Du</p>
-                            <p className="text-[10px] text-gray-400">Premium Numbers</p>
+                            <p className="text-[10px] text-gray-400">VIP Numbers</p>
                           </div>
                         </Link>
                       </div>

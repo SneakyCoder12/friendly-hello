@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
-import { Loader2, Plus, Pencil, Trash2, Eye, EyeOff, CheckCircle, Search, X, Shield, Smartphone } from 'lucide-react';
+import { Loader2, Plus, Pencil, Trash2, Eye, EyeOff, CheckCircle, Search, X, Shield, Smartphone, Heart } from 'lucide-react';
 import PhoneInput from '@/components/PhoneInput';
 
 const EMIRATES = ['Abu Dhabi', 'Dubai', 'Sharjah', 'Ajman', 'Umm Al Quwain', 'Ras Al Khaimah', 'Fujairah'];
@@ -89,6 +89,19 @@ export default function DashboardPage() {
     contact_phone: '',
   });
   const [mobileDeleteId, setMobileDeleteId] = useState<string | null>(null);
+
+  // Favorites
+  interface FavoriteItem {
+    id: string;
+    listing_type: string;
+    listing_id: string;
+    phone_number?: string;
+    plate_number?: string;
+    emirate?: string;
+    carrier?: string;
+    price?: number | null;
+  }
+  const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
 
   useEffect(() => {
     if (profile) setProfileForm({ full_name: profile.full_name || '', phone_number: profile.phone_number || '' });
@@ -233,6 +246,35 @@ export default function DashboardPage() {
   };
 
   useEffect(() => { fetchMobileNumbers(); }, [user]);
+
+  const fetchFavorites = async () => {
+    if (!user) return;
+    const { data: favs } = await supabase
+      .from('favorites')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+    if (!favs) return;
+
+    const items: FavoriteItem[] = [];
+    for (const fav of favs) {
+      if (fav.listing_type === 'mobile_number') {
+        const { data } = await supabase.from('mobile_numbers').select('phone_number, carrier, price').eq('id', fav.listing_id).single();
+        if (data) items.push({ id: fav.id, listing_type: fav.listing_type, listing_id: fav.listing_id, phone_number: (data as any).phone_number, carrier: (data as any).carrier, price: (data as any).price });
+      } else if (fav.listing_type === 'plate') {
+        const { data } = await supabase.from('listings').select('plate_number, emirate, price').eq('id', fav.listing_id).single();
+        if (data) items.push({ id: fav.id, listing_type: fav.listing_type, listing_id: fav.listing_id, plate_number: (data as any).plate_number, emirate: (data as any).emirate, price: (data as any).price });
+      }
+    }
+    setFavorites(items);
+  };
+  useEffect(() => { fetchFavorites(); }, [user]);
+
+  const removeFavorite = async (favId: string) => {
+    await supabase.from('favorites').delete().eq('id', favId);
+    setFavorites(prev => prev.filter(f => f.id !== favId));
+    toast.success('Removed from favorites');
+  };
 
   const initMobileForm = () => {
     setMobileForm({
@@ -588,8 +630,8 @@ export default function DashboardPage() {
                       type="button"
                       onClick={() => setMobileForm(f => ({ ...f, carrier: 'du' }))}
                       className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border text-sm font-bold transition-all ${mobileForm.carrier === 'du'
-                          ? 'bg-blue-50 border-blue-300 text-blue-700 ring-2 ring-blue-200 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-300'
-                          : 'bg-surface border-border text-muted-foreground hover:border-gray-400'
+                        ? 'bg-blue-50 border-blue-300 text-blue-700 ring-2 ring-blue-200 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-300'
+                        : 'bg-surface border-border text-muted-foreground hover:border-gray-400'
                         }`}
                     >
                       <img src="/du-logo.png" alt="Du" className="h-5 w-5 object-contain" />
@@ -599,8 +641,8 @@ export default function DashboardPage() {
                       type="button"
                       onClick={() => setMobileForm(f => ({ ...f, carrier: 'etisalat' }))}
                       className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border text-sm font-bold transition-all ${mobileForm.carrier === 'etisalat'
-                          ? 'bg-emerald-50 border-emerald-300 text-emerald-700 ring-2 ring-emerald-200 dark:bg-emerald-900/30 dark:border-emerald-500 dark:text-emerald-300'
-                          : 'bg-surface border-border text-muted-foreground hover:border-gray-400'
+                        ? 'bg-emerald-50 border-emerald-300 text-emerald-700 ring-2 ring-emerald-200 dark:bg-emerald-900/30 dark:border-emerald-500 dark:text-emerald-300'
+                        : 'bg-surface border-border text-muted-foreground hover:border-gray-400'
                         }`}
                     >
                       <img src="/Eand_Logo.svg" alt="Etisalat" className="h-5 w-5 object-contain" />
@@ -709,6 +751,46 @@ export default function DashboardPage() {
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* ─── My Favorites Section ─── */}
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-display font-bold text-foreground flex items-center gap-2">
+            <Heart className="h-5 w-5 text-red-500" /> My Favorites
+          </h2>
+        </div>
+        <div className="bg-card border border-border rounded-2xl p-6 mb-8">
+          {favorites.length === 0 ? (
+            <p className="text-muted-foreground text-sm text-center py-6">No favorites saved yet. Browse listings and tap the ❤️ to save.</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {favorites.map(fav => (
+                <div key={fav.id} className="bg-surface border border-border rounded-xl p-4 flex items-center gap-4 group">
+                  <Link
+                    to={fav.listing_type === 'mobile_number' ? `/mobile-number/${fav.listing_id}` : `/plate/${fav.listing_id}`}
+                    className="flex-1 min-w-0"
+                  >
+                    <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold mb-1">
+                      {fav.listing_type === 'mobile_number' ? (fav.carrier === 'etisalat' ? 'e& Number' : 'Du Number') : (fav.emirate || 'Plate')}
+                    </p>
+                    <p className="text-lg font-black font-mono text-foreground truncate group-hover:text-primary transition-colors">
+                      {fav.listing_type === 'mobile_number' ? fav.phone_number : fav.plate_number}
+                    </p>
+                    <p className="text-sm font-mono text-muted-foreground">
+                      {fav.price ? `AED ${fav.price.toLocaleString()}` : 'Call for price'}
+                    </p>
+                  </Link>
+                  <button
+                    onClick={() => removeFavorite(fav.id)}
+                    className="h-8 w-8 rounded-lg bg-red-50 border border-red-200 flex items-center justify-center text-red-500 hover:bg-red-100 transition-colors flex-shrink-0"
+                    title="Remove from favorites"
+                  >
+                    <Heart className="h-4 w-4 fill-current" />
+                  </button>
                 </div>
               ))}
             </div>
