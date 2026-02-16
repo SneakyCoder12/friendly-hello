@@ -28,22 +28,25 @@ export default function PlateListings() {
 
   useEffect(() => {
     (async () => {
+      console.log('[PlateListings] Fetching active listings...');
       const { data, error } = await supabase
         .from('listings')
-        .select('id, plate_number, emirate, plate_style, price, profiles!listings_user_id_fkey(phone_number)')
+        .select('id, plate_number, emirate, plate_style, price, contact_phone, profiles!listings_user_id_fkey(phone_number)')
         .eq('status', 'active')
         .order('created_at', { ascending: false })
         .limit(28);
 
       if (error) {
-        console.error(error);
+        console.error('[PlateListings] Query error:', error);
       } else {
+        console.log('[PlateListings] Raw data:', data);
         const grouped: Record<string, SupabaseListing[]> = {};
         ((data || []) as unknown as SupabaseListing[]).forEach((l) => {
           const key = EMIRATE_KEY_MAP[l.emirate] || l.emirate;
           if (!grouped[key]) grouped[key] = [];
           if (grouped[key].length < 4) grouped[key].push(l);
         });
+        console.log('[PlateListings] Grouped:', grouped);
         setListingsByEmirate(grouped);
       }
       setLoading(false);
@@ -57,7 +60,7 @@ export default function PlateListings() {
           <div key={section.emirateKey} className="animate-pulse">
             <div className="h-8 bg-muted rounded w-48 mb-12" />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[1,2,3,4].map(i => <div key={i} className="h-[260px] bg-muted rounded-2xl" />)}
+              {[1, 2, 3, 4].map(i => <div key={i} className="h-[260px] bg-muted rounded-2xl" />)}
             </div>
           </div>
         ))}
