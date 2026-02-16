@@ -1,4 +1,4 @@
-import { Menu, X, Globe, ChevronDown } from 'lucide-react';
+import { Menu, X, Globe, ChevronDown, Phone } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -53,10 +53,13 @@ export default function Navbar() {
 
             {/* Marketplace Dropdown */}
             <div className="relative group/market">
-              <button className="flex items-center gap-1 text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors duration-300">
+              <Link
+                to="/marketplace"
+                className="flex items-center gap-1 text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors duration-300"
+              >
                 {t('marketplace')}
                 <ChevronDown className="h-3.5 w-3.5 transition-transform duration-300 group-hover/market:rotate-180" />
-              </button>
+              </Link>
 
               {/* Hover bridge — invisible padding to prevent dropdown closing */}
               <div className="absolute left-1/2 -translate-x-1/2 top-full h-6 w-[750px] opacity-0 group-hover/market:opacity-100 pointer-events-none group-hover/market:pointer-events-auto" />
@@ -76,12 +79,12 @@ export default function Navbar() {
                           <Link
                             key={cat.plates}
                             to={`/marketplace?emirate=${encodeURIComponent(cat.plates)}`}
-                            className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors duration-200 group/item"
+                            className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-all duration-200 group/item hover:shadow-sm"
                           >
                             <img
                               src={cat.image}
                               alt={cat.name}
-                              className="h-10 w-20 object-contain rounded"
+                              className="h-12 w-24 object-contain rounded transition-transform duration-200 group-hover/item:scale-110"
                             />
                             <div>
                               <p className="text-sm font-semibold text-gray-800 group-hover/item:text-gray-900">{cat.name}</p>
@@ -94,15 +97,18 @@ export default function Navbar() {
                     {/* Divider */}
                     <div className="w-px bg-gray-100" />
 
-                    {/* Prestigious Numbers */}
-                    <div className="w-[220px]">
+                    {/* Right Column */}
+                    <div className="w-[230px]">
+                      {/* Prestigious Numbers */}
                       <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-5">Prestigious Numbers</h3>
                       <div className="space-y-3">
                         <Link
                           to="/marketplace?category=etisalat"
                           className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors duration-200"
                         >
-                          <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-yellow-400 to-yellow-500 flex items-center justify-center text-white font-bold text-sm shadow-sm">e&</div>
+                          <div className="h-10 w-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center overflow-hidden shadow-sm">
+                            <img src="/Eand_Logo.svg" alt="Etisalat" className="h-7 w-7 object-contain" />
+                          </div>
                           <div>
                             <p className="text-sm font-semibold text-gray-800">Etisalat</p>
                             <p className="text-[10px] text-gray-400">Premium Numbers</p>
@@ -112,10 +118,28 @@ export default function Navbar() {
                           to="/marketplace?category=du"
                           className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors duration-200"
                         >
-                          <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center text-white font-bold text-sm shadow-sm">du</div>
+                          <div className="h-10 w-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center overflow-hidden shadow-sm">
+                            <img src="/du-logo.png" alt="Du" className="h-7 w-7 object-contain" />
+                          </div>
                           <div>
                             <p className="text-sm font-semibold text-gray-800">Du</p>
                             <p className="text-[10px] text-gray-400">Premium Numbers</p>
+                          </div>
+                        </Link>
+                      </div>
+
+                      {/* Request a Plate */}
+                      <div className="mt-5 pt-5 border-t border-gray-100">
+                        <Link
+                          to="/request"
+                          className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors duration-200 group/req"
+                        >
+                          <div className="h-10 w-14 rounded-lg bg-white border border-gray-200 flex items-center justify-center overflow-hidden shadow-sm">
+                            <img src="/dubai-plate.png" alt="Plate" className="h-6 w-12 object-contain" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-gray-800 group-hover/req:text-gray-900">Request a Plate</p>
+                            <p className="text-[10px] text-gray-400">Can't find it? We'll help</p>
                           </div>
                         </Link>
                       </div>
