@@ -5,13 +5,13 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useState } from 'react';
 
 const PLATE_CATEGORIES = [
-  { name: 'Abu Dhabi', plates: 'abudhabi', image: '/abudhabi-plate.png' },
-  { name: 'Dubai', plates: 'dubai', image: '/dubai-plate.png' },
-  { name: 'Sharjah', plates: 'sharjah', image: '/sharjah-plate.png' },
-  { name: 'Ajman', plates: 'ajman', image: '/ajman-plate.png' },
-  { name: 'RAK', plates: 'rak', image: '/rak-plate.png' },
-  { name: 'Fujairah', plates: 'fujairah', image: '/fujariah-plate.png' },
-  { name: 'UAQ', plates: 'umm_al_quwain', image: '/umm-al-q-plate.png' },
+  { name: 'Abu Dhabi', plates: 'Abu Dhabi', image: '/abudhabi-plate.png' },
+  { name: 'Dubai', plates: 'Dubai', image: '/dubai-plate.png' },
+  { name: 'Sharjah', plates: 'Sharjah', image: '/sharjah-plate.png' },
+  { name: 'Ajman', plates: 'Ajman', image: '/ajman-plate.png' },
+  { name: 'RAK', plates: 'Ras Al Khaimah', image: '/rak-plate.png' },
+  { name: 'Fujairah', plates: 'Fujairah', image: '/fujariah-plate.png' },
+  { name: 'UAQ', plates: 'Umm Al Quwain', image: '/umm-al-q-plate.png' },
 ];
 
 export default function Navbar() {
@@ -58,27 +58,30 @@ export default function Navbar() {
                 <ChevronDown className="h-3.5 w-3.5 transition-transform duration-300 group-hover/market:rotate-180" />
               </button>
 
-              {/* Dropdown Panel */}
-              <div className="absolute left-1/2 -translate-x-1/2 top-full pt-4 opacity-0 invisible group-hover/market:opacity-100 group-hover/market:visible transition-all duration-300">
-                <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-6 min-w-[650px]">
-                  {/* Arrow */}
-                  <div className="absolute top-4 left-1/2 -translate-x-1/2 -translate-y-full w-3 h-3 bg-white border-l border-t border-gray-100 rotate-45" />
+              {/* Hover bridge — invisible padding to prevent dropdown closing */}
+              <div className="absolute left-1/2 -translate-x-1/2 top-full h-6 w-[750px] opacity-0 group-hover/market:opacity-100 pointer-events-none group-hover/market:pointer-events-auto" />
 
-                  <div className="flex gap-8">
+              {/* Dropdown Panel */}
+              <div className="absolute left-1/2 -translate-x-1/2 top-full pt-6 opacity-0 invisible group-hover/market:opacity-100 group-hover/market:visible transition-all duration-300">
+                <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-8 min-w-[750px]">
+                  {/* Arrow */}
+                  <div className="absolute top-6 left-1/2 -translate-x-1/2 -translate-y-full w-3 h-3 bg-white border-l border-t border-gray-100 rotate-45" />
+
+                  <div className="flex gap-10">
                     {/* Plate Numbers */}
                     <div className="flex-1">
-                      <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Plate Numbers</h3>
-                      <div className="grid grid-cols-2 gap-2">
+                      <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-5">Plate Numbers</h3>
+                      <div className="grid grid-cols-2 gap-3">
                         {PLATE_CATEGORIES.map((cat) => (
                           <Link
                             key={cat.plates}
-                            to={`/marketplace?emirate=${cat.plates}`}
-                            className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 transition-colors duration-200 group/item"
+                            to={`/marketplace?emirate=${encodeURIComponent(cat.plates)}`}
+                            className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors duration-200 group/item"
                           >
                             <img
                               src={cat.image}
                               alt={cat.name}
-                              className="h-8 w-16 object-contain rounded"
+                              className="h-10 w-20 object-contain rounded"
                             />
                             <div>
                               <p className="text-sm font-semibold text-gray-800 group-hover/item:text-gray-900">{cat.name}</p>
@@ -92,9 +95,9 @@ export default function Navbar() {
                     <div className="w-px bg-gray-100" />
 
                     {/* Prestigious Numbers */}
-                    <div className="w-[200px]">
-                      <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Prestigious Numbers</h3>
-                      <div className="space-y-2">
+                    <div className="w-[220px]">
+                      <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-5">Prestigious Numbers</h3>
+                      <div className="space-y-3">
                         <Link
                           to="/marketplace?category=etisalat"
                           className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors duration-200"
@@ -120,7 +123,7 @@ export default function Navbar() {
                   </div>
 
                   {/* Bottom Bar */}
-                  <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+                  <div className="mt-6 pt-5 border-t border-gray-100 flex justify-between items-center">
                     <p className="text-xs text-gray-400">Browse all categories</p>
                     <Link to="/marketplace" className="text-xs font-bold text-gray-800 hover:text-gray-600 transition-colors">
                       View All →
@@ -130,7 +133,8 @@ export default function Navbar() {
               </div>
             </div>
 
-            <a className={navLinkClass} href="/#generator">{t('generator')}</a>
+            <Link className={navLinkClass} to="/visualizer">{t('generator')}</Link>
+            <Link className={navLinkClass} to="/contact">{t('contactUs')}</Link>
             {user && <Link className={navLinkClass} to="/dashboard">{t('dashboard')}</Link>}
           </div>
 
@@ -176,7 +180,8 @@ export default function Navbar() {
           <div className="md:hidden border-t border-gray-200 py-4 space-y-3">
             <Link to="/" onClick={() => setMenuOpen(false)} className="block text-sm font-semibold text-foreground py-2 hover:text-gray-600 transition-colors">{t('home')}</Link>
             <Link to="/marketplace" onClick={() => setMenuOpen(false)} className="block text-sm font-semibold text-gray-600 py-2 hover:text-gray-900 transition-colors">{t('marketplace')}</Link>
-            <a href="/#generator" onClick={() => setMenuOpen(false)} className="block text-sm font-semibold text-gray-600 py-2 hover:text-gray-900 transition-colors">{t('generator')}</a>
+            <Link to="/visualizer" onClick={() => setMenuOpen(false)} className="block text-sm font-semibold text-gray-600 py-2 hover:text-gray-900 transition-colors">{t('generator')}</Link>
+            <Link to="/contact" onClick={() => setMenuOpen(false)} className="block text-sm font-semibold text-gray-600 py-2 hover:text-gray-900 transition-colors">{t('contactUs')}</Link>
             {user && <Link to="/dashboard" onClick={() => setMenuOpen(false)} className="block text-sm font-semibold text-gray-600 py-2 hover:text-gray-900 transition-colors">{t('dashboard')}</Link>}
             {user && (
               <button onClick={() => { handleSignOut(); setMenuOpen(false); }} className="block text-sm font-semibold text-gray-600 py-2 hover:text-gray-900 transition-colors">{t('logout')}</button>

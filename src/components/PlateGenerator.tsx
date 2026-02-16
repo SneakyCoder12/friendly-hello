@@ -34,7 +34,7 @@ export default function PlateGeneratorSection() {
             </div>
           </div>
           <div>
-            <h2 className="text-4xl font-display font-bold text-foreground tracking-tight">Plate Generator</h2>
+            <h2 className="text-4xl font-display font-bold text-foreground tracking-tight">Plate Visualizer</h2>
             <p className="text-sm font-bold uppercase tracking-[0.2em] mt-1 text-muted-foreground">Create Your HD Number Plate</p>
           </div>
         </div>

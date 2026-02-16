@@ -91,6 +91,7 @@ export const translations = {
     terms: 'Terms of Service',
     privacy: 'Privacy Policy',
     faq: 'FAQ',
+    submitRequest: 'Submit a Request',
     copyright: '© 2025 AL NUAMI UAE. All rights reserved.',
     // General
     loading: 'Loading...',
@@ -185,6 +186,7 @@ export const translations = {
     terms: 'شروط الخدمة',
     privacy: 'سياسة الخصوصية',
     faq: 'الأسئلة الشائعة',
+    submitRequest: 'تقديم طلب',
     copyright: '© ٢٠٢٥ النعيمي الإمارات. جميع الحقوق محفوظة.',
     loading: 'جاري التحميل...',
     error: 'حدث خطأ ما',

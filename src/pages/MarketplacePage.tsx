@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Search, Phone, MessageCircle, ChevronLeft, ChevronRight, Loader2, X } from 'lucide-react';
@@ -22,6 +22,7 @@ interface ListingWithSeller {
 
 export default function MarketplacePage() {
   const { t } = useLanguage();
+  const [searchParams] = useSearchParams();
   const [listings, setListings] = useState<ListingWithSeller[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -30,7 +31,20 @@ export default function MarketplacePage() {
   const [maxPrice, setMaxPrice] = useState('');
   const [page, setPage] = useState(0);
   const [total, setTotal] = useState(0);
-  const [flipped, setFlipped] = useState<Set<string>>(new Set());
+
+  // Read ?emirate= from URL on mount
+  useEffect(() => {
+    const paramEmirate = searchParams.get('emirate');
+    if (paramEmirate) {
+      // Match against known emirate names (case-insensitive)
+      const match = EMIRATES.find(e => e.toLowerCase() === paramEmirate.toLowerCase());
+      if (match) {
+        setEmirateFilter(match);
+      } else {
+        setEmirateFilter(paramEmirate);
+      }
+    }
+  }, [searchParams]);
 
   const fetchListings = useCallback(async () => {
     setLoading(true);
@@ -66,14 +80,6 @@ export default function MarketplacePage() {
   useEffect(() => { fetchListings(); }, [fetchListings]);
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
-
-  const toggleFlip = (id: string) => {
-    setFlipped(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
-      return next;
-    });
-  };
 
   const resetFilters = () => {
     setSearch('');
@@ -129,49 +135,30 @@ export default function MarketplacePage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
             {listings.map(listing => (
-              <div key={listing.id} className="perspective-1000 cursor-pointer" onClick={() => toggleFlip(listing.id)}>
-                <div className={`relative w-full h-[280px] transition-transform duration-700 transform-style-3d ${flipped.has(listing.id) ? 'rotate-y-180' : ''}`}>
-                  {/* Front */}
-                  <div className="absolute inset-0 backface-hidden bg-card border border-border rounded-2xl overflow-hidden shadow-card">
-                    <div className="h-[160px] bg-surface flex items-center justify-center p-6">
-                      <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-xl px-8 py-5 border-2 border-zinc-600 shadow-lg w-full text-center">
-                        <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest mb-1">{listing.emirate}</p>
-                        <p className="text-3xl font-mono font-black text-white tracking-wider">{listing.plate_number}</p>
-                        {listing.plate_style && <p className="text-[10px] text-zinc-500 mt-1">{listing.plate_style}</p>}
-                      </div>
-                    </div>
-                    <div className="p-4 border-t border-border">
-                      <div className="flex justify-between items-end">
-                        <div>
-                          <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold mb-1">{t('price')}</p>
-                          <p className="text-xl font-bold text-foreground font-mono">
-                            {listing.price ? `AED ${listing.price.toLocaleString()}` : 'Contact'}
-                          </p>
-                        </div>
-                        <p className="text-[10px] text-muted-foreground">{t('contactSeller')} →</p>
-                      </div>
-                    </div>
-                  </div>
-                  {/* Back */}
-                  <div className="absolute inset-0 backface-hidden rotate-y-180 bg-card border border-border rounded-2xl overflow-hidden shadow-card flex flex-col items-center justify-center p-6 text-center">
-                    <p className="text-xs text-muted-foreground uppercase tracking-wider font-bold mb-3">{t('sellerInfo')}</p>
-                    <p className="text-foreground font-bold text-lg mb-1">{listing.profiles?.full_name || 'Seller'}</p>
-                    {listing.profiles?.phone_number && (
-                      <div className="flex flex-col gap-3 mt-4 w-full max-w-[200px]">
-                        <a href={`tel:${listing.profiles.phone_number}`} onClick={e => e.stopPropagation()}
-                          className="flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2.5 rounded-xl text-sm font-bold hover:bg-primary-hover transition-all">
-                          <Phone className="h-4 w-4" /> {t('callSeller')}
-                        </a>
-                        <a href={`https://wa.me/${listing.profiles.phone_number.replace(/[^0-9]/g, '')}`}
-                          target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
-                          className="flex items-center justify-center gap-2 bg-emerald-600 text-white py-2.5 rounded-xl text-sm font-bold hover:bg-emerald-700 transition-all">
-                          <MessageCircle className="h-4 w-4" /> {t('whatsapp')}
-                        </a>
-                      </div>
-                    )}
+              <Link
+                key={listing.id}
+                to={`/plate/${listing.id}`}
+                className="block bg-card border border-border rounded-2xl overflow-hidden shadow-card hover:border-primary/30 hover:shadow-lg transition-all duration-300 group"
+              >
+                <div className="h-[160px] bg-surface flex items-center justify-center p-6">
+                  <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-xl px-8 py-5 border-2 border-zinc-600 shadow-lg w-full text-center group-hover:scale-105 transition-transform duration-300">
+                    <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest mb-1">{listing.emirate}</p>
+                    <p className="text-3xl font-mono font-black text-white tracking-wider">{listing.plate_number}</p>
+                    {listing.plate_style && <p className="text-[10px] text-zinc-500 mt-1">{listing.plate_style}</p>}
                   </div>
                 </div>
-              </div>
+                <div className="p-4 border-t border-border">
+                  <div className="flex justify-between items-end">
+                    <div>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold mb-1">{t('price')}</p>
+                      <p className="text-xl font-bold text-foreground font-mono">
+                        {listing.price ? `AED ${listing.price.toLocaleString()}` : 'Contact'}
+                      </p>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground group-hover:text-primary transition-colors">View Details →</p>
+                  </div>
+                </div>
+              </Link>
             ))}
           </div>
         )}

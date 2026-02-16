@@ -1,13 +1,23 @@
 import { ArrowRight } from 'lucide-react';
 import PlateCard from './PlateCard';
-import type { PlateListing, EmirateSection as SectionData } from '@/data/listings';
+import type { EmirateSection as SectionData } from '@/data/listings';
+
+interface SupabaseListing {
+  id: string;
+  plate_number: string;
+  emirate: string;
+  plate_style: string | null;
+  price: number | null;
+}
 
 interface Props {
   section: SectionData;
-  listings: PlateListing[];
+  listings: SupabaseListing[];
 }
 
 export default function EmirateSection({ section, listings }: Props) {
+  const hasListings = listings.length > 0;
+
   return (
     <section>
       <div className="flex items-end justify-between mb-12 border-b border-border pb-6">
@@ -19,18 +29,40 @@ export default function EmirateSection({ section, listings }: Props) {
           />
           <div>
             <h2 className="text-4xl font-display font-bold text-foreground tracking-tight">{section.name}</h2>
-
           </div>
         </div>
-        <a className="group flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-primary transition-colors" href="/marketplace">
+        <a className="group flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-primary transition-colors" href={`/marketplace?emirate=${encodeURIComponent(section.name)}`}>
           VIEW ALL
           <ArrowRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
         </a>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {listings.map((listing) => (
-          <PlateCard key={`${listing.emirate}-${listing.code}-${listing.number}`} listing={listing} />
-        ))}
+        {hasListings ? (
+          listings.map((listing) => {
+            // Parse plate_number: could be "A 333" or just "12345"
+            const parts = listing.plate_number.split(' ');
+            const code = parts.length > 1 ? parts[0] : '';
+            const number = parts.length > 1 ? parts.slice(1).join(' ') : parts[0];
+            return (
+              <PlateCard
+                key={listing.id}
+                emirate={section.emirateKey}
+                code={code}
+                number={number}
+                price={listing.price ? `AED ${listing.price.toLocaleString()}` : undefined}
+                plateUrl={`/plate/${section.emirateKey}-${code}-${number}`}
+              />
+            );
+          })
+        ) : (
+          <PlateCard
+            emirate={section.emirateKey}
+            code="X"
+            number="XXX"
+            plateUrl="#"
+            comingSoon
+          />
+        )}
       </div>
     </section>
   );
