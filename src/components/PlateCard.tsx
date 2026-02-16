@@ -1,5 +1,5 @@
 import { memo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { usePlateImage } from '@/hooks/usePlateGenerator';
 import { Phone, MessageCircle, ExternalLink } from 'lucide-react';
 
@@ -17,6 +17,7 @@ interface PlateCardProps {
 function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerPhone, plateNumber }: PlateCardProps) {
   const dataUrl = usePlateImage(emirate, code, number);
   const [flipped, setFlipped] = useState(false);
+  const navigate = useNavigate();
 
   const displayPlate = plateNumber || `${code} ${number}`.trim();
   const phoneDigits = sellerPhone?.replace(/\D/g, '') || '';
@@ -40,17 +41,26 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
     );
   }
 
+  const handleCardClick = () => {
+    // On mobile, first tap flips; second tap navigates
+    if (!flipped) {
+      setFlipped(true);
+    } else {
+      navigate(plateUrl);
+    }
+  };
+
   return (
     <div
       className="perspective-1000 h-[260px] cursor-pointer"
       onMouseEnter={() => setFlipped(true)}
       onMouseLeave={() => setFlipped(false)}
-      onClick={() => setFlipped(f => !f)}
+      onClick={handleCardClick}
     >
       <div
         className={`relative w-full h-full transition-transform duration-500 ease-out transform-style-3d ${flipped ? 'rotate-y-180' : ''}`}
       >
-        {/* FRONT SIDE — original plate card (UNTOUCHED rendering) */}
+        {/* FRONT SIDE — plate card */}
         <div className="absolute inset-0 backface-hidden">
           <Link to={plateUrl} className="block h-full bg-card rounded-2xl border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300 group" onClick={e => flipped && e.preventDefault()}>
             <div className="flex flex-col items-center justify-center h-full">
@@ -79,7 +89,7 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
           </Link>
         </div>
 
-        {/* BACK SIDE — contact options (matches reference design) */}
+        {/* BACK SIDE — contact options */}
         <div className="absolute inset-0 backface-hidden rotate-y-180">
           <div className="h-full bg-card rounded-2xl border border-border flex flex-col items-center justify-center px-5 py-4">
             {/* Header */}
@@ -96,9 +106,9 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
               </p>
             </div>
 
-            {/* Action buttons */}
+            {/* Action buttons — only show if phone number exists */}
             <div className="w-full space-y-2 mb-3">
-              {telUrl ? (
+              {telUrl && (
                 <a
                   href={telUrl}
                   onClick={e => e.stopPropagation()}
@@ -106,9 +116,9 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
                 >
                   <Phone className="h-4 w-4" /> Call Now
                 </a>
-              ) : null}
+              )}
 
-              {whatsappUrl ? (
+              {whatsappUrl && (
                 <a
                   href={whatsappUrl}
                   target="_blank"
@@ -118,17 +128,16 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
                 >
                   <MessageCircle className="h-4 w-4" /> WhatsApp
                 </a>
-              ) : null}
-
-              {!telUrl && !whatsappUrl && (
-                <Link
-                  to={plateUrl}
-                  onClick={e => e.stopPropagation()}
-                  className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-white py-2.5 rounded-full font-bold text-sm transition-all"
-                >
-                  <ExternalLink className="h-4 w-4" /> View Details
-                </Link>
               )}
+
+              {/* View Details — always visible */}
+              <Link
+                to={plateUrl}
+                onClick={e => e.stopPropagation()}
+                className="w-full flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 text-white py-2.5 rounded-full font-bold text-sm transition-all"
+              >
+                <ExternalLink className="h-4 w-4" /> View Details
+              </Link>
             </div>
 
             {/* Phone number at bottom */}

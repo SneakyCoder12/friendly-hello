@@ -59,7 +59,7 @@ export default function DashboardPage() {
 
   // Edit single
   const [editId, setEditId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState({ plate_number: '', emirate: 'Dubai', plate_style: '', price: '', description: '' });
+  const [editForm, setEditForm] = useState({ plate_code: '', plate_number: '', emirate: 'Dubai', price: '', description: '' });
 
   // Profile edit
   const [profileForm, setProfileForm] = useState({ full_name: '', phone_number: '' });
@@ -110,17 +110,22 @@ export default function DashboardPage() {
     if (!valid.length) { toast.error('Add at least one plate number'); return; }
 
     setSaving(true);
-    const payload = valid.map(r => ({
-      plate_number: r.plate_number.trim(),
-      emirate: r.emirate,
-      plate_style: r.plate_style || null,
-      price: r.price ? Number(r.price) : null,
-      description: r.description || null,
-      contact_email: r.contact_email || null,
-      contact_phone: r.contact_phone || null,
-      user_id: user.id,
-      status: 'active' as const,
-    }));
+    const payload = valid.map(r => {
+      const fullPlateNumber = r.plate_style.trim()
+        ? `${r.plate_style.trim()} ${r.plate_number.trim()}`
+        : r.plate_number.trim();
+      return {
+        plate_number: fullPlateNumber,
+        emirate: r.emirate,
+        plate_style: r.plate_style || null,
+        price: r.price ? Number(r.price) : null,
+        description: r.description || null,
+        contact_email: r.contact_email || null,
+        contact_phone: r.contact_phone || null,
+        user_id: user.id,
+        status: 'active' as const,
+      };
+    });
 
     const { error } = await supabase.from('listings').insert(payload);
     if (error) toast.error(error.message);
@@ -135,10 +140,13 @@ export default function DashboardPage() {
 
   // Edit single listing
   const startEdit = (listing: Listing) => {
+    const pParts = listing.plate_number?.split(' ') || [];
+    const pCode = pParts.length > 1 ? pParts[0] : '';
+    const pNum = pParts.length > 1 ? pParts.slice(1).join(' ') : pParts[0] || '';
     setEditForm({
-      plate_number: listing.plate_number,
+      plate_code: pCode,
+      plate_number: pNum,
       emirate: listing.emirate,
-      plate_style: listing.plate_style || '',
       price: listing.price?.toString() || '',
       description: listing.description || '',
     });
@@ -148,11 +156,15 @@ export default function DashboardPage() {
   const handleEditSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !editId) return;
+    if (!editForm.plate_number.trim()) { toast.error('Number is required'); return; }
     setSaving(true);
+    const fullPlateNumber = editForm.plate_code.trim()
+      ? `${editForm.plate_code.trim()} ${editForm.plate_number.trim()}`
+      : editForm.plate_number.trim();
     const { error } = await supabase.from('listings').update({
-      plate_number: editForm.plate_number.trim(),
+      plate_number: fullPlateNumber,
       emirate: editForm.emirate,
-      plate_style: editForm.plate_style || null,
+      plate_style: editForm.plate_code.trim() || null,
       price: editForm.price ? Number(editForm.price) : null,
       description: editForm.description || null,
     }).eq('id', editId);
@@ -259,19 +271,40 @@ export default function DashboardPage() {
             <h3 className="font-display font-bold text-foreground mb-4">Add New Listings</h3>
             <div className="space-y-3 max-h-[60vh] overflow-y-auto">
               {rows.map((row, idx) => (
-                <div key={idx} className="grid grid-cols-12 gap-2 items-start bg-surface rounded-xl p-3 border border-border/50">
-                  <input value={row.plate_number} onChange={e => updateRow(idx, 'plate_number', e.target.value)} placeholder="Plate #"
-                    className="col-span-2 bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
-                  <select value={row.emirate} onChange={e => updateRow(idx, 'emirate', e.target.value)}
-                    className="col-span-2 bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
-                    {EMIRATES.map(em => <option key={em} value={em}>{em}</option>)}
-                  </select>
-                  <input value={row.plate_style} onChange={e => updateRow(idx, 'plate_style', e.target.value)} placeholder="Code"
-                    className="col-span-1 bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
-                  <input type="number" value={row.price} onChange={e => updateRow(idx, 'price', e.target.value)} placeholder="Price"
-                    className="col-span-2 bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
-                  <input value={row.description} onChange={e => updateRow(idx, 'description', e.target.value)} placeholder="Description"
-                    className="col-span-4 bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                <div key={idx} className="grid grid-cols-12 gap-2 items-end bg-surface rounded-xl p-3 border border-border/50">
+                  <div className="col-span-2">
+                    {idx === 0 && <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Number</label>}
+                    <input value={row.plate_number} onChange={e => {
+                      const v = e.target.value.replace(/\D/g, '').slice(0, 5);
+                      updateRow(idx, 'plate_number', v);
+                    }} placeholder="12345" maxLength={5}
+                      className="w-full bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground font-mono font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  </div>
+                  <div className="col-span-2">
+                    {idx === 0 && <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Emirate</label>}
+                    <select value={row.emirate} onChange={e => updateRow(idx, 'emirate', e.target.value)}
+                      className="w-full bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
+                      {EMIRATES.map(em => <option key={em} value={em}>{em}</option>)}
+                    </select>
+                  </div>
+                  <div className="col-span-1">
+                    {idx === 0 && <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Code</label>}
+                    <input value={row.plate_style} onChange={e => {
+                      const v = e.target.value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 2);
+                      updateRow(idx, 'plate_style', v.toUpperCase());
+                    }} placeholder="A" maxLength={2}
+                      className="w-full bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground font-mono font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  </div>
+                  <div className="col-span-2">
+                    {idx === 0 && <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Price</label>}
+                    <input type="number" value={row.price} onChange={e => updateRow(idx, 'price', e.target.value)} placeholder="Price"
+                      className="w-full bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  </div>
+                  <div className="col-span-4">
+                    {idx === 0 && <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Description</label>}
+                    <input value={row.description} onChange={e => updateRow(idx, 'description', e.target.value)} placeholder="Description"
+                      className="w-full bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  </div>
                   <button onClick={() => removeRow(idx)} className="col-span-1 h-9 flex items-center justify-center text-red-400 hover:text-red-300 transition-colors"
                     disabled={rows.length <= 1}>
                     <Trash2 className="h-4 w-4" />
@@ -295,27 +328,80 @@ export default function DashboardPage() {
 
         {/* Edit Form */}
         {editId && (
-          <form onSubmit={handleEditSave} className="bg-card border border-border rounded-2xl p-6 mb-8 space-y-4">
-            <h3 className="font-display font-bold text-foreground">{t('editListing')}</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <input required value={editForm.plate_number} onChange={e => setEditForm(p => ({ ...p, plate_number: e.target.value }))}
-                className="bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Plate Number" />
-              <select value={editForm.emirate} onChange={e => setEditForm(p => ({ ...p, emirate: e.target.value }))}
-                className="bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
-                {EMIRATES.map(em => <option key={em} value={em}>{em}</option>)}
-              </select>
-              <input value={editForm.plate_style} onChange={e => setEditForm(p => ({ ...p, plate_style: e.target.value }))}
-                className="bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Plate Style" />
-              <input type="number" value={editForm.price} onChange={e => setEditForm(p => ({ ...p, price: e.target.value }))}
-                className="bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Price (AED)" />
+          <form onSubmit={handleEditSave} className="bg-card border border-border rounded-2xl p-6 mb-8">
+            <h3 className="font-display font-bold text-foreground text-lg mb-5">{t('editListing')}</h3>
+
+            {/* Live plate preview */}
+            <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800/50 dark:to-gray-900/50 rounded-xl p-4 mb-6 flex items-center justify-center border border-border/50">
+              <div className="bg-white dark:bg-card border-2 border-gray-300 dark:border-border rounded-xl px-6 py-3">
+                <p className="font-mono font-black text-2xl text-foreground tracking-wider text-center">
+                  {editForm.plate_code && <span>{editForm.plate_code}</span>}
+                  {editForm.plate_code && editForm.plate_number && <span className="mx-2"> </span>}
+                  <span>{editForm.plate_number || '—'}</span>
+                </p>
+              </div>
             </div>
-            <textarea value={editForm.description} onChange={e => setEditForm(p => ({ ...p, description: e.target.value }))} rows={2}
-              className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none" placeholder="Description" />
+
+            <div className="grid grid-cols-12 gap-4 mb-4">
+              {/* Code */}
+              <div className="col-span-3">
+                <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Code</label>
+                <input
+                  value={editForm.plate_code}
+                  onChange={e => {
+                    const v = e.target.value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 2);
+                    setEditForm(p => ({ ...p, plate_code: v.toUpperCase() }));
+                  }}
+                  maxLength={2}
+                  className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground font-mono font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  placeholder="A"
+                />
+              </div>
+              {/* Number */}
+              <div className="col-span-5">
+                <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Number</label>
+                <input
+                  required
+                  value={editForm.plate_number}
+                  onChange={e => {
+                    const v = e.target.value.replace(/\D/g, '').slice(0, 5);
+                    setEditForm(p => ({ ...p, plate_number: v }));
+                  }}
+                  maxLength={5}
+                  className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground font-mono font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  placeholder="12345"
+                />
+              </div>
+              {/* Emirate */}
+              <div className="col-span-4">
+                <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Emirate</label>
+                <select value={editForm.emirate} onChange={e => setEditForm(p => ({ ...p, emirate: e.target.value }))}
+                  className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
+                  {EMIRATES.map(em => <option key={em} value={em}>{em}</option>)}
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Price (AED)</label>
+                <input type="number" value={editForm.price} onChange={e => setEditForm(p => ({ ...p, price: e.target.value }))}
+                  className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="22,000" />
+              </div>
+              <div>
+                <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Description</label>
+                <input value={editForm.description} onChange={e => setEditForm(p => ({ ...p, description: e.target.value }))}
+                  className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Optional description" />
+              </div>
+            </div>
+
             <div className="flex gap-3">
-              <button type="submit" disabled={saving} className="bg-primary text-primary-foreground px-6 py-2.5 rounded-xl text-sm font-bold disabled:opacity-50 flex items-center gap-2">
+              <button type="submit" disabled={saving}
+                className="bg-primary text-primary-foreground px-6 py-2.5 rounded-xl text-sm font-bold disabled:opacity-50 flex items-center gap-2 hover:bg-primary-hover transition-all">
                 {saving && <Loader2 className="h-4 w-4 animate-spin" />} {t('save')}
               </button>
-              <button type="button" onClick={() => setEditId(null)} className="bg-surface border border-border px-6 py-2.5 rounded-xl text-sm font-bold text-foreground">{t('cancel')}</button>
+              <button type="button" onClick={() => setEditId(null)}
+                className="bg-surface border border-border px-6 py-2.5 rounded-xl text-sm font-bold text-foreground hover:bg-surface-accent transition-colors">{t('cancel')}</button>
             </div>
           </form>
         )}
