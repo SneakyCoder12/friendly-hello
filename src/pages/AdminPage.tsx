@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
-import { Loader2, Users, FileText, BarChart3, Upload, Trash2, Eye, EyeOff, Search, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Loader2, Users, FileText, BarChart3, Upload, Trash2, Eye, EyeOff, Search, X, ChevronDown, ChevronUp, Smartphone } from 'lucide-react';
 
 interface UserProfile {
   id: string;
@@ -25,11 +25,24 @@ interface AdminListing {
 
 const EMIRATES = ['Abu Dhabi', 'Dubai', 'Sharjah', 'Ajman', 'Umm Al Quwain', 'Ras Al Khaimah', 'Fujairah'];
 
+interface AdminMobileNumber {
+  id: string;
+  phone_number: string;
+  carrier: string;
+  price: number | null;
+  status: string;
+  user_id: string;
+  created_at: string;
+  description: string | null;
+  contact_phone: string | null;
+}
+
 export default function AdminPage() {
   const { t } = useLanguage();
   const [tab, setTab] = useState<'analytics' | 'users' | 'listings' | 'bulk'>('analytics');
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [listings, setListings] = useState<AdminListing[]>([]);
+  const [mobileNumbers, setMobileNumbers] = useState<AdminMobileNumber[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Listings filters
@@ -51,12 +64,14 @@ export default function AdminPage() {
 
   const fetchAll = async () => {
     setLoading(true);
-    const [usersRes, listingsRes] = await Promise.all([
+    const [usersRes, listingsRes, mobileRes] = await Promise.all([
       supabase.from('profiles').select('*').order('created_at', { ascending: false }),
       supabase.from('listings').select('*').order('created_at', { ascending: false }),
+      supabase.from('mobile_numbers').select('*').order('created_at', { ascending: false }),
     ]);
     if (usersRes.data) setUsers(usersRes.data as UserProfile[]);
     if (listingsRes.data) setListings(listingsRes.data as unknown as AdminListing[]);
+    if (mobileRes.data) setMobileNumbers(mobileRes.data as unknown as AdminMobileNumber[]);
     setLoading(false);
   };
 
@@ -71,6 +86,19 @@ export default function AdminPage() {
   const toggleListingStatus = async (listing: AdminListing) => {
     const next = listing.status === 'active' ? 'hidden' : 'active';
     const { error } = await supabase.from('listings').update({ status: next }).eq('id', listing.id);
+    if (error) toast.error(error.message);
+    else fetchAll();
+  };
+
+  const deleteMobileNumber = async (id: string) => {
+    const { error } = await supabase.from('mobile_numbers').delete().eq('id', id);
+    if (error) toast.error(error.message);
+    else { toast.success('Mobile number deleted'); fetchAll(); }
+  };
+
+  const toggleMobileStatus = async (mn: AdminMobileNumber) => {
+    const next = mn.status === 'active' ? 'hidden' : 'active';
+    const { error } = await supabase.from('mobile_numbers').update({ status: next }).eq('id', mn.id);
     if (error) toast.error(error.message);
     else fetchAll();
   };
@@ -139,11 +167,13 @@ export default function AdminPage() {
       totalUsers: users.length,
       totalListings: listings.length,
       activeListings: listings.filter(l => l.status === 'active').length,
+      totalMobile: mobileNumbers.length,
+      activeMobile: mobileNumbers.filter(m => m.status === 'active').length,
       byEmirate,
       topUsers,
       recentActivity,
     };
-  }, [listings, users]);
+  }, [listings, mobileNumbers, users]);
 
   // Filtered listings
   const filteredListings = useMemo(() => {
@@ -199,11 +229,13 @@ export default function AdminPage() {
         {/* Analytics */}
         {tab === 'analytics' && (
           <div className="space-y-8">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4">
               {[
                 { label: t('totalUsers'), value: stats.totalUsers, color: 'text-blue-400' },
                 { label: t('totalListings'), value: stats.totalListings, color: 'text-emerald-400' },
                 { label: t('activeListingsCount'), value: stats.activeListings, color: 'text-amber-400' },
+                { label: 'Mobile Numbers', value: stats.totalMobile, color: 'text-purple-400' },
+                { label: 'Active Numbers', value: stats.activeMobile, color: 'text-pink-400' },
               ].map(stat => (
                 <div key={stat.label} className="bg-card border border-border rounded-2xl p-6">
                   <p className="text-sm text-muted-foreground font-bold uppercase tracking-wider mb-2">{stat.label}</p>
@@ -335,6 +367,8 @@ export default function AdminPage() {
               </select>
             </div>
             <div className="space-y-2">
+              {/* Plate Listings */}
+              {filteredListings.length > 0 && <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mt-4 mb-2">Plate Listings</h3>}
               {filteredListings.map(l => (
                 <div key={l.id} className="bg-card border border-border rounded-xl p-4 flex items-center justify-between gap-4">
                   <div className="flex-1 min-w-0">
@@ -361,6 +395,54 @@ export default function AdminPage() {
                   </div>
                 </div>
               ))}
+
+              {/* Mobile Number Listings */}
+              {mobileNumbers.length > 0 && <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mt-6 mb-2 flex items-center gap-2"><Smartphone className="h-4 w-4" /> Mobile Numbers</h3>}
+              {mobileNumbers
+                .filter(mn => {
+                  if (filterByUserId && mn.user_id !== filterByUserId) return false;
+                  if (listSearch) {
+                    const owner = users.find(u => u.id === mn.user_id);
+                    return (
+                      mn.phone_number.toLowerCase().includes(listSearch.toLowerCase()) ||
+                      (owner?.email || '').toLowerCase().includes(listSearch.toLowerCase()) ||
+                      (owner?.full_name || '').toLowerCase().includes(listSearch.toLowerCase())
+                    );
+                  }
+                  if (listStatusFilter && mn.status !== listStatusFilter) return false;
+                  return true;
+                })
+                .map(mn => (
+                  <div key={mn.id} className="bg-card border border-border rounded-xl p-4 flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                      <div className={`h-9 w-9 rounded-lg flex items-center justify-center overflow-hidden border ${mn.carrier === 'etisalat' ? 'border-emerald-200 bg-emerald-50' : 'border-blue-200 bg-blue-50'}`}>
+                        <img src={mn.carrier === 'etisalat' ? '/Eand_Logo.svg' : '/du-logo.png'} alt={mn.carrier} className="h-5 w-5 object-contain" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-3 mb-1 flex-wrap">
+                          <span className="font-mono font-bold text-foreground text-sm">{mn.phone_number}</span>
+                          <span className="text-muted-foreground text-xs capitalize">{mn.carrier}</span>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${mn.status === 'active' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20'}`}>
+                            {mn.status}
+                          </span>
+                          {mn.price && <span className="font-mono text-sm text-foreground">AED {mn.price.toLocaleString()}</span>}
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Added by <span className="text-foreground font-medium">{(() => { const o = users.find(u => u.id === mn.user_id); return o?.full_name || o?.email || 'Unknown'; })()}</span>
+                          {' • '}{new Date(mn.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button onClick={() => toggleMobileStatus(mn)} className="h-8 w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-muted-foreground hover:text-foreground">
+                        {mn.status === 'active' ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                      <button onClick={() => deleteMobileNumber(mn.id)} className="h-8 w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-red-400 hover:text-red-300">
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
             </div>
           </div>
         )}

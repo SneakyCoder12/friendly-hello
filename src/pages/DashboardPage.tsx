@@ -89,6 +89,14 @@ export default function DashboardPage() {
     contact_phone: '',
   });
   const [mobileDeleteId, setMobileDeleteId] = useState<string | null>(null);
+  const [mobileEditId, setMobileEditId] = useState<string | null>(null);
+  const [mobileEditForm, setMobileEditForm] = useState({
+    phone_number: '',
+    carrier: 'du' as 'du' | 'etisalat',
+    price: '',
+    description: '',
+    contact_phone: '',
+  });
 
   // Favorites
   interface FavoriteItem {
@@ -333,6 +341,37 @@ export default function DashboardPage() {
     const { error } = await supabase.from('mobile_numbers').update({ status: nextStatus }).eq('id', mn.id);
     if (error) toast.error(error.message);
     else fetchMobileNumbers();
+  };
+
+  const startMobileEdit = (mn: MobileNumber) => {
+    setMobileEditForm({
+      phone_number: mn.phone_number,
+      carrier: mn.carrier as 'du' | 'etisalat',
+      price: mn.price?.toString() || '',
+      description: mn.description || '',
+      contact_phone: mn.contact_phone || '',
+    });
+    setMobileEditId(mn.id);
+  };
+
+  const handleMobileEditSave = async () => {
+    if (!user || !mobileEditId) return;
+    if (!mobileEditForm.phone_number.trim()) { toast.error('Phone number is required'); return; }
+    if (!validateUAEMobile(mobileEditForm.phone_number)) {
+      toast.error('Enter a valid UAE number (e.g. 971 50 123 4567 or 050 123 4567)');
+      return;
+    }
+    setSaving(true);
+    const { error } = await supabase.from('mobile_numbers').update({
+      phone_number: mobileEditForm.phone_number.trim(),
+      carrier: mobileEditForm.carrier,
+      price: mobileEditForm.price ? Number(mobileEditForm.price) : null,
+      description: mobileEditForm.description || null,
+      contact_phone: mobileEditForm.contact_phone || null,
+    }).eq('id', mobileEditId);
+    if (error) toast.error(error.message);
+    else { toast.success('Number updated'); setMobileEditId(null); fetchMobileNumbers(); }
+    setSaving(false);
   };
 
   const statusColor = (s: string) => {
@@ -616,6 +655,70 @@ export default function DashboardPage() {
             </button>
           </div>
 
+          {/* Mobile Edit Form */}
+          {mobileEditId && (
+            <div className="bg-card border border-border rounded-2xl p-6 mb-8">
+              <h3 className="text-sm font-bold text-foreground mb-5">Edit Mobile Number</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Carrier</label>
+                  <div className="flex gap-2">
+                    <button type="button" onClick={() => setMobileEditForm(f => ({ ...f, carrier: 'du' }))}
+                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border text-sm font-bold transition-all ${mobileEditForm.carrier === 'du'
+                        ? 'bg-blue-50 border-blue-300 text-blue-700 ring-2 ring-blue-200 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-300'
+                        : 'bg-surface border-border text-muted-foreground hover:border-gray-400'}`}>
+                      <img src="/du-logo.png" alt="Du" className="h-5 w-5 object-contain" /> Du
+                    </button>
+                    <button type="button" onClick={() => setMobileEditForm(f => ({ ...f, carrier: 'etisalat' }))}
+                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border text-sm font-bold transition-all ${mobileEditForm.carrier === 'etisalat'
+                        ? 'bg-emerald-50 border-emerald-300 text-emerald-700 ring-2 ring-emerald-200 dark:bg-emerald-900/30 dark:border-emerald-500 dark:text-emerald-300'
+                        : 'bg-surface border-border text-muted-foreground hover:border-gray-400'}`}>
+                      <img src="/Eand_Logo.svg" alt="e&" className="h-5 w-5 object-contain" /> e&
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Phone Number</label>
+                  <input value={mobileEditForm.phone_number}
+                    onChange={e => setMobileEditForm(f => ({ ...f, phone_number: e.target.value }))}
+                    className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground font-mono focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    placeholder="050 123 4567" />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Price (AED)</label>
+                  <input type="number" value={mobileEditForm.price}
+                    onChange={e => setMobileEditForm(f => ({ ...f, price: e.target.value }))}
+                    className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    placeholder="99,399" />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Description</label>
+                  <input value={mobileEditForm.description}
+                    onChange={e => setMobileEditForm(f => ({ ...f, description: e.target.value }))}
+                    className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    placeholder="Optional description" />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Your Contact Phone</label>
+                  <input value={mobileEditForm.contact_phone}
+                    onChange={e => setMobileEditForm(f => ({ ...f, contact_phone: e.target.value }))}
+                    className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    placeholder="Auto-filled from profile" />
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <button onClick={handleMobileEditSave} disabled={saving}
+                  className="bg-primary text-primary-foreground px-6 py-2.5 rounded-xl text-sm font-bold disabled:opacity-50 flex items-center gap-2 hover:bg-primary-hover transition-all">
+                  {saving && <Loader2 className="h-4 w-4 animate-spin" />} Save Changes
+                </button>
+                <button onClick={() => setMobileEditId(null)}
+                  className="bg-surface border border-border px-6 py-2.5 rounded-xl text-sm font-bold text-foreground hover:bg-surface-accent transition-colors">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Mobile Add Form */}
           {showMobileForm && (
             <div className="bg-card border border-border rounded-2xl p-6 mb-8">
@@ -745,6 +848,9 @@ export default function DashboardPage() {
                       title={mn.status === 'active' ? 'Mark as sold' : 'Mark as active'}
                     >
                       {mn.status === 'active' ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                    </button>
+                    <button onClick={() => startMobileEdit(mn)} className="h-8 w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+                      <Pencil className="h-4 w-4" />
                     </button>
                     <button onClick={() => setMobileDeleteId(mn.id)}
                       className="h-8 w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-red-400 hover:text-red-300 transition-colors">

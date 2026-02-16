@@ -106,40 +106,55 @@ export default function MobileNumbersPage() {
         <div className="min-h-screen bg-white">
             <div className="max-w-7xl mx-auto px-4 py-8 pt-24">
 
-                {/* ─── Elegant White Banner ─── */}
-                <div className="relative rounded-3xl overflow-hidden mb-10 bg-gradient-to-br from-gray-50 via-white to-gray-50 border border-gray-200 shadow-sm">
-                    {/* Decorative circles */}
-                    <div className="absolute -top-20 -right-20 w-60 h-60 rounded-full bg-gradient-to-br from-blue-100/60 to-emerald-100/40 blur-3xl" />
-                    <div className="absolute -bottom-20 -left-20 w-60 h-60 rounded-full bg-gradient-to-tr from-emerald-100/50 to-blue-100/30 blur-3xl" />
+                {/* ─── Premium Mobile Numbers Banner ─── */}
+                <div className="relative rounded-3xl overflow-hidden mb-10 border border-gray-200/60 shadow-sm" style={{ background: 'linear-gradient(135deg, #fafaf9 0%, #ffffff 30%, #f5f3ef 60%, #faf8f5 100%)' }}>
+                    {/* Skyline silhouette overlay (right) */}
+                    <div className="absolute inset-0 opacity-[0.06]"
+                        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 200'%3E%3Cpath d='M0,200 L0,180 L30,180 L30,120 L35,120 L35,100 L40,100 L40,120 L45,120 L45,180 L80,180 L80,140 L85,140 L85,60 L87,55 L89,60 L89,140 L95,140 L95,180 L130,180 L130,150 L140,150 L140,130 L150,130 L150,150 L160,150 L160,180 L200,180 L200,160 L210,160 L210,40 L213,10 L216,40 L216,160 L220,160 L220,180 L260,180 L260,150 L280,150 L280,130 L290,130 L290,170 L310,170 L310,140 L325,140 L325,170 L340,170 L340,180 L380,180 L380,160 L400,160 L400,120 L405,120 L405,80 L410,75 L415,80 L415,120 L420,120 L420,160 L440,160 L440,180 L500,180 L500,140 L520,140 L520,110 L540,110 L540,140 L560,140 L560,180 L600,180 L600,155 L620,155 L620,130 L630,130 L630,155 L650,155 L650,180 L700,180 L700,160 L730,160 L730,140 L750,140 L750,160 L780,160 L780,180 L800,180 L800,200 Z' fill='%23000' opacity='0.5'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right bottom', backgroundSize: '70% auto' }} />
+
+                    {/* Warm golden glow effects */}
+                    <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-gradient-to-br from-amber-100/40 to-orange-50/20 blur-3xl" />
+                    <div className="absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-gradient-to-tr from-amber-50/30 to-yellow-50/10 blur-3xl" />
+
+                    {/* Floating phone numbers (decorative) */}
+                    <div className="absolute top-3 right-[12%] text-amber-300/[0.08] text-2xl font-mono font-black tracking-widest select-none hidden md:block" style={{ transform: 'rotate(-5deg)' }}>050 777 7777</div>
+                    <div className="absolute top-14 right-[3%] text-amber-300/[0.08] text-xl font-mono font-black tracking-widest select-none hidden md:block" style={{ transform: 'rotate(4deg)' }}>052 999 0000</div>
+                    <div className="absolute bottom-6 right-[10%] text-amber-300/[0.08] text-lg font-mono font-black tracking-widest select-none hidden md:block" style={{ transform: 'rotate(-3deg)' }}>053 777 777777</div>
+                    <div className="absolute bottom-16 left-[50%] text-amber-300/[0.06] text-base font-mono font-black tracking-widest select-none hidden md:block" style={{ transform: 'rotate(6deg)' }}>055 111 1111</div>
+
                     {/* Fine dot pattern */}
-                    <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, #000 0.5px, transparent 0.5px)', backgroundSize: '18px 18px' }} />
+                    <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(circle, #000 0.5px, transparent 0.5px)', backgroundSize: '16px 16px' }} />
+
+                    {/* UAE flag stripe accent (top) */}
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 via-white to-red-500 opacity-30" />
 
                     <div className="relative px-8 md:px-14 py-12 md:py-16 flex flex-col md:flex-row items-center gap-8">
-                        <div className="flex-1 text-center md:text-start">
-                            <div className="flex items-center gap-2 mb-3 justify-center md:justify-start">
-                                <Smartphone className="h-4 w-4 text-gray-400" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">VIP Collection</span>
+                        {/* Left: Text content */}
+                        <div className="flex-1 text-center md:text-start z-10">
+                            <div className="inline-flex items-center gap-2 mb-4 px-4 py-1.5 rounded-full border border-amber-200/80 bg-gradient-to-r from-amber-50 to-white">
+                                <Star className="h-3.5 w-3.5 text-amber-500" />
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-600">VIP Numbers</span>
                             </div>
-                            <h1 className="text-3xl md:text-4xl font-display font-black text-gray-900 tracking-tight mb-3">
-                                Premium Mobile Numbers
+                            <h1 className="text-3xl md:text-5xl font-display font-black text-gray-900 tracking-tight mb-3 leading-tight">
+                                Premium Mobile<br />Numbers
                             </h1>
-                            <p className="text-gray-500 text-sm md:text-base leading-relaxed max-w-lg">
-                                Browse exclusive Du and Etisalat VIP numbers. Find the perfect number that stands out.
+                            <p className="text-gray-500 text-sm md:text-base leading-relaxed max-w-md">
+                                Browse exclusive Du and Etisalat VIP numbers.<br className="hidden md:block" /> Find the perfect number that stands out.
                             </p>
                             <Link
                                 to="/marketplace"
-                                className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-gray-700 hover:text-gray-900 transition-colors border border-gray-200 rounded-full px-5 py-2.5 bg-white hover:bg-gray-50 shadow-sm"
+                                className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-gray-700 hover:text-gray-900 transition-colors border border-gray-200 rounded-full px-5 py-2.5 bg-white hover:bg-gray-50 shadow-sm"
                             >
                                 Browse Plate Numbers <ArrowRight className="h-3.5 w-3.5" />
                             </Link>
                         </div>
-                        {/* Carrier Logos */}
-                        <div className="flex gap-4">
-                            <div className="h-20 w-20 rounded-2xl bg-white border border-gray-200 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow">
-                                <img src="/du-logo.png" alt="Du" className="h-10 w-10 object-contain" />
+                        {/* Right: Carrier Logos */}
+                        <div className="flex gap-5 z-10">
+                            <div className="h-24 w-24 rounded-2xl bg-white border border-gray-200 flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow hover:-translate-y-1 transform duration-300">
+                                <img src="/du-logo.png" alt="Du" className="h-12 w-12 object-contain" />
                             </div>
-                            <div className="h-20 w-20 rounded-2xl bg-white border border-gray-200 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow">
-                                <img src="/Eand_Logo.svg" alt="Etisalat" className="h-10 w-10 object-contain" />
+                            <div className="h-24 w-24 rounded-2xl bg-white border border-gray-200 flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow hover:-translate-y-1 transform duration-300">
+                                <img src="/Eand_Logo.svg" alt="Etisalat" className="h-12 w-12 object-contain" />
                             </div>
                         </div>
                     </div>
@@ -207,8 +222,8 @@ export default function MobileNumbersPage() {
                                     {/* Top row: carrier badge + fav */}
                                     <div className="flex justify-between items-center mb-5">
                                         <span className={`inline-flex items-center gap-1.5 text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider border ${item.carrier === 'etisalat'
-                                                ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
-                                                : 'bg-blue-50 border-blue-200 text-blue-700'
+                                            ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                                            : 'bg-blue-50 border-blue-200 text-blue-700'
                                             }`}>
                                             <img
                                                 src={item.carrier === 'etisalat' ? '/Eand_Logo.svg' : '/du-logo.png'}
