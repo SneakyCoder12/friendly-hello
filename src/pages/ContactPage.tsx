@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Send, CheckCircle, MapPin, Phone, Mail } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import Footer from '@/components/Footer';
 
 export default function ContactPage() {
   const { t } = useLanguage();
@@ -108,7 +107,6 @@ export default function ContactPage() {
           </div>
         </div>
       </div>
-      <Footer />
     </>
   );
 }

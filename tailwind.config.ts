@@ -41,6 +41,9 @@ export default {
         card: "0 4px 6px -1px rgba(0, 0, 0, 0.15), 0 2px 4px -1px rgba(0, 0, 0, 0.1)",
         "card-hover": "0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1)",
       },
+      transitionDuration: {
+        '400': '400ms',
+      },
     },
   },
   plugins: [],

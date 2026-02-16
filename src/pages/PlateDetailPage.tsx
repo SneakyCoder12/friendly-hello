@@ -1,6 +1,7 @@
 import { useParams, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { Phone, MessageCircle, Shield, ArrowLeft, Share2, Car, X as XIcon } from 'lucide-react';
+import ListWithUsBanner from '@/components/ListWithUsBanner';
 import { usePlateImage } from '@/hooks/usePlateGenerator';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -210,9 +211,9 @@ export default function PlateDetailPage() {
                                             alt={`${emirateDisplay} ${code} ${number} on car`}
                                             className="absolute drop-shadow-lg"
                                             style={{
-                                                width: '14%',
-                                                top: '76%',
-                                                left: '58%',
+                                                width: '17%',
+                                                top: '71%',
+                                                left: '73%',
                                                 transform: 'translate(-50%, -50%) perspective(600px) rotateX(4deg) rotateY(-3deg) rotateZ(-1deg)',
                                                 filter: 'brightness(0.92) contrast(1.05)',
                                                 imageRendering: '-webkit-optimize-contrast',
@@ -322,6 +323,9 @@ export default function PlateDetailPage() {
                         </div>
                     </div>
                 </div>
+
+                {/* List With Us Banner */}
+                <ListWithUsBanner />
             </div>
         </div>
     );

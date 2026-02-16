@@ -5,6 +5,8 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import AnimatedPage from '@/components/AnimatedPage';
 import { Loader2 } from 'lucide-react';
 
 const HomePage = lazy(() => import('@/pages/HomePage'));
@@ -37,22 +39,25 @@ export default function App() {
           <div className="flex flex-col min-h-screen">
             <Navbar />
             <Suspense fallback={<Loading />}>
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/marketplace" element={<MarketplacePage />} />
-                <Route path="/mobile-numbers" element={<MobileNumbersPage />} />
-                <Route path="/mobile-number/:numberId" element={<MobileNumberDetailPage />} />
-                <Route path="/plate/:plateId" element={<PlateDetailPage />} />
-                <Route path="/request" element={<RequestPage />} />
-                <Route path="/contact" element={<ContactPage />} />
-                <Route path="/visualizer" element={<VisualizerPage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/signup" element={<SignupPage />} />
-                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-                <Route path="/dashboard/admin" element={<ProtectedRoute adminOnly><AdminPage /></ProtectedRoute>} />
-              </Routes>
+              <AnimatedPage>
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/marketplace" element={<MarketplacePage />} />
+                  <Route path="/mobile-numbers" element={<MobileNumbersPage />} />
+                  <Route path="/mobile-number/:numberId" element={<MobileNumberDetailPage />} />
+                  <Route path="/plate/:plateId" element={<PlateDetailPage />} />
+                  <Route path="/request" element={<RequestPage />} />
+                  <Route path="/contact" element={<ContactPage />} />
+                  <Route path="/visualizer" element={<VisualizerPage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/signup" element={<SignupPage />} />
+                  <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                  <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+                  <Route path="/dashboard/admin" element={<ProtectedRoute adminOnly><AdminPage /></ProtectedRoute>} />
+                </Routes>
+              </AnimatedPage>
             </Suspense>
+            <Footer />
           </div>
           <Toaster position="top-center" richColors />
         </BrowserRouter>

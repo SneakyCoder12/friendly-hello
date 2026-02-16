@@ -3,7 +3,7 @@ import NoticeBanner from '@/components/NoticeBanner';
 import PlateListings from '@/components/PlateListings';
 import MobileNumbers from '@/components/MobileNumbers';
 import RequestBanner from '@/components/RequestBanner';
-import Footer from '@/components/Footer';
+import ListWithUsBanner from '@/components/ListWithUsBanner';
 
 export default function HomePage() {
   return (
@@ -14,8 +14,8 @@ export default function HomePage() {
         <PlateListings />
         <MobileNumbers />
         <RequestBanner />
+        <ListWithUsBanner />
       </main>
-      <Footer />
     </>
   );
 }

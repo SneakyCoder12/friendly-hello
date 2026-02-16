@@ -1,5 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import ListWithUsBanner from '@/components/ListWithUsBanner';
 import { Phone, MessageCircle, Shield, ArrowLeft, Share2, Heart } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -196,8 +197,8 @@ export default function MobileNumberDetailPage() {
 
                             {/* Carrier Badge */}
                             <div className={`mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold border ${listing.carrier === 'etisalat'
-                                    ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
-                                    : 'bg-blue-50 border-blue-200 text-blue-700'
+                                ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                                : 'bg-blue-50 border-blue-200 text-blue-700'
                                 }`}>
                                 <img src={carrierLogo} alt="" className="h-4 w-4 object-contain" />
                                 {carrierDisplay} • VIP Number
@@ -292,6 +293,11 @@ export default function MobileNumberDetailPage() {
                         </div>
                     </div>
                 </div>
+            </div>
+
+            {/* List With Us Banner */}
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                <ListWithUsBanner />
             </div>
         </div>
     );

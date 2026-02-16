@@ -2,8 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Search, ChevronLeft, ChevronRight, Loader2, X, Smartphone, Star, Phone, MessageCircle, Heart, ArrowRight } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Loader2, X, Smartphone, Star, Heart, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
+import MobileNumberCard from '@/components/MobileNumberCard';
 
 const PAGE_SIZE = 12;
 
@@ -205,78 +206,19 @@ export default function MobileNumbersPage() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-                        {listings.map(item => {
-                            const isFav = favoriteIds.has(item.id);
-                            const phoneDigits = item.contact_phone?.replace(/\D/g, '') || '';
-                            const whatsappUrl = phoneDigits
-                                ? `https://wa.me/${phoneDigits}?text=${encodeURIComponent(`Hi, I'm interested in the number ${item.phone_number}.`)}`
-                                : null;
-                            const telUrl = phoneDigits ? `tel:+${phoneDigits}` : null;
-
-                            return (
-                                <Link
-                                    key={item.id}
-                                    to={`/mobile-number/${item.id}`}
-                                    className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg hover:border-gray-300 transition-all duration-300 group block"
-                                >
-                                    {/* Top row: carrier badge + fav */}
-                                    <div className="flex justify-between items-center mb-5">
-                                        <span className={`inline-flex items-center gap-1.5 text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider border ${item.carrier === 'etisalat'
-                                            ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
-                                            : 'bg-blue-50 border-blue-200 text-blue-700'
-                                            }`}>
-                                            <img
-                                                src={item.carrier === 'etisalat' ? '/Eand_Logo.svg' : '/du-logo.png'}
-                                                alt={item.carrier}
-                                                className="h-4 w-4 object-contain"
-                                            />
-                                            {item.carrier === 'etisalat' ? 'e&' : 'du'}
-                                        </span>
-                                        <button
-                                            onClick={(e) => toggleFavorite(e, item.id)}
-                                            className="h-8 w-8 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center hover:bg-red-50 hover:border-red-200 transition-all"
-                                        >
-                                            <Heart className={`h-3.5 w-3.5 transition-colors ${isFav ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
-                                        </button>
-                                    </div>
-
-                                    {/* Number */}
-                                    <p className="text-2xl font-black tracking-widest text-gray-900 mb-2 font-mono group-hover:text-gray-700 transition-colors">
-                                        {item.phone_number}
-                                    </p>
-
-                                    {/* Description */}
-                                    {item.description && (
-                                        <p className="text-xs text-gray-400 mb-3 line-clamp-2">{item.description}</p>
-                                    )}
-
-                                    <div className="h-px w-full bg-gray-100 my-4" />
-
-                                    {/* Price */}
-                                    <p className="text-gray-900 font-mono font-bold text-xl mb-4">
-                                        {item.price ? `AED ${item.price.toLocaleString()}` : 'Call for Price'}
-                                    </p>
-
-                                    {/* Action Buttons */}
-                                    <div className="flex gap-2">
-                                        {telUrl && (
-                                            <span
-                                                onClick={(e) => { e.preventDefault(); window.location.href = telUrl; }}
-                                                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-gray-900 text-white text-xs font-bold hover:bg-gray-800 transition-all cursor-pointer">
-                                                <Phone className="h-3.5 w-3.5" /> Call
-                                            </span>
-                                        )}
-                                        {whatsappUrl && (
-                                            <span
-                                                onClick={(e) => { e.preventDefault(); window.open(whatsappUrl, '_blank'); }}
-                                                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 transition-all cursor-pointer">
-                                                <MessageCircle className="h-3.5 w-3.5" /> WhatsApp
-                                            </span>
-                                        )}
-                                    </div>
-                                </Link>
-                            );
-                        })}
+                        {listings.map(item => (
+                            <MobileNumberCard
+                                key={item.id}
+                                id={item.id}
+                                phoneNumber={item.phone_number}
+                                carrier={item.carrier}
+                                price={item.price}
+                                description={item.description}
+                                contactPhone={item.contact_phone}
+                                isFavorite={favoriteIds.has(item.id)}
+                                onToggleFavorite={toggleFavorite}
+                            />
+                        ))}
                     </div>
                 )}
 

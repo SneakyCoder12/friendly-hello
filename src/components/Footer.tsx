@@ -11,8 +11,11 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
           <div className="col-span-1 md:col-span-2 pr-0 md:pr-12">
             <div className="flex items-center gap-3 mb-6">
-              <img src="/Logo.png" alt="Al Nuami" className="h-14 w-auto object-contain" />
-              <span className="font-display font-black text-2xl text-foreground">AL NUAMI</span>
+              <img src="/Logo.png" alt="Alnuami Groups" className="h-20 w-auto object-contain" />
+              <div className="leading-none">
+                <span className="font-display font-black text-2xl text-foreground">ALNUAMI</span>
+                <p className="text-[8px] font-bold uppercase tracking-[0.3em] text-muted-foreground -mt-0.5" style={{ paddingLeft: '61.5%' }}>Groups</p>
+              </div>
             </div>
             <p className="text-muted-foreground leading-relaxed text-sm">
               {t('footerDesc')}
