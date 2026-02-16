@@ -8,7 +8,7 @@ interface SupabaseListing {
   emirate: string;
   plate_style: string | null;
   price: number | null;
-  profiles?: { phone_number: string | null } | null;
+  contact_phone?: string | null;
 }
 
 interface Props {
@@ -51,7 +51,7 @@ export default function EmirateSection({ section, listings }: Props) {
                 number={number}
                 price={listing.price ? `AED ${listing.price.toLocaleString()}` : undefined}
                 plateUrl={`/plate/${listing.id}`}
-                sellerPhone={listing.profiles?.phone_number}
+                sellerPhone={listing.contact_phone}
                 plateNumber={listing.plate_number}
               />
             );

@@ -22,7 +22,7 @@ interface ListingWithSeller {
   status: string;
   created_at: string;
   user_id: string;
-  profiles: { full_name: string | null; phone_number: string | null } | null;
+  contact_phone: string | null;
 }
 
 export default function MarketplacePage() {
@@ -50,7 +50,7 @@ export default function MarketplacePage() {
     setLoading(true);
     let query = supabase
       .from('listings')
-      .select('*, profiles!listings_user_id_fkey(full_name, phone_number)', { count: 'exact' })
+      .select('*', { count: 'exact' })
       .eq('status', 'active')
       .order('created_at', { ascending: false })
       .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
@@ -132,7 +132,7 @@ export default function MarketplacePage() {
                   number={number}
                   price={listing.price ? `AED ${listing.price.toLocaleString()}` : undefined}
                   plateUrl={`/plate/${listing.id}`}
-                  sellerPhone={listing.profiles?.phone_number}
+                  sellerPhone={listing.contact_phone}
                   plateNumber={listing.plate_number}
                 />
               );

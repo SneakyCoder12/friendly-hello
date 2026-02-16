@@ -21,7 +21,6 @@ interface AdminListing {
   status: string;
   user_id: string;
   created_at: string;
-  profiles: { full_name: string | null; phone_number: string | null; email: string | null } | null;
 }
 
 const EMIRATES = ['Abu Dhabi', 'Dubai', 'Sharjah', 'Ajman', 'Umm Al Quwain', 'Ras Al Khaimah', 'Fujairah'];
@@ -54,7 +53,7 @@ export default function AdminPage() {
     setLoading(true);
     const [usersRes, listingsRes] = await Promise.all([
       supabase.from('profiles').select('*').order('created_at', { ascending: false }),
-      supabase.from('listings').select('*, profiles!listings_user_id_fkey(full_name, phone_number, email)').order('created_at', { ascending: false }),
+      supabase.from('listings').select('*').order('created_at', { ascending: false }),
     ]);
     if (usersRes.data) setUsers(usersRes.data as UserProfile[]);
     if (listingsRes.data) setListings(listingsRes.data as unknown as AdminListing[]);
@@ -129,7 +128,8 @@ export default function AdminPage() {
     const byUser: Record<string, { name: string; count: number }> = {};
     listings.forEach(l => {
       byEmirate[l.emirate] = (byEmirate[l.emirate] || 0) + 1;
-      const uName = l.profiles?.full_name || l.profiles?.email || 'Unknown';
+      const owner = users.find(u => u.id === l.user_id);
+      const uName = owner?.full_name || owner?.email || 'Unknown';
       if (!byUser[l.user_id]) byUser[l.user_id] = { name: uName, count: 0 };
       byUser[l.user_id].count++;
     });
@@ -149,16 +149,19 @@ export default function AdminPage() {
   const filteredListings = useMemo(() => {
     let result = [...listings];
     if (filterByUserId) result = result.filter(l => l.user_id === filterByUserId);
-    if (listSearch) result = result.filter(l =>
-      l.plate_number.toLowerCase().includes(listSearch.toLowerCase()) ||
-      l.profiles?.email?.toLowerCase().includes(listSearch.toLowerCase()) ||
-      l.profiles?.full_name?.toLowerCase().includes(listSearch.toLowerCase())
-    );
+    if (listSearch) result = result.filter(l => {
+      const owner = users.find(u => u.id === l.user_id);
+      return (
+        l.plate_number.toLowerCase().includes(listSearch.toLowerCase()) ||
+        (owner?.email || '').toLowerCase().includes(listSearch.toLowerCase()) ||
+        (owner?.full_name || '').toLowerCase().includes(listSearch.toLowerCase())
+      );
+    });
     if (listEmirateFilter) result = result.filter(l => l.emirate === listEmirateFilter);
     if (listStatusFilter) result = result.filter(l => l.status === listStatusFilter);
     if (listSort === 'price') result.sort((a, b) => (b.price || 0) - (a.price || 0));
     return result;
-  }, [listings, listSearch, listEmirateFilter, listStatusFilter, listSort, filterByUserId]);
+  }, [listings, users, listSearch, listEmirateFilter, listStatusFilter, listSort, filterByUserId]);
 
   // Filtered users
   const filteredUsers = useMemo(() => {
@@ -242,7 +245,7 @@ export default function AdminPage() {
                 {stats.recentActivity.map(l => (
                   <div key={l.id} className="flex items-center justify-between text-sm py-2 border-b border-border/30 last:border-0">
                     <span className="text-muted-foreground">
-                      <span className="text-foreground font-medium">{l.profiles?.full_name || l.profiles?.email || 'User'}</span> added <span className="font-mono text-foreground">{l.plate_number}</span>
+                      <span className="text-foreground font-medium">{(() => { const o = users.find(u => u.id === l.user_id); return o?.full_name || o?.email || 'User'; })()}</span> added <span className="font-mono text-foreground">{l.plate_number}</span>
                     </span>
                     <span className="text-xs text-muted-foreground">{new Date(l.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                   </div>
@@ -344,7 +347,7 @@ export default function AdminPage() {
                       {l.price && <span className="font-mono text-sm text-foreground">AED {l.price.toLocaleString()}</span>}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Added by <span className="text-foreground font-medium">{l.profiles?.full_name || l.profiles?.email || 'Unknown'}</span>
+                      Added by <span className="text-foreground font-medium">{(() => { const o = users.find(u => u.id === l.user_id); return o?.full_name || o?.email || 'Unknown'; })()}</span>
                       {' • '}{new Date(l.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </p>
                   </div>
