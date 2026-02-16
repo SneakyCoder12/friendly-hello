@@ -136,14 +136,6 @@ export default function PlateDetailPage() {
                             </div>
                         </div>
 
-                        {/* Request to Buy */}
-                        <Link
-                            to="/request"
-                            className="block text-center w-full bg-white text-gray-900 border-2 border-gray-200 py-3.5 rounded-xl font-bold text-sm hover:bg-gray-50 hover:border-gray-400 transition-all"
-                        >
-                            Request this Plate
-                        </Link>
-
                         {/* Disclaimer */}
                         <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
                             <Shield className="h-5 w-5 text-gray-400 flex-shrink-0 mt-0.5" />

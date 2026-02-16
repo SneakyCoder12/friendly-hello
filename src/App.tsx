@@ -11,6 +11,8 @@ const HomePage = lazy(() => import('@/pages/HomePage'));
 const MarketplacePage = lazy(() => import('@/pages/MarketplacePage'));
 const PlateDetailPage = lazy(() => import('@/pages/PlateDetailPage'));
 const RequestPage = lazy(() => import('@/pages/RequestPage'));
+const ContactPage = lazy(() => import('@/pages/ContactPage'));
+const VisualizerPage = lazy(() => import('@/pages/VisualizerPage'));
 const LoginPage = lazy(() => import('@/pages/LoginPage'));
 const SignupPage = lazy(() => import('@/pages/SignupPage'));
 const ForgotPasswordPage = lazy(() => import('@/pages/ForgotPasswordPage'));
@@ -38,6 +40,8 @@ export default function App() {
                 <Route path="/marketplace" element={<MarketplacePage />} />
                 <Route path="/plate/:plateId" element={<PlateDetailPage />} />
                 <Route path="/request" element={<RequestPage />} />
+                <Route path="/contact" element={<ContactPage />} />
+                <Route path="/visualizer" element={<VisualizerPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignupPage />} />
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />

@@ -1,4 +1,5 @@
-import { LayoutGrid, Facebook, Camera, AtSign } from 'lucide-react';
+import { Facebook, Camera, AtSign } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Footer() {
@@ -10,9 +11,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
           <div className="col-span-1 md:col-span-2 pr-0 md:pr-12">
             <div className="flex items-center gap-3 mb-6">
-              <div className="h-10 w-10 bg-primary/10 rounded-lg flex items-center justify-center border border-primary/20">
-                <LayoutGrid className="h-5 w-5 text-primary" />
-              </div>
+              <img src="/Logo.png" alt="Al Nuami" className="h-14 w-auto object-contain" />
               <span className="font-display font-black text-2xl text-foreground">AL NUAMI</span>
             </div>
             <p className="text-muted-foreground leading-relaxed text-sm">
@@ -22,18 +21,19 @@ export default function Footer() {
           <div>
             <h4 className="font-bold text-foreground mb-6 text-sm uppercase tracking-wider">{t('marketplaceTitle')}</h4>
             <ul className="space-y-4 text-sm text-muted-foreground font-medium">
-              <li><a className="hover:text-primary transition-colors" href="/marketplace">Abu Dhabi Plates</a></li>
-              <li><a className="hover:text-primary transition-colors" href="/marketplace">Dubai Plates</a></li>
-              <li><a className="hover:text-primary transition-colors" href="/marketplace">Sharjah Plates</a></li>
+              <li><Link className="hover:text-primary transition-colors" to="/marketplace?emirate=Abu+Dhabi">Abu Dhabi Plates</Link></li>
+              <li><Link className="hover:text-primary transition-colors" to="/marketplace?emirate=Dubai">Dubai Plates</Link></li>
+              <li><Link className="hover:text-primary transition-colors" to="/marketplace?emirate=Sharjah">Sharjah Plates</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-bold text-foreground mb-6 text-sm uppercase tracking-wider">{t('supportTitle')}</h4>
             <ul className="space-y-4 text-sm text-muted-foreground font-medium">
-              <li><a className="hover:text-primary transition-colors" href="#">{t('contactUs')}</a></li>
+              <li><Link className="hover:text-primary transition-colors" to="/contact">{t('contactUs')}</Link></li>
+              <li><Link className="hover:text-primary transition-colors" to="/request">{t('submitRequest') || 'Submit Request'}</Link></li>
+              <li><Link className="hover:text-primary transition-colors" to="/visualizer">{t('generator')}</Link></li>
               <li><a className="hover:text-primary transition-colors" href="#">{t('terms')}</a></li>
               <li><a className="hover:text-primary transition-colors" href="#">{t('privacy')}</a></li>
-              <li><a className="hover:text-primary transition-colors" href="#">{t('faq')}</a></li>
             </ul>
           </div>
         </div>
