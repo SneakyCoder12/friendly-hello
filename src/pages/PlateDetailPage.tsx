@@ -1,34 +1,99 @@
 import { useParams, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { Phone, MessageCircle, Shield, ArrowLeft, Share2 } from 'lucide-react';
 import { usePlateImage } from '@/hooks/usePlateGenerator';
-import { LISTINGS } from '@/data/listings';
+import { supabase } from '@/integrations/supabase/client';
+
+const EMIRATE_KEY_MAP: Record<string, string> = {
+    'Abu Dhabi': 'abudhabi',
+    'Dubai': 'dubai',
+    'Sharjah': 'sharjah',
+    'Ajman': 'ajman',
+    'Umm Al Quwain': 'umm_al_quwain',
+    'Ras Al Khaimah': 'rak',
+    'Fujairah': 'fujairah',
+};
+
+interface ListingDetail {
+    id: string;
+    plate_number: string;
+    emirate: string;
+    plate_style: string | null;
+    price: number | null;
+    description: string | null;
+    contact_phone: string | null;
+    contact_email: string | null;
+    created_at: string;
+    user_id: string;
+}
+
+interface SellerProfile {
+    full_name: string | null;
+    phone_number: string | null;
+    email: string | null;
+    created_at: string | null;
+}
 
 export default function PlateDetailPage() {
     const { plateId } = useParams<{ plateId: string }>();
+    const [listing, setListing] = useState<ListingDetail | null>(null);
+    const [seller, setSeller] = useState<SellerProfile | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    // Parse plateId format: "dubai-A-333"
-    const parts = plateId?.split('-') || [];
-    const emirate = parts[0] || '';
-    const code = parts[1] || '';
-    const number = parts.slice(2).join('-') || '';
+    useEffect(() => {
+        if (!plateId) return;
+        (async () => {
+            setLoading(true);
+            // Fetch listing by UUID
+            const { data, error: fetchError } = await supabase
+                .from('listings')
+                .select('*')
+                .eq('id', plateId)
+                .single();
 
-    // Find matching listing
-    const listing = LISTINGS.find(
-        (l) => l.emirate === emirate && l.code === code && l.number === number
-    );
+            if (fetchError || !data) {
+                setError('Listing not found');
+                setLoading(false);
+                return;
+            }
 
-    const dataUrl = usePlateImage(emirate, code, number);
+            const listingData = data as unknown as ListingDetail;
+            setListing(listingData);
 
-    // Mock seller info
-    const seller = {
-        name: 'Al Nuami Groups',
-        phone: '+971 50 123 4567',
-        whatsapp: '971501234567',
-        location: 'UAE',
-        memberSince: '2024',
-    };
+            // Fetch seller profile
+            const { data: profileData } = await supabase
+                .from('profiles')
+                .select('full_name, phone_number, email, created_at')
+                .eq('id', listingData.user_id)
+                .single();
 
-    const emirateDisplay = emirate.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+            if (profileData) {
+                setSeller(profileData as SellerProfile);
+            }
+            setLoading(false);
+        })();
+    }, [plateId]);
+
+    // Parse plate_number → code + number (e.g. "A 12345" → code="A", number="12345")
+    const parts = listing?.plate_number?.split(' ') || [];
+    const code = parts.length > 1 ? parts[0] : '';
+    const number = parts.length > 1 ? parts.slice(1).join(' ') : parts[0] || '';
+    const emirateKey = listing ? (EMIRATE_KEY_MAP[listing.emirate] || listing.emirate.toLowerCase().replace(/\s+/g, '_')) : '';
+    const emirateDisplay = listing?.emirate || '';
+
+    const dataUrl = usePlateImage(emirateKey, code, number);
+
+    // Contact info — prefer listing contact_phone, fall back to seller phone_number
+    const phone = listing?.contact_phone || seller?.phone_number || '';
+    const phoneDigits = phone.replace(/\D/g, '');
+    const telUrl = phoneDigits ? `tel:+${phoneDigits}` : null;
+    const whatsappUrl = phoneDigits
+        ? `https://wa.me/${phoneDigits}?text=${encodeURIComponent(`Hi, I'm interested in the ${emirateDisplay} ${code} ${number} plate.`)}`
+        : null;
+
+    const sellerName = seller?.full_name || seller?.email || 'Seller';
+    const memberYear = seller?.created_at ? new Date(seller.created_at).getFullYear().toString() : '';
 
     const handleShare = () => {
         if (navigator.share) {
@@ -40,6 +105,40 @@ export default function PlateDetailPage() {
             navigator.clipboard.writeText(window.location.href);
         }
     };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-white pt-24 pb-16">
+                <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="animate-pulse space-y-6">
+                        <div className="h-6 bg-gray-200 rounded w-40" />
+                        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
+                            <div className="lg:col-span-3">
+                                <div className="bg-gray-100 rounded-2xl h-[300px]" />
+                            </div>
+                            <div className="lg:col-span-2 space-y-6">
+                                <div className="h-32 bg-gray-100 rounded-2xl" />
+                                <div className="h-48 bg-gray-100 rounded-2xl" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (error || !listing) {
+        return (
+            <div className="min-h-screen bg-white pt-24 pb-16">
+                <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                    <p className="text-xl font-bold text-gray-900 mb-4">Listing not found</p>
+                    <Link to="/marketplace" className="text-primary font-bold hover:underline">
+                        ← Back to Marketplace
+                    </Link>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-white pt-24 pb-16">
@@ -78,13 +177,21 @@ export default function PlateDetailPage() {
                             </div>
                             <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 text-center">
                                 <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">Code</p>
-                                <p className="text-lg font-bold text-gray-900">{code}</p>
+                                <p className="text-lg font-bold text-gray-900">{code || '—'}</p>
                             </div>
                             <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 text-center">
                                 <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">Number</p>
                                 <p className="text-lg font-bold text-gray-900">{number}</p>
                             </div>
                         </div>
+
+                        {/* Description */}
+                        {listing.description && (
+                            <div className="mt-6 bg-gray-50 rounded-xl p-5 border border-gray-100">
+                                <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-2">Description</p>
+                                <p className="text-sm text-gray-700 leading-relaxed">{listing.description}</p>
+                            </div>
+                        )}
                     </div>
 
                     {/* Right: Info Panel (2 cols) */}
@@ -94,7 +201,7 @@ export default function PlateDetailPage() {
                         <div className="bg-white rounded-2xl border border-gray-200 p-6">
                             <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-2">Price</p>
                             <p className="text-4xl font-black text-gray-900 font-mono tracking-tight">
-                                {listing?.price || 'Contact Seller'}
+                                {listing.price ? `AED ${listing.price.toLocaleString()}` : 'Contact Seller'}
                             </p>
 
                             <button
@@ -110,29 +217,38 @@ export default function PlateDetailPage() {
                             <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-4">Seller Information</p>
                             <div className="flex items-center gap-3 mb-4">
                                 <div className="h-12 w-12 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-500 font-bold text-lg">
-                                    {seller.name.charAt(0)}
+                                    {sellerName.charAt(0).toUpperCase()}
                                 </div>
                                 <div>
-                                    <p className="font-bold text-gray-900">{seller.name}</p>
-                                    <p className="text-xs text-gray-400">Member since {seller.memberSince} · {seller.location}</p>
+                                    <p className="font-bold text-gray-900">{sellerName}</p>
+                                    <p className="text-xs text-gray-400">
+                                        {memberYear && `Member since ${memberYear} · `}UAE
+                                    </p>
                                 </div>
                             </div>
 
                             <div className="space-y-3">
-                                <a
-                                    href={`tel:${seller.phone}`}
-                                    className="flex items-center justify-center gap-2 w-full bg-gray-900 text-white py-3.5 rounded-xl font-bold text-sm hover:bg-gray-800 transition-all shadow-sm"
-                                >
-                                    <Phone className="h-4 w-4" /> Call Seller
-                                </a>
-                                <a
-                                    href={`https://wa.me/${seller.whatsapp}?text=Hi, I'm interested in the ${emirateDisplay} ${code} ${number} plate.`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center justify-center gap-2 w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold text-sm hover:bg-emerald-700 transition-all shadow-sm"
-                                >
-                                    <MessageCircle className="h-4 w-4" /> WhatsApp
-                                </a>
+                                {telUrl && (
+                                    <a
+                                        href={telUrl}
+                                        className="flex items-center justify-center gap-2 w-full bg-gray-900 text-white py-3.5 rounded-xl font-bold text-sm hover:bg-gray-800 transition-all shadow-sm"
+                                    >
+                                        <Phone className="h-4 w-4" /> Call Seller
+                                    </a>
+                                )}
+                                {whatsappUrl && (
+                                    <a
+                                        href={whatsappUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center justify-center gap-2 w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold text-sm hover:bg-emerald-700 transition-all shadow-sm"
+                                    >
+                                        <MessageCircle className="h-4 w-4" /> WhatsApp
+                                    </a>
+                                )}
+                                {!telUrl && !whatsappUrl && (
+                                    <p className="text-sm text-gray-500 text-center py-2">No contact info available</p>
+                                )}
                             </div>
                         </div>
 

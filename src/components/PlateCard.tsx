@@ -79,45 +79,62 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
           </Link>
         </div>
 
-        {/* BACK SIDE — contact options */}
+        {/* BACK SIDE — contact options (matches reference design) */}
         <div className="absolute inset-0 backface-hidden rotate-y-180">
-          <div className="h-full bg-card rounded-2xl border border-border flex flex-col items-center justify-center gap-4 p-6">
-            <p className="font-mono font-bold text-foreground text-lg tracking-wider">{displayPlate}</p>
-            <p className="text-sm text-muted-foreground font-bold">{price || 'Contact for price'}</p>
+          <div className="h-full bg-card rounded-2xl border border-border flex flex-col items-center justify-center px-5 py-4">
+            {/* Header */}
+            <p className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-bold mb-1">Contact Seller</p>
+            <p className="text-sm font-display font-bold text-foreground mb-0.5">Premium Plate</p>
+            <p className="text-[10px] text-muted-foreground font-medium mb-3">{emirate}</p>
 
-            {telUrl ? (
-              <a
-                href={telUrl}
-                onClick={e => e.stopPropagation()}
-                className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold text-sm transition-colors"
-              >
-                <Phone className="h-4 w-4" /> Call Seller
-              </a>
-            ) : null}
+            {/* Large plate number */}
+            <div className="bg-surface border border-border rounded-xl px-5 py-2.5 mb-4">
+              <p className="font-mono font-black text-foreground text-2xl tracking-wider text-center">
+                {code && <span>{code}</span>}
+                {code && number && <span className="mx-1.5"> </span>}
+                <span>{number}</span>
+              </p>
+            </div>
 
-            {whatsappUrl ? (
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={e => e.stopPropagation()}
-                className="w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#1da851] text-white py-3 rounded-xl font-bold text-sm transition-colors"
-              >
-                <MessageCircle className="h-4 w-4" /> WhatsApp
-              </a>
-            ) : null}
+            {/* Action buttons */}
+            <div className="w-full space-y-2 mb-3">
+              {telUrl ? (
+                <a
+                  href={telUrl}
+                  onClick={e => e.stopPropagation()}
+                  className="w-full flex items-center justify-center gap-2.5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white py-2.5 rounded-full font-bold text-sm transition-all shadow-sm hover:shadow-md"
+                >
+                  <Phone className="h-4 w-4" /> Call Now
+                </a>
+              ) : null}
 
-            {!telUrl && !whatsappUrl && (
-              <p className="text-sm text-muted-foreground text-center">Contact for details</p>
+              {whatsappUrl ? (
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={e => e.stopPropagation()}
+                  className="w-full flex items-center justify-center gap-2.5 bg-gradient-to-r from-[#25D366] to-[#20BD5A] hover:from-[#1da851] hover:to-[#189E49] text-white py-2.5 rounded-full font-bold text-sm transition-all shadow-sm hover:shadow-md"
+                >
+                  <MessageCircle className="h-4 w-4" /> WhatsApp
+                </a>
+              ) : null}
+
+              {!telUrl && !whatsappUrl && (
+                <Link
+                  to={plateUrl}
+                  onClick={e => e.stopPropagation()}
+                  className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-white py-2.5 rounded-full font-bold text-sm transition-all"
+                >
+                  <ExternalLink className="h-4 w-4" /> View Details
+                </Link>
+              )}
+            </div>
+
+            {/* Phone number at bottom */}
+            {phoneDigits && (
+              <p className="text-[10px] text-muted-foreground font-mono tracking-wide">+{phoneDigits}</p>
             )}
-
-            <Link
-              to={plateUrl}
-              onClick={e => e.stopPropagation()}
-              className="flex items-center gap-1.5 text-xs text-primary font-bold hover:underline mt-1"
-            >
-              <ExternalLink className="h-3 w-3" /> View Details
-            </Link>
           </div>
         </div>
       </div>
