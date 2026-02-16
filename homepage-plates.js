@@ -97,14 +97,15 @@
         const btnIcon = isBid ? 'gavel' : 'shopping_cart';
 
         return `
-            <div class="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-card hover:shadow-card-hover transition-all duration-300 group relative">
-                <div class="p-8 flex items-center justify-center bg-gray-50 min-h-[200px] relative">
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-card hover:shadow-card-hover transition-all duration-300 group relative">
+                <div class="p-4 flex items-center justify-center bg-gray-50 min-h-[130px] relative overflow-hidden">
                     <div id="plate-slot-${index}"
-                         class="w-[280px] transform group-hover:scale-110 transition-transform duration-500 flex items-center justify-center">
-                        <div class="animate-pulse bg-gray-200 rounded-lg w-[260px] h-[65px]"></div>
+                         class="w-[90%] mx-auto flex items-center justify-center transform group-hover:scale-105 transition-transform duration-300">
+                        <div class="animate-pulse bg-gray-200 rounded w-full h-[65px]"></div>
                     </div>
                 </div>
-                <div class="p-6 border-t border-gray-100">
+                <!-- Reduced padding in footer too for consistency -->
+                <div class="px-6 py-4 border-t border-gray-100">
                     <div class="flex justify-between items-end">
                         <div>
                             <p class="text-[10px] text-gray-400 uppercase tracking-wider font-bold mb-1">${priceLabel}</p>
@@ -119,7 +120,7 @@
     }
 
     // ── Build one emirate section ─────────────────
-    function buildEmirateSection(emirateName, subtitle, logoHtml, listings, startIndex) {
+    function buildEmirateSection(emirateName, logoHtml, listings, startIndex) {
         const cards = listings.map((l, i) => buildCard(l, startIndex + i)).join('\n');
 
         return `
@@ -129,7 +130,6 @@
                     ${logoHtml}
                     <div>
                         <h2 class="text-4xl font-display font-bold text-text-main tracking-tight">${emirateName}</h2>
-                        <p class="text-sm font-bold uppercase tracking-[0.2em] mt-1 text-text-main">${subtitle}</p>
                     </div>
                 </div>
                 <a class="group flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-primary transition-colors" href="#">
@@ -143,36 +143,15 @@
         </section>`;
     }
 
-    // ── Section definitions ──────────────────────
+    // ── Section definitions (no subtitles) ─────────
     const SECTIONS = [
-        {
-            name: 'Abu Dhabi', subtitle: 'Capital Collection',
-            logo: '<img alt="Abu Dhabi Logo" class="h-16 w-auto object-contain flex-shrink-0" src="Abu_Dhabi-logo.png" />'
-        },
-        {
-            name: 'Dubai', subtitle: 'Premium RTA Series',
-            logo: '<img alt="Dubai Logo" class="h-16 w-auto object-contain flex-shrink-0" src="dubai logo.png" />'
-        },
-        {
-            name: 'Sharjah', subtitle: 'Exclusive Series',
-            logo: '<img alt="Sharjah Logo" class="h-16 w-auto object-contain flex-shrink-0" src="SHARJAH-LOGO.png" />'
-        },
-        {
-            name: 'Ajman', subtitle: 'Distinctive Codes',
-            logo: '<img alt="Ajman Logo" class="h-9 w-auto object-contain flex-shrink-0" src="ajman logo.png" />'
-        },
-        {
-            name: 'Umm Al Quwain', subtitle: 'Vintage Selection',
-            logo: '<img alt="Umm Al Quwain Logo" class="h-16 w-auto object-contain flex-shrink-0" src="ummalquein-logo.png" />'
-        },
-        {
-            name: 'Ras Al Khaimah', subtitle: 'Northern Emirates',
-            logo: '<img alt="Ras Al Khaimah Logo" class="h-16 w-auto object-contain flex-shrink-0" src="rak-logo.png" />'
-        },
-        {
-            name: 'Fujairah', subtitle: 'Eastern Region Collection',
-            logo: '<img alt="Fujairah Logo" class="h-16 w-auto object-contain flex-shrink-0" src="fujairah-logo.png" />'
-        },
+        { name: 'Abu Dhabi', logo: '<img alt="Abu Dhabi Logo" class="h-16 w-auto object-contain flex-shrink-0" src="Abu_Dhabi-logo.png" />' },
+        { name: 'Dubai', logo: '<img alt="Dubai Logo" class="h-16 w-auto object-contain flex-shrink-0" src="dubai logo.png" />' },
+        { name: 'Sharjah', logo: '<img alt="Sharjah Logo" class="h-16 w-auto object-contain flex-shrink-0" src="SHARJAH-LOGO.png" />' },
+        { name: 'Ajman', logo: '<img alt="Ajman Logo" class="h-9 w-auto object-contain flex-shrink-0" src="ajman logo.png" />' },
+        { name: 'Umm Al Quwain', logo: '<img alt="Umm Al Quwain Logo" class="h-16 w-auto object-contain flex-shrink-0" src="ummalquein-logo.png" />' },
+        { name: 'Ras Al Khaimah', logo: '<img alt="Ras Al Khaimah Logo" class="h-16 w-auto object-contain flex-shrink-0" src="rak-logo.png" />' },
+        { name: 'Fujairah', logo: '<img alt="Fujairah Logo" class="h-16 w-auto object-contain flex-shrink-0" src="fujairah-logo.png" />' },
     ];
 
     // ── Main Init ────────────────────────────────
@@ -202,7 +181,7 @@
         grouped.forEach((group, sIdx) => {
             const sec = SECTIONS[sIdx];
             if (sec) {
-                html += buildEmirateSection(sec.name, sec.subtitle, sec.logo, group, globalIdx);
+                html += buildEmirateSection(sec.name, sec.logo, group, globalIdx);
             }
             globalIdx += group.length;
         });
@@ -231,10 +210,10 @@
                     blankPlateImage: img
                 });
 
-                // Convert canvas to img for lighter DOM
+                // Convert canvas to img for lighter DOM (no rounded to avoid cut edges)
                 const dataUrl = canvas.toDataURL('image/png');
                 slot.innerHTML = `<img src="${dataUrl}" alt="${listing.emirate} ${listing.code} ${listing.number}" 
-                    class="w-full h-auto rounded shadow-plate" style="image-rendering: -webkit-optimize-contrast;" />`;
+                    class="w-full h-full object-contain" style="image-rendering: -webkit-optimize-contrast;" />`;
             } catch (e) {
                 console.error(`Failed to render plate ${i}:`, e);
                 slot.innerHTML = '<p class="text-xs text-red-400">Render failed</p>';

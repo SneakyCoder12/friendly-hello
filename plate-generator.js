@@ -47,18 +47,18 @@
            letterSpacingRatio: Space between letters. Example: 0.01.
            baselineOffsetRatio: Move Up (Negative) or Down (Positive). Example: -0.05 moves UP.
         */
+        // Dubai: "DUBAI" text is on the blank image (dubai-plate.png). We only draw code (B) and number (6836).
+        // Move code right so it does not overlap the DUBAI label on the template.
         dubai: {
             hasCode: true,
             fontHeightRatio: 0.125,
             letterSpacingRatio: 0.015,
-            // Use narrower font for Dubai
             fontFile: 'fonts/DIN-1451.ttf',
-            // Fixed vertical position (0.0 = Top, 1.0 = Bottom)
             verticalCenter: false,
-            baselineRatio: 0.44, // Moved up from bottom
+            baselineRatio: 0.60,
             components: [
-                { type: 'code', xRatio: 0.115, align: 'center', emboss: true },
-                { type: 'number', xRatio: 0.67, align: 'center', emboss: true }
+                { type: 'code', xRatio: 0.26, align: 'center', emboss: true },
+                { type: 'number', xRatio: 0.70, align: 'center', emboss: true }
             ]
         },
         sharjah: {
@@ -154,7 +154,7 @@
             if (config.verticalCenter) {
                 baselineY = (H / 2) + (globalFontHeight * 0.35); // Approx baseline
             } else {
-                baselineY = W * config.baselineRatio;
+                baselineY = H * config.baselineRatio;
             }
 
             const targetWeight = config.fontWeight || 'bold';
@@ -184,7 +184,7 @@
                 // Baseline Offset
                 let compY = baselineY;
                 if (comp.baselineOffsetRatio) {
-                    compY = baselineY + (W * comp.baselineOffsetRatio);
+                    compY = baselineY + (H * comp.baselineOffsetRatio);
                 }
 
                 // Update font for this component

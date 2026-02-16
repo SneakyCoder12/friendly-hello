@@ -19,7 +19,7 @@ export default function EmirateSection({ section, listings }: Props) {
           />
           <div>
             <h2 className="text-4xl font-display font-bold text-foreground tracking-tight">{section.name}</h2>
-            <p className="text-sm font-bold uppercase tracking-[0.2em] mt-1 text-muted-foreground">{section.subtitle}</p>
+
           </div>
         </div>
         <a className="group flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-primary transition-colors" href="/marketplace">
