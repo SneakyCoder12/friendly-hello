@@ -17,11 +17,12 @@ interface PlateCardProps {
   plateNumber?: string;
   listingId?: string;
   status?: string;
+  plateStyle?: 'private' | 'bike';
 }
 
-function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerPhone, plateNumber, listingId, status }: PlateCardProps) {
+function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerPhone, plateNumber, listingId, status, plateStyle = 'private' }: PlateCardProps) {
   const isSold = status === 'sold';
-  const dataUrl = usePlateImage(emirate, code, number);
+  const dataUrl = usePlateImage(emirate, code, number, plateStyle);
   const [flipped, setFlipped] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();

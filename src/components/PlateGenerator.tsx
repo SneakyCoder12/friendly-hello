@@ -1,20 +1,21 @@
-import { Download, Palette, Loader2 } from 'lucide-react';
+import { Download, Palette, Loader2, Building2, Landmark, BookOpen, ShieldCheck, Waves, Mountain, Anchor } from 'lucide-react';
 import { usePlateGenerator } from '@/hooks/usePlateGenerator';
 import { getConfig } from '@/lib/plate-generator';
 
-const EMIRATES = [
-  { value: 'abudhabi', label: 'Abu Dhabi' },
-  { value: 'dubai', label: 'Dubai' },
-  { value: 'sharjah', label: 'Sharjah' },
-  { value: 'ajman', label: 'Ajman' },
-  { value: 'umm_al_quwain', label: 'Umm Al Quwain' },
-  { value: 'rak', label: 'Ras Al Khaimah' },
-  { value: 'fujairah', label: 'Fujairah' },
+const EMIRATES_CONFIG = [
+  { value: 'abudhabi', label: 'Abu Dhabi', icon: Landmark, color: 'text-amber-500' },
+  { value: 'dubai', label: 'Dubai', icon: Building2, color: 'text-sky-500' },
+  { value: 'sharjah', label: 'Sharjah', icon: BookOpen, color: 'text-blue-600' },
+  { value: 'ajman', label: 'Ajman', icon: ShieldCheck, color: 'text-red-500' },
+  { value: 'umm_al_quwain', label: 'Umm Al Quwain', icon: Waves, color: 'text-teal-500' },
+  { value: 'rak', label: 'Ras Al Khaimah', icon: Mountain, color: 'text-stone-500' },
+  { value: 'fujairah', label: 'Fujairah', icon: Anchor, color: 'text-indigo-500' },
 ];
 
 export default function PlateGeneratorSection() {
   const {
     emirate, setEmirate,
+    plateStyle, setPlateStyle,
     plateCode, setPlateCode,
     plateNumber, setPlateNumber,
     canvasRef,
@@ -22,7 +23,7 @@ export default function PlateGeneratorSection() {
     isDownloading,
   } = usePlateGenerator();
 
-  const config = getConfig(emirate);
+  const config = getConfig(emirate, plateStyle);
 
   return (
     <section id="generator" className="scroll-mt-24">
@@ -41,23 +42,59 @@ export default function PlateGeneratorSection() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-        <div className="bg-card rounded-2xl border border-border shadow-card p-8 space-y-6">
+        <div className="bg-card rounded-2xl border border-border shadow-card p-8 space-y-8">
           <h3 className="text-lg font-display font-bold text-foreground mb-2">Configure Your Plate</h3>
 
           <div>
-            <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2" htmlFor="emirateSelect">
+            <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">
               Emirate
             </label>
-            <select
-              id="emirateSelect"
-              className="w-full bg-surface border border-border rounded-xl px-4 py-3.5 text-sm font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all appearance-none cursor-pointer"
-              value={emirate}
-              onChange={(e) => setEmirate(e.target.value)}
-            >
-              {EMIRATES.map((e) => (
-                <option key={e.value} value={e.value}>{e.label}</option>
-              ))}
-            </select>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {EMIRATES_CONFIG.map((item) => {
+                const Icon = item.icon;
+                const isSelected = emirate === item.value;
+                return (
+                  <button
+                    key={item.value}
+                    onClick={() => setEmirate(item.value)}
+                    className={`relative flex flex-col items-center justify-center gap-2 p-3 rounded-2xl border transition-all duration-300 w-full aspect-square sm:aspect-auto sm:h-24 ${isSelected
+                      ? 'bg-primary/5 border-primary shadow-[0_0_0_1px_hsl(var(--primary))]'
+                      : 'bg-surface border-border hover:bg-surface-accent hover:border-primary/30'
+                      }`}
+                  >
+                    <Icon className={`h-6 w-6 ${isSelected ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'} transition-colors`} />
+                    <span className={`text-xs font-bold text-center leading-tight ${isSelected ? 'text-primary' : 'text-foreground'}`}>
+                      {item.label}
+                    </span>
+                    {isSelected && (
+                      <div className="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary animate-pulse" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
+              Plate Style
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                className={`flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl border text-sm font-bold transition-all ${plateStyle === 'private' ? 'bg-primary text-primary-foreground border-primary shadow-md' : 'bg-surface border-border text-muted-foreground hover:bg-surface-accent hover:border-primary/30'}`}
+                onClick={() => setPlateStyle('private')}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 flex-shrink-0"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" /><circle cx="7" cy="17" r="2" /><path d="M9 17h6" /><circle cx="17" cy="17" r="2" /></svg>
+                Car
+              </button>
+              <button
+                className={`flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl border text-sm font-bold transition-all ${plateStyle === 'bike' ? 'bg-primary text-primary-foreground border-primary shadow-md' : 'bg-surface border-border text-muted-foreground hover:bg-surface-accent hover:border-primary/30'}`}
+                onClick={() => setPlateStyle('bike')}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 flex-shrink-0"><circle cx="18.5" cy="17.5" r="3.5" /><circle cx="5.5" cy="17.5" r="3.5" /><circle cx="15" cy="5" r="1" /><path d="M12 17.5V14l-3-3 4-3 2 3h2" /></svg>
+                Bike
+              </button>
+            </div>
           </div>
 
           {config.hasCode !== false && (
@@ -120,6 +157,6 @@ export default function PlateGeneratorSection() {
           </div>
         </div>
       </div>
-    </section>
+    </section >
   );
 }

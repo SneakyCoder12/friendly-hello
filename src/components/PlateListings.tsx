@@ -11,6 +11,7 @@ interface SupabaseListing {
   price: number | null;
   contact_phone: string | null;
   status: string;
+  vehicle_type?: string;
 }
 
 const EMIRATE_KEY_MAP: Record<string, string> = {
@@ -32,7 +33,7 @@ export default function PlateListings() {
       console.log('[PlateListings] Fetching active & sold listings...');
       const { data, error } = await supabase
         .from('listings')
-        .select('id, plate_number, emirate, plate_style, price, contact_phone, status')
+        .select('id, plate_number, emirate, plate_style, price, contact_phone, status, vehicle_type')
         .in('status', ['active', 'sold'])
         .order('created_at', { ascending: false })
         .limit(28);

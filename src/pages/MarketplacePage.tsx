@@ -23,6 +23,7 @@ interface ListingWithSeller {
   created_at: string;
   user_id: string;
   contact_phone: string | null;
+  vehicle_type?: string;
 }
 
 export default function MarketplacePage() {
@@ -50,7 +51,7 @@ export default function MarketplacePage() {
     setLoading(true);
     let query = supabase
       .from('listings')
-      .select('*', { count: 'exact' })
+      .select('*', { count: 'exact' }) // vehicle_type is included in * if column exists
       .in('status', ['active', 'sold'])
       .order('created_at', { ascending: false })
       .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);

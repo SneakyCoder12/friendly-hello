@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Search, ChevronLeft, ChevronRight, Loader2, X, Smartphone, Star, Heart, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import MobileNumberCard from '@/components/MobileNumberCard';
@@ -20,6 +21,7 @@ interface MobileListing {
 }
 
 export default function MobileNumbersPage() {
+    const { t } = useLanguage();
     const [searchParams] = useSearchParams();
     const { user } = useAuth();
     const [listings, setListings] = useState<MobileListing[]>([]);
@@ -134,19 +136,19 @@ export default function MobileNumbersPage() {
                         <div className="flex-1 text-center md:text-start z-10">
                             <div className="inline-flex items-center gap-2 mb-4 px-4 py-1.5 rounded-full border border-amber-200/80 bg-gradient-to-r from-amber-50 to-white">
                                 <Star className="h-3.5 w-3.5 text-amber-500" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-600">VIP Numbers</span>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-600">{t('vipMobileNumbers')}</span>
                             </div>
                             <h1 className="text-3xl md:text-5xl font-display font-black text-gray-900 tracking-tight mb-3 leading-tight">
-                                Premium Mobile<br />Numbers
+                                {t('vipMobileNumbers')}
                             </h1>
                             <p className="text-gray-500 text-sm md:text-base leading-relaxed max-w-md">
-                                Browse exclusive Du and Etisalat VIP numbers.<br className="hidden md:block" /> Find the perfect number that stands out.
+                                {t('vipMobileSubtitle')}
                             </p>
                             <Link
                                 to="/marketplace"
                                 className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-gray-700 hover:text-gray-900 transition-colors border border-gray-200 rounded-full px-5 py-2.5 bg-white hover:bg-gray-50 shadow-sm"
                             >
-                                Browse Plate Numbers <ArrowRight className="h-3.5 w-3.5" />
+                                {t('browsePlates')} <ArrowRight className="h-3.5 w-3.5" />
                             </Link>
                         </div>
                         {/* Right: Carrier Logos */}
@@ -163,7 +165,7 @@ export default function MobileNumbersPage() {
 
                 {/* Header */}
                 <div className="flex items-center justify-between mb-8">
-                    <h2 className="text-2xl font-display font-bold text-gray-900">Active Listings</h2>
+                    <h2 className="text-2xl font-display font-bold text-gray-900">{t('activeListings')}</h2>
                     <span className="text-sm text-gray-400 font-mono">{total} numbers</span>
                 </div>
 
@@ -174,24 +176,24 @@ export default function MobileNumbersPage() {
                             <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                             <input value={search} onChange={e => { setSearch(e.target.value); setPage(0); }}
                                 className="w-full bg-white border border-gray-200 rounded-xl ps-10 pe-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                                placeholder="Search numbers..." />
+                                placeholder={t('searchMobileNumber')} />
                         </div>
                         <select value={carrierFilter} onChange={e => { setCarrierFilter(e.target.value); setPage(0); }}
                             className="bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-300">
-                            <option value="">All Carriers</option>
+                            <option value="">{t('allCarriers')}</option>
                             <option value="du">Du</option>
                             <option value="etisalat">Etisalat</option>
                         </select>
                         <input type="number" value={minPrice} onChange={e => { setMinPrice(e.target.value); setPage(0); }}
-                            placeholder="Min Price (AED)"
+                            placeholder={t('minPrice')}
                             className="bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-300" />
                         <input type="number" value={maxPrice} onChange={e => { setMaxPrice(e.target.value); setPage(0); }}
-                            placeholder="Max Price (AED)"
+                            placeholder={t('maxPrice')}
                             className="bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-300" />
                     </div>
                     {hasFilters && (
                         <button onClick={resetFilters} className="mt-3 text-xs text-gray-700 font-bold flex items-center gap-1 hover:underline">
-                            <X className="h-3 w-3" /> Reset Filters
+                            <X className="h-3 w-3" /> {t('resetFilters')}
                         </button>
                     )}
                 </div>
@@ -202,7 +204,7 @@ export default function MobileNumbersPage() {
                 ) : listings.length === 0 ? (
                     <div className="text-center py-20">
                         <Smartphone className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-                        <p className="text-gray-500">No numbers found</p>
+                        <p className="text-gray-500">{t('noResults')}</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
@@ -229,7 +231,7 @@ export default function MobileNumbersPage() {
                             className="h-10 w-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-700 disabled:opacity-30 hover:bg-gray-50 transition-colors">
                             <ChevronLeft className="h-4 w-4" />
                         </button>
-                        <span className="text-sm text-gray-500 font-mono">Page {page + 1} of {totalPages}</span>
+                        <span className="text-sm text-gray-500 font-mono">{t('page')} {page + 1} {t('of')} {totalPages}</span>
                         <button onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1}
                             className="h-10 w-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-700 disabled:opacity-30 hover:bg-gray-50 transition-colors">
                             <ChevronRight className="h-4 w-4" />

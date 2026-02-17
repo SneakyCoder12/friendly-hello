@@ -10,6 +10,7 @@ interface SupabaseListing {
   price: number | null;
   contact_phone?: string | null;
   status: string;
+  vehicle_type?: string;
 }
 
 interface Props {
@@ -56,6 +57,7 @@ export default function EmirateSection({ section, listings }: Props) {
                 plateNumber={listing.plate_number}
                 listingId={listing.id}
                 status={listing.status}
+                plateStyle={listing.vehicle_type === 'bike' ? 'bike' : 'private'}
               />
             );
           })

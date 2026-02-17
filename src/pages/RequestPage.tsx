@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Send, ArrowLeft, CheckCircle } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function RequestPage() {
+    const { t } = useLanguage();
     const [submitted, setSubmitted] = useState(false);
     const [form, setForm] = useState({
         name: '',
@@ -20,7 +22,6 @@ export default function RequestPage() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // TODO: Connect to Supabase database / send email
         console.log('Form submitted:', form);
         setSubmitted(true);
     };
@@ -32,15 +33,15 @@ export default function RequestPage() {
                     <div className="h-16 w-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-6">
                         <CheckCircle className="h-8 w-8 text-emerald-600" />
                     </div>
-                    <h2 className="text-3xl font-black text-gray-900 mb-3">Request Submitted!</h2>
+                    <h2 className="text-3xl font-black text-gray-900 mb-3">{t('requestSuccess')}</h2>
                     <p className="text-gray-500 mb-8">
-                        We've received your request. Our team will get back to you shortly with available plates matching your criteria.
+                        {t('requestDesc')}
                     </p>
                     <Link
                         to="/"
                         className="inline-flex items-center gap-2 bg-gray-900 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-gray-800 transition-all"
                     >
-                        Back to Home
+                        {t('home')}
                     </Link>
                 </div>
             </div>
@@ -56,16 +57,16 @@ export default function RequestPage() {
                     to="/"
                     className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors mb-8"
                 >
-                    <ArrowLeft className="h-4 w-4" /> Back to Home
+                    <ArrowLeft className="h-4 w-4" /> {t('back')}
                 </Link>
 
                 {/* Header */}
                 <div className="mb-10">
                     <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">
-                        Your Exclusive Number, Made Simple.
+                        {t('requestTitle')}
                     </h1>
                     <p className="text-gray-500 text-lg">
-                        Request your favourite number plate, a VIP phone number, or a #Tag that mirrors who you are. Submit your request and we'll notify you once it's available.
+                        {t('requestSubtitle')}
                     </p>
                 </div>
 
@@ -75,7 +76,7 @@ export default function RequestPage() {
                     {/* Name & Email */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Full Name *</label>
+                            <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">{t('fullName')} *</label>
                             <input
                                 type="text"
                                 name="name"
@@ -83,11 +84,11 @@ export default function RequestPage() {
                                 onChange={handleChange}
                                 required
                                 className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-900 font-medium focus:outline-none focus:border-gray-400 focus:bg-white transition-all"
-                                placeholder="Your name"
+                                placeholder={t('yourName')}
                             />
                         </div>
                         <div>
-                            <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Email *</label>
+                            <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">{t('email')} *</label>
                             <input
                                 type="email"
                                 name="email"
@@ -103,7 +104,7 @@ export default function RequestPage() {
                     {/* Phone & Emirate */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Phone Number *</label>
+                            <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">{t('phoneNumber')} *</label>
                             <input
                                 type="tel"
                                 name="phone"
@@ -115,7 +116,7 @@ export default function RequestPage() {
                             />
                         </div>
                         <div>
-                            <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Category *</label>
+                            <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">{t('preferredEmirate')} *</label>
                             <select
                                 name="emirate"
                                 value={form.emirate}
@@ -123,7 +124,7 @@ export default function RequestPage() {
                                 required
                                 className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-900 font-medium focus:outline-none focus:border-gray-400 focus:bg-white transition-all"
                             >
-                                <option value="">Select category</option>
+                                <option value="">{t('selectEmirate')}</option>
                                 <optgroup label="Number Plates">
                                     <option value="abudhabi">Abu Dhabi</option>
                                     <option value="dubai">Dubai</option>
@@ -133,7 +134,7 @@ export default function RequestPage() {
                                     <option value="fujairah">Fujairah</option>
                                     <option value="umm_al_quwain">Umm Al Quwain</option>
                                 </optgroup>
-                                <optgroup label="Prestigious Numbers">
+                                <optgroup label={t('mobileNumbers')}>
                                     <option value="etisalat">Etisalat</option>
                                     <option value="du">Du</option>
                                 </optgroup>
@@ -143,7 +144,7 @@ export default function RequestPage() {
 
                     {/* Plate Details */}
                     <div>
-                        <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Plate / Number Details *</label>
+                        <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">{t('preferredNumber')} *</label>
                         <input
                             type="text"
                             name="plateDetails"
@@ -157,7 +158,7 @@ export default function RequestPage() {
 
                     {/* Budget */}
                     <div>
-                        <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Budget Range</label>
+                        <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">{t('budget')}</label>
                         <input
                             type="text"
                             name="budget"
@@ -170,14 +171,14 @@ export default function RequestPage() {
 
                     {/* Message */}
                     <div>
-                        <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Additional Message</label>
+                        <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">{t('additionalNotes')}</label>
                         <textarea
                             name="message"
                             value={form.message}
                             onChange={handleChange}
                             rows={4}
                             className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-900 font-medium focus:outline-none focus:border-gray-400 focus:bg-white transition-all resize-none"
-                            placeholder="Any additional details or preferences..."
+                            placeholder={t('additionalNotes')}
                         />
                     </div>
 
@@ -186,12 +187,12 @@ export default function RequestPage() {
                         type="submit"
                         className="w-full flex items-center justify-center gap-2 bg-gray-900 text-white py-4 rounded-xl font-bold text-lg hover:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300"
                     >
-                        <Send className="h-5 w-5" /> Submit Request
+                        <Send className="h-5 w-5" /> {t('submitRequestBtn')}
                     </button>
 
                     {/* Disclaimer */}
                     <p className="text-xs text-center text-gray-400 leading-relaxed">
-                        By submitting, you agree to be contacted regarding your request. We facilitate connections but are not liable for private transactions between buyers and sellers.
+                        {t('noticeText')}
                     </p>
                 </form>
             </div>

@@ -17,16 +17,17 @@ interface ComponentConfig {
   fontSizeRatio?: number;
   letterSpacingRatio?: number;
   baselineOffsetRatio?: number;
+  yRatio?: number; // Explicit Y position ratio (0.0 to 1.0) overrides baseline
 }
 
 interface EmirateConfig {
   hasCode: boolean;
   fontHeightRatio: number;
   letterSpacingRatio: number;
-  baselineRatio?: number;
   verticalCenter: boolean;
   fontFile?: string;
   fontWeight?: string;
+  baselineRatio?: number;
   components: ComponentConfig[];
 }
 
@@ -123,8 +124,108 @@ const CONFIGS: Record<string, EmirateConfig> = {
   },
 };
 
-export function getConfig(emirate: string): EmirateConfig {
-  return CONFIGS[emirate] || CONFIGS['ajman'];
+// --- Bike Configurations (Shared Defaults) ---
+const BIKE_SQUARE_DEFAULTS = {
+  fontHeightRatio: 0.28,
+  letterSpacingRatio: 0.015,
+  verticalCenter: false, // We use explicit positioning for 2 lines
+  baselineRatio: 0.5,
+};
+
+
+
+// --- Add Bike Configs ---
+// Helper to extend config
+const withBike = (base: EmirateConfig, overrides: Partial<EmirateConfig>): EmirateConfig => ({ ...base, ...overrides });
+
+// Abu Dhabi Bike
+CONFIGS['abudhabi_bike'] = {
+  ...BIKE_SQUARE_DEFAULTS,
+  hasCode: true,
+  fontFile: '/fonts/GL-Nummernschild-Mtl.ttf',
+  components: [
+    { type: 'code', xRatio: 0.87, yRatio: 0.39, align: 'center', emboss: true, fontSizeRatio: 0.155 },
+    { type: 'number', xRatio: 0.53, yRatio: 0.90, align: 'center', emboss: true, fontSizeRatio: 0.15 },
+  ],
+};
+
+
+// Dubai Bike
+CONFIGS['dubai_bike'] = {
+  ...BIKE_SQUARE_DEFAULTS,
+  hasCode: true,
+  fontFile: '/fonts/Rough Motion.otf',
+  letterSpacingRatio: 0.001,
+  components: [
+    { type: 'code', xRatio: 0.877, yRatio: 0.44, align: 'center', emboss: true, fontSizeRatio: 0.20 },
+    { type: 'number', xRatio: 0.5, yRatio: 0.875, align: 'center', emboss: true, fontSizeRatio: 0.25 },
+  ],
+};
+
+
+// Sharjah Bike
+CONFIGS['sharjah_bike'] = {
+  ...BIKE_SQUARE_DEFAULTS,
+  hasCode: true,
+  fontFile: '/fonts/DIN-1451.ttf',
+  letterSpacingRatio: 0.01,
+  components: [
+    { type: 'code', xRatio: 0.177, yRatio: 0.44, align: 'center', emboss: true, fontSizeRatio: 0.20 },
+    { type: 'number', xRatio: 0.66, yRatio: 0.815, align: 'center', emboss: true, fontSizeRatio: 0.20 },
+  ],
+};
+
+// Ajman Bike
+CONFIGS['ajman_bike'] = {
+  ...BIKE_SQUARE_DEFAULTS,
+  hasCode: true,
+  fontFile: '/fonts/DIN-1451.ttf',
+  components: [
+    { type: 'code', xRatio: 0.177, yRatio: 0.44, align: 'center', emboss: true, fontSizeRatio: 0.20 },
+    { type: 'number', xRatio: 0.64, yRatio: 0.815, align: 'center', emboss: true, fontSizeRatio: 0.20 },
+  ],
+};
+
+// Umm Al Quwain Bike
+CONFIGS['umm_al_quwain_bike'] = {
+  ...BIKE_SQUARE_DEFAULTS,
+  hasCode: true,
+  letterSpacingRatio: 0.01,
+  fontFile: '/fonts/Rough Motion.otf',
+  components: [
+    { type: 'code', xRatio: 0.171, yRatio: 0.87, align: 'center', emboss: true, fontSizeRatio: 0.18 },
+    { type: 'number', xRatio: 0.62, yRatio: 0.87, align: 'center', emboss: true, fontSizeRatio: 0.18 },
+  ],
+};
+
+// Ras Al Khaimah Bike
+CONFIGS['rak_bike'] = {
+  ...BIKE_SQUARE_DEFAULTS,
+  hasCode: true,
+  fontFile: '/fonts/Rough Motion.otf',
+  letterSpacingRatio: 0.01,
+  components: [
+    { type: 'code', xRatio: 0.12, yRatio: 0.43, align: 'center', emboss: true, fontSizeRatio: 0.18 },
+    { type: 'number', xRatio: 0.52, yRatio: 0.87, align: 'center', emboss: true, fontSizeRatio: 0.18 },
+  ],
+};
+
+// Fujairah Bike
+CONFIGS['fujairah_bike'] = {
+  ...BIKE_SQUARE_DEFAULTS,
+  hasCode: false,
+  fontFile: '/fonts/Rough Motion.otf',
+  letterSpacingRatio: 0.01,
+  components: [
+    { type: 'number', xRatio: 0.5, yRatio: 0.89, align: 'center', emboss: true, fontSizeRatio: 0.20 },
+  ],
+};
+
+export function getConfig(emirate: string, plateStyle: 'private' | 'bike' = 'private'): EmirateConfig {
+  const emId = (emirate || 'ajman').toLowerCase().replace(/\s+/g, '_');
+  const styleSuffix = plateStyle && plateStyle !== 'private' ? `_${plateStyle}` : '';
+  const configKey = `${emId}${styleSuffix}`;
+  return CONFIGS[configKey] || CONFIGS[emId] || CONFIGS['ajman'];
 }
 
 // Global font cache
@@ -156,6 +257,7 @@ export interface GeneratePlateOptions {
   plateNumber: string;
   blankPlateImage: HTMLImageElement;
   emirate: string;
+  plateStyle?: 'private' | 'bike';
 }
 
 export async function generatePlate({
@@ -163,10 +265,13 @@ export async function generatePlate({
   plateNumber,
   blankPlateImage,
   emirate,
+  plateStyle = 'private',
 }: GeneratePlateOptions): Promise<HTMLCanvasElement> {
   if (!blankPlateImage || !blankPlateImage.width) throw new Error('Invalid blank plate image');
-  const id = (emirate || 'ajman').toLowerCase().replace(/\s+/g, '_');
-  const config = CONFIGS[id] || CONFIGS['ajman'];
+  const emId = (emirate || 'ajman').toLowerCase().replace(/\s+/g, '_');
+  const styleSuffix = plateStyle && plateStyle !== 'private' ? `_${plateStyle}` : '';
+  const configKey = `${emId}${styleSuffix}`;
+  const config = CONFIGS[configKey] || CONFIGS[emId] || CONFIGS['ajman'];
 
   const canvas = document.createElement('canvas');
   canvas.width = OUTPUT_WIDTH;
@@ -192,7 +297,7 @@ export async function generatePlate({
   // Load Fonts
   const targetWeight = config.fontWeight || 'bold';
   const fontFileURL = config.fontFile || FONT_FILE;
-  const fontNameId = config.fontFile ? `PlateFont_${id}` : FONT_PRIMARY;
+  const fontNameId = config.fontFile ? `PlateFont_${emId}` : FONT_PRIMARY;
 
   // Load Font
   const font = new FontFace(fontNameId, `url("${fontFileURL}")`, { weight: targetWeight });
@@ -212,7 +317,11 @@ export async function generatePlate({
 
     const x = W * comp.xRatio;
     let compY = baselineY;
-    if (comp.baselineOffsetRatio) compY = baselineY + H * comp.baselineOffsetRatio;
+    if (comp.yRatio !== undefined) {
+      compY = H * comp.yRatio;
+    } else if (comp.baselineOffsetRatio) {
+      compY = baselineY + H * comp.baselineOffsetRatio;
+    }
 
     ctx.font = `${targetWeight} ${Math.round(compFontSize)}px "${fontNameId}", sans-serif`;
 

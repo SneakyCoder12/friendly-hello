@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --primary: 174 75% 26%;
-  --primary-hover: 174 78% 21%;
+  --primary: 40 86% 44%;
+  --primary-hover: 40 90% 36%;
   --primary-foreground: 0 0% 100%;
   --background: 0 0% 100%;
   --foreground: 0 0% 10%;
@@ -208,7 +208,7 @@ input[type="number"] {
   position: absolute;
   top: 0;
   right: 0;
-  z-index: 20;
+  z-index: 50;
   overflow: hidden;
   width: 100px;
   height: 100px;

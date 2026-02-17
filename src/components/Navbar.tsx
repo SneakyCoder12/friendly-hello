@@ -42,7 +42,7 @@ export default function Navbar() {
   const closeMenu = () => setMenuOpen(false);
 
   const navLinkClass =
-    'relative text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors duration-300 after:content-[""] after:absolute after:left-0 after:bottom-[-4px] after:w-0 after:h-[2px] after:bg-gray-800 after:rounded-full after:transition-all after:duration-300 hover:after:w-full';
+    'relative text-base font-semibold text-gray-500 hover:text-gray-900 transition-colors duration-300 after:content-[""] after:absolute after:left-0 after:bottom-[-4px] after:w-0 after:h-[2px] after:bg-gray-800 after:rounded-full after:transition-all after:duration-300 hover:after:w-full';
 
   return (
     <>
@@ -55,13 +55,13 @@ export default function Navbar() {
               <img
                 src="/Logo.png"
                 alt="Alnuami Groups"
-                className="h-16 sm:h-20 w-auto object-contain transition-transform duration-300 group-hover:scale-105 self-center"
+                className="h-16 sm:h-20 lg:h-24 w-auto object-contain transition-transform duration-300 group-hover:scale-105 self-center"
               />
               <div className="-ml-3 leading-none">
-                <h1 className="font-display font-black text-xl sm:text-2xl tracking-tighter text-gray-900 transition-colors duration-300 group-hover:text-gray-700">
+                <h1 className="font-display font-black text-xl sm:text-2xl lg:text-3xl tracking-tighter text-gray-900 transition-colors duration-300 group-hover:text-gray-700">
                   ALNUAMI
                 </h1>
-                <p className="text-[7px] sm:text-[8px] font-bold uppercase tracking-[0.3em] text-gray-400 -mt-0.5" style={{ paddingLeft: '64.5%' }}>Groups</p>
+                <p className="text-[7px] sm:text-[8px] lg:text-[9px] font-bold uppercase tracking-[0.3em] text-gray-400 -mt-0.5" style={{ paddingLeft: '64.5%' }}>Groups</p>
               </div>
             </Link>
 
@@ -73,7 +73,7 @@ export default function Navbar() {
               <div className="relative group/market">
                 <Link
                   to="/marketplace"
-                  className="flex items-center gap-1 text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors duration-300"
+                  className="flex items-center gap-1 text-base font-semibold text-gray-500 hover:text-gray-900 transition-colors duration-300"
                 >
                   {t('marketplace')}
                   <ChevronDown className="h-3.5 w-3.5 transition-transform duration-300 group-hover/market:rotate-180" />

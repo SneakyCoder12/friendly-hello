@@ -1,43 +1,68 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, PlusCircle, Sparkles } from 'lucide-react';
+import { ArrowRight, PlusCircle, Sparkles, TrendingUp, Shield, Users } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
 
 export default function ListWithUsBanner() {
     const { user } = useAuth();
+    const { t } = useLanguage();
     const navigate = useNavigate();
 
     const handleListClick = (e: React.MouseEvent) => {
         if (!user) {
             e.preventDefault();
-            toast.info('Please login to list your number');
+            toast.info(t('loginToList'));
             navigate('/login');
         }
     };
 
     return (
-        <section className="relative w-full rounded-3xl overflow-hidden border border-gray-100 shadow-sm mt-8 bg-white">
-            {/* Background gradient */}
-            <div className="absolute inset-0 bg-gradient-to-r from-white via-gray-50 to-white" />
+        <section className="relative w-full rounded-3xl overflow-hidden border border-primary/20 shadow-xl shadow-primary/5 mt-8">
+            {/* Rich gold gradient background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.06] via-primary/[0.02] to-primary/[0.08]" />
 
-            {/* Decorative pattern */}
-            <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:16px_16px]" />
+            {/* Decorative corner accents */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/10 to-transparent rounded-bl-full" />
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-primary/8 to-transparent rounded-tr-full" />
 
-            <div className="relative px-8 md:px-12 py-10">
+            {/* Animated shimmer line */}
+            <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+
+            {/* Floating dots pattern */}
+            <div className="absolute inset-0 opacity-[0.02] bg-[radial-gradient(#b8860b_1.5px,transparent_1.5px)] [background-size:24px_24px]" />
+
+            <div className="relative px-6 sm:px-8 md:px-14 py-10 md:py-14">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-8">
 
                     {/* Left side — text */}
                     <div className="text-center md:text-start max-w-xl">
-                        <div className="flex items-center justify-center md:justify-start gap-2 mb-3">
-                            <Sparkles className="h-4 w-4 text-amber-500" />
-                            <span className="text-xs font-bold uppercase tracking-widest text-amber-500">Sell With Us</span>
+                        <div className="inline-flex items-center gap-2 mb-4 bg-primary/10 px-3.5 py-1.5 rounded-full border border-primary/20">
+                            <Sparkles className="h-3.5 w-3.5 text-primary" />
+                            <span className="text-[11px] font-bold uppercase tracking-widest text-primary">{t('sellWithUs')}</span>
                         </div>
-                        <h2 className="text-2xl md:text-3xl font-display font-black text-gray-900 tracking-tight mb-2">
-                            Want to list your number?
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-black text-foreground tracking-tight mb-3 leading-tight">
+                            {t('wantToListNumber')}
                         </h2>
-                        <p className="text-gray-500 text-sm md:text-base leading-relaxed">
-                            Join the marketplace and sell your unique plate or mobile number to thousands of buyers.
+                        <p className="text-muted-foreground text-sm md:text-base leading-relaxed max-w-md">
+                            {t('wantToListNumberDesc')}
                         </p>
+
+                        {/* Trust stats */}
+                        <div className="flex flex-wrap items-center gap-4 sm:gap-6 mt-5 justify-center md:justify-start">
+                            <div className="flex items-center gap-1.5 text-muted-foreground">
+                                <Users className="h-3.5 w-3.5 text-primary/60" />
+                                <span className="text-[10px] font-bold uppercase tracking-wider">{t('thousandsBuyers')}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-muted-foreground">
+                                <TrendingUp className="h-3.5 w-3.5 text-primary/60" />
+                                <span className="text-[10px] font-bold uppercase tracking-wider">{t('freeListing')}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-muted-foreground">
+                                <Shield className="h-3.5 w-3.5 text-primary/60" />
+                                <span className="text-[10px] font-bold uppercase tracking-wider">{t('secureDeals')}</span>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Right side — CTA */}
@@ -45,11 +70,13 @@ export default function ListWithUsBanner() {
                         <Link
                             to={user ? '/dashboard' : '/login'}
                             onClick={handleListClick}
-                            className="relative inline-flex items-center gap-2 bg-gray-900 text-white px-6 py-3.5 rounded-xl font-bold text-base hover:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 group overflow-hidden"
+                            className="relative inline-flex items-center gap-2 bg-gradient-to-r from-primary to-primary-hover text-primary-foreground px-8 py-4 rounded-2xl font-bold text-base hover:shadow-xl hover:shadow-primary/25 hover:scale-[1.02] transition-all duration-300 group overflow-hidden"
                         >
+                            {/* Shimmer effect */}
+                            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                             <span className="relative flex items-center gap-2">
                                 <PlusCircle className="h-5 w-5" />
-                                List Your Number
+                                {t('listYourNumber')}
                                 <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                             </span>
                         </Link>

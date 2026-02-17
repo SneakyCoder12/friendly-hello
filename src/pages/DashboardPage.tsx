@@ -4,8 +4,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
-import { Loader2, Plus, Pencil, Trash2, Eye, EyeOff, CheckCircle, Search, X, Shield, Smartphone, Heart } from 'lucide-react';
+import { Loader2, Plus, Pencil, Trash2, Eye, EyeOff, CheckCircle, Search, X, Shield, Smartphone, Heart, BarChart3, TrendingUp, Hash, Car } from 'lucide-react';
 import PhoneInput from '@/components/PhoneInput';
+import MiniPlatePreview from '@/components/MiniPlatePreview';
 
 const EMIRATES = ['Abu Dhabi', 'Dubai', 'Sharjah', 'Ajman', 'Umm Al Quwain', 'Ras Al Khaimah', 'Fujairah'];
 
@@ -18,6 +19,7 @@ interface Listing {
   description: string | null;
   status: string;
   created_at: string;
+  vehicle_type: string;
 }
 
 interface BulkRow {
@@ -28,6 +30,7 @@ interface BulkRow {
   description: string;
   contact_email: string;
   contact_phone: string;
+  vehicle_type: 'car' | 'bike';
 }
 
 const emptyRow = (prev?: BulkRow, email?: string, phone?: string): BulkRow => ({
@@ -38,6 +41,7 @@ const emptyRow = (prev?: BulkRow, email?: string, phone?: string): BulkRow => ({
   description: '',
   contact_email: email || prev?.contact_email || '',
   contact_phone: phone || prev?.contact_phone || '',
+  vehicle_type: prev?.vehicle_type || 'car',
 });
 
 export default function DashboardPage() {
@@ -59,7 +63,7 @@ export default function DashboardPage() {
 
   // Edit single
   const [editId, setEditId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState({ plate_code: '', plate_number: '', emirate: 'Dubai', price: '', description: '' });
+  const [editForm, setEditForm] = useState({ plate_code: '', plate_number: '', emirate: 'Dubai', price: '', description: '', vehicle_type: 'car' });
 
   // Profile edit
   const [profileForm, setProfileForm] = useState({ full_name: '', phone_number: '' });
@@ -121,7 +125,13 @@ export default function DashboardPage() {
       .from('listings').select('*').eq('user_id', user.id)
       .order('created_at', { ascending: false });
     if (error) toast.error(error.message);
-    else setListings(data || []);
+    else {
+      const typedData = (data || []).map(d => ({
+        ...d,
+        vehicle_type: (d as any).vehicle_type || 'car'
+      })) as Listing[];
+      setListings(typedData);
+    }
     setLoading(false);
   };
 
@@ -167,6 +177,7 @@ export default function DashboardPage() {
         contact_phone: r.contact_phone || null,
         user_id: user.id,
         status: 'active' as const,
+        vehicle_type: r.vehicle_type,
       };
     });
 
@@ -192,6 +203,7 @@ export default function DashboardPage() {
       emirate: listing.emirate,
       price: listing.price?.toString() || '',
       description: listing.description || '',
+      vehicle_type: listing.vehicle_type || 'car',
     });
     setEditId(listing.id);
   };
@@ -210,6 +222,7 @@ export default function DashboardPage() {
       plate_style: editForm.plate_code.trim() || null,
       price: editForm.price ? Number(editForm.price) : null,
       description: editForm.description || null,
+      vehicle_type: editForm.vehicle_type,
     }).eq('id', editId);
     if (error) toast.error(error.message);
     else { toast.success('Listing updated'); setEditId(null); fetchListings(); }
@@ -382,9 +395,9 @@ export default function DashboardPage() {
   };
 
   const statusColor = (s: string) => {
-    if (s === 'active') return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
-    if (s === 'sold') return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
-    return 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20';
+    if (s === 'active') return 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20';
+    if (s === 'sold') return 'bg-red-500/10 text-red-600 border-red-500/20';
+    return 'bg-zinc-500/10 text-zinc-500 border-zinc-500/20';
   };
 
   // Filtered listings
@@ -463,121 +476,195 @@ export default function DashboardPage() {
           )}
         </div>
 
+        {/* ── Stats Strip ── */}
+        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-8 dash-animate dash-animate-delay-2">
+          <div className="bg-gradient-to-br from-primary/5 to-primary/[0.02] border border-primary/15 rounded-xl p-3 sm:p-4 text-center group hover:border-primary/30 transition-all">
+            <div className="flex items-center justify-center gap-1.5 mb-1">
+              <Hash className="h-3.5 w-3.5 text-primary" />
+              <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Total</span>
+            </div>
+            <p className="text-xl sm:text-2xl font-black text-foreground font-mono">{listings.length}</p>
+          </div>
+          <div className="bg-gradient-to-br from-emerald-500/5 to-emerald-500/[0.02] border border-emerald-500/15 rounded-xl p-3 sm:p-4 text-center group hover:border-emerald-500/30 transition-all">
+            <div className="flex items-center justify-center gap-1.5 mb-1">
+              <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />
+              <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Active</span>
+            </div>
+            <p className="text-xl sm:text-2xl font-black text-emerald-600 font-mono">{listings.filter(l => l.status === 'active').length}</p>
+          </div>
+          <div className="bg-gradient-to-br from-red-500/5 to-red-500/[0.02] border border-red-500/15 rounded-xl p-3 sm:p-4 text-center group hover:border-red-500/30 transition-all">
+            <div className="flex items-center justify-center gap-1.5 mb-1">
+              <CheckCircle className="h-3.5 w-3.5 text-red-500" />
+              <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Sold</span>
+            </div>
+            <p className="text-xl sm:text-2xl font-black text-red-600 font-mono">{listings.filter(l => l.status === 'sold').length}</p>
+          </div>
+          <div className="hidden sm:block bg-gradient-to-br from-primary/5 to-primary/[0.02] border border-primary/15 rounded-xl p-3 sm:p-4 text-center group hover:border-primary/30 transition-all">
+            <div className="flex items-center justify-center gap-1.5 mb-1">
+              <Smartphone className="h-3.5 w-3.5 text-primary" />
+              <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Mobiles</span>
+            </div>
+            <p className="text-xl sm:text-2xl font-black text-foreground font-mono">{mobileNumbers.length}</p>
+          </div>
+        </div>
+
         {/* ── Listings Header ── */}
         <div className="flex items-center justify-between mb-5 dash-animate dash-animate-delay-2">
-          <h2 className="text-xl sm:text-2xl font-display font-bold text-foreground">{t('myListings')}</h2>
+          <div className="flex items-center gap-2.5">
+            <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center shadow-md">
+              <Car className="h-4 w-4 text-white" />
+            </div>
+            <h2 className="text-xl sm:text-2xl font-display font-bold text-foreground">{t('myListings')}</h2>
+          </div>
           <button onClick={initBulkForm}
             className="btn-glow bg-gradient-to-r from-primary to-primary-hover text-primary-foreground px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 hover:shadow-lg hover:shadow-primary/20 active:scale-[0.97] transition-all">
             <Plus className="h-4 w-4" /> Add Listings
           </button>
         </div>
 
-        {/* Bulk Form */}
+        {/* Bulk Form — Premium */}
         {showForm && (
-          <div className="glass-card border border-border/60 rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-sm dash-animate">
-            <h3 className="font-display font-bold text-foreground mb-4 text-sm sm:text-base flex items-center gap-2">
-              <div className="h-6 w-6 rounded-lg bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center">
-                <Plus className="h-3.5 w-3.5 text-white" />
-              </div>
-              Add New Listings
-            </h3>
-            <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+          <div className="glass-card border border-primary/20 rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-lg shadow-primary/5 dash-animate">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="font-display font-bold text-foreground text-sm sm:text-base flex items-center gap-2">
+                <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center shadow-md">
+                  <Plus className="h-3.5 w-3.5 text-white" />
+                </div>
+                Add New Listings
+              </h3>
+              <span className="text-[10px] font-bold text-primary bg-primary/5 px-2.5 py-1 rounded-lg border border-primary/15">{rows.filter(r => r.plate_number.trim()).length} plate{rows.filter(r => r.plate_number.trim()).length !== 1 ? 's' : ''} ready</span>
+            </div>
+
+            <div className="space-y-5 max-h-[65vh] overflow-y-auto pr-1">
               {rows.map((row, idx) => (
-                <div key={idx} className="bg-surface rounded-xl p-3 sm:p-4 border border-border/50">
-                  <div className="flex items-center justify-between mb-2 sm:hidden">
-                    <span className="text-xs font-bold text-muted-foreground">Listing #{idx + 1}</span>
-                    <button onClick={() => removeRow(idx)} className="h-7 w-7 flex items-center justify-center text-red-400 hover:text-red-300 rounded-lg hover:bg-red-50 transition-colors"
+                <div key={idx} className="bg-white border border-border/60 rounded-2xl overflow-hidden hover:border-primary/20 transition-all group">
+                  {/* Top bar: listing number + remove */}
+                  <div className="flex items-center justify-between px-4 pt-3 pb-0">
+                    <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Listing #{idx + 1}</span>
+                    <button onClick={() => removeRow(idx)} className="h-7 w-7 flex items-center justify-center text-red-300 hover:text-red-500 rounded-lg hover:bg-red-50 transition-all active:scale-90"
                       disabled={rows.length <= 1}>
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   </div>
-                  {/* Mobile: stacked layout */}
-                  <div className="grid grid-cols-2 sm:hidden gap-2">
-                    <div>
-                      <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Number</label>
-                      <input value={row.plate_number} onChange={e => {
-                        const v = e.target.value.replace(/\D/g, '').slice(0, 5);
-                        updateRow(idx, 'plate_number', v);
-                      }} placeholder="12345" maxLength={5}
-                        className="w-full bg-card border border-border rounded-lg px-3 py-2.5 text-sm text-foreground font-mono font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/30" />
+
+                  <div className="p-4 pt-2">
+                    {/* Row 1: Live preview + Code & Number inputs */}
+                    <div className="flex flex-col sm:flex-row gap-4 mb-4">
+                      {/* Live Plate Preview */}
+                      <div className="flex-shrink-0 sm:w-48 h-24 sm:h-28 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-border/50 flex items-center justify-center overflow-hidden">
+                        <MiniPlatePreview
+                          emirate={row.emirate}
+                          code={row.plate_style}
+                          number={row.plate_number}
+                          vehicleType={row.vehicle_type || 'car'}
+                          className="w-full h-full p-1"
+                        />
+                      </div>
+
+                      {/* Code + Number */}
+                      <div className="flex-1 space-y-3">
+                        <div className="grid grid-cols-3 gap-2">
+                          <div className="col-span-1">
+                            <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Code</label>
+                            <input value={row.plate_style} onChange={e => {
+                              const v = e.target.value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 2);
+                              updateRow(idx, 'plate_style', v.toUpperCase());
+                            }} placeholder="A" maxLength={2}
+                              className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-base text-foreground font-mono font-black text-center focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all" />
+                          </div>
+                          <div className="col-span-2">
+                            <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Number</label>
+                            <input value={row.plate_number} onChange={e => {
+                              const v = e.target.value.replace(/\D/g, '').slice(0, 5);
+                              updateRow(idx, 'plate_number', v);
+                            }} placeholder="12345" maxLength={5}
+                              className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-base text-foreground font-mono font-black text-center focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all" />
+                          </div>
+                        </div>
+
+                        {/* Price + Description */}
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Price (AED)</label>
+                            <input type="number" value={row.price} onChange={e => updateRow(idx, 'price', e.target.value)} placeholder="22,000"
+                              className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all" />
+                          </div>
+                          <div>
+                            <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Description</label>
+                            <input value={row.description} onChange={e => updateRow(idx, 'description', e.target.value)} placeholder="Optional note"
+                              className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all" />
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Code</label>
-                      <input value={row.plate_style} onChange={e => {
-                        const v = e.target.value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 2);
-                        updateRow(idx, 'plate_style', v.toUpperCase());
-                      }} placeholder="A" maxLength={2}
-                        className="w-full bg-card border border-border rounded-lg px-3 py-2.5 text-sm text-foreground font-mono font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/30" />
+
+                    {/* Row 2: Emirate pills + Type toggle */}
+                    <div className="flex flex-col sm:flex-row sm:items-end gap-3">
+                      {/* Emirate selection pills */}
+                      <div className="flex-1">
+                        <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-2">Emirate</label>
+                        <div className="flex flex-wrap gap-1.5">
+                          {EMIRATES.map(em => {
+                            const isSelected = row.emirate === em;
+                            const short = em === 'Ras Al Khaimah' ? 'RAK' : em === 'Umm Al Quwain' ? 'UAQ' : em;
+                            return (
+                              <button
+                                key={em}
+                                type="button"
+                                onClick={() => updateRow(idx, 'emirate', em)}
+                                className={`px-2.5 py-1.5 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all active:scale-95 ${isSelected
+                                    ? 'bg-gradient-to-r from-primary to-primary-hover text-primary-foreground shadow-md shadow-primary/20'
+                                    : 'bg-surface border border-border text-muted-foreground hover:border-primary/30 hover:text-foreground'
+                                  }`}
+                              >
+                                {short}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Vehicle type toggle */}
+                      <div className="flex-shrink-0">
+                        <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-2">Type</label>
+                        <div className="flex rounded-xl border border-border overflow-hidden">
+                          <button
+                            type="button"
+                            onClick={() => updateRow(idx, 'vehicle_type', 'car')}
+                            className={`px-4 py-2 text-xs font-bold transition-all ${row.vehicle_type === 'car' || !row.vehicle_type
+                                ? 'bg-gradient-to-r from-primary to-primary-hover text-primary-foreground'
+                                : 'bg-surface text-muted-foreground hover:text-foreground'
+                              }`}
+                          >
+                            🚗 Car
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => updateRow(idx, 'vehicle_type', 'bike')}
+                            className={`px-4 py-2 text-xs font-bold transition-all ${row.vehicle_type === 'bike'
+                                ? 'bg-gradient-to-r from-primary to-primary-hover text-primary-foreground'
+                                : 'bg-surface text-muted-foreground hover:text-foreground'
+                              }`}
+                          >
+                            🏍️ Bike
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                    <div className="col-span-2">
-                      <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Emirate</label>
-                      <select value={row.emirate} onChange={e => updateRow(idx, 'emirate', e.target.value)}
-                        className="w-full bg-card border border-border rounded-lg px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
-                        {EMIRATES.map(em => <option key={em} value={em}>{em}</option>)}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Price</label>
-                      <input type="number" value={row.price} onChange={e => updateRow(idx, 'price', e.target.value)} placeholder="Price"
-                        className="w-full bg-card border border-border rounded-lg px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
-                    </div>
-                    <div>
-                      <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Description</label>
-                      <input value={row.description} onChange={e => updateRow(idx, 'description', e.target.value)} placeholder="Optional"
-                        className="w-full bg-card border border-border rounded-lg px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
-                    </div>
-                  </div>
-                  {/* Desktop: inline layout */}
-                  <div className="hidden sm:grid grid-cols-12 gap-2 items-end">
-                    <div className="col-span-2">
-                      {idx === 0 && <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Number</label>}
-                      <input value={row.plate_number} onChange={e => {
-                        const v = e.target.value.replace(/\D/g, '').slice(0, 5);
-                        updateRow(idx, 'plate_number', v);
-                      }} placeholder="12345" maxLength={5}
-                        className="w-full bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground font-mono font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/30" />
-                    </div>
-                    <div className="col-span-2">
-                      {idx === 0 && <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Emirate</label>}
-                      <select value={row.emirate} onChange={e => updateRow(idx, 'emirate', e.target.value)}
-                        className="w-full bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
-                        {EMIRATES.map(em => <option key={em} value={em}>{em}</option>)}
-                      </select>
-                    </div>
-                    <div className="col-span-1">
-                      {idx === 0 && <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Code</label>}
-                      <input value={row.plate_style} onChange={e => {
-                        const v = e.target.value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 2);
-                        updateRow(idx, 'plate_style', v.toUpperCase());
-                      }} placeholder="A" maxLength={2}
-                        className="w-full bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground font-mono font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/30" />
-                    </div>
-                    <div className="col-span-2">
-                      {idx === 0 && <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Price</label>}
-                      <input type="number" value={row.price} onChange={e => updateRow(idx, 'price', e.target.value)} placeholder="Price"
-                        className="w-full bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
-                    </div>
-                    <div className="col-span-4">
-                      {idx === 0 && <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Description</label>}
-                      <input value={row.description} onChange={e => updateRow(idx, 'description', e.target.value)} placeholder="Description"
-                        className="w-full bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
-                    </div>
-                    <button onClick={() => removeRow(idx)} className="col-span-1 h-9 flex items-center justify-center text-red-400 hover:text-red-300 transition-colors"
-                      disabled={rows.length <= 1}>
-                      <Trash2 className="h-4 w-4" />
-                    </button>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-4">
-              <button onClick={addRow} className="bg-surface border border-border px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-foreground hover:bg-surface-accent active:scale-[0.97] transition-all flex items-center gap-1">
+
+            {/* Bottom actions */}
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-5 pt-4 border-t border-border/50">
+              <button onClick={addRow} className="bg-surface border border-dashed border-primary/30 px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-primary hover:bg-primary/5 active:scale-[0.97] transition-all flex items-center gap-1.5">
                 <Plus className="h-4 w-4" /> Add Another
               </button>
               <div className="flex-1" />
               <button onClick={() => setShowForm(false)} className="bg-surface border border-border px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-foreground hover:bg-surface-accent active:scale-[0.97] transition-all">{t('cancel')}</button>
               <button onClick={handleBulkSave} disabled={saving}
-                className="bg-gradient-to-r from-primary to-primary-hover text-primary-foreground px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold disabled:opacity-50 flex items-center gap-2 hover:shadow-lg hover:shadow-primary/20 active:scale-[0.97] transition-all">
+                className="bg-gradient-to-r from-primary to-primary-hover text-primary-foreground px-5 sm:px-7 py-2.5 rounded-xl text-xs sm:text-sm font-bold disabled:opacity-50 flex items-center gap-2 hover:shadow-lg hover:shadow-primary/20 active:scale-[0.97] transition-all">
                 {saving && <Loader2 className="h-4 w-4 animate-spin" />} Save ({rows.filter(r => r.plate_number.trim()).length})
               </button>
             </div>
@@ -594,14 +681,40 @@ export default function DashboardPage() {
               {t('editListing')}
             </h3>
 
+            {/* Type selector for Edit Form */}
+            <div className="flex gap-4 mb-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="editVehicleType"
+                  checked={editForm.vehicle_type === 'car'}
+                  onChange={() => setEditForm(prev => ({ ...prev, vehicle_type: 'car' }))}
+                  className="accent-primary"
+                />
+                <span className="text-sm font-bold text-foreground">Car</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="editVehicleType"
+                  checked={editForm.vehicle_type === 'bike'}
+                  onChange={() => setEditForm(prev => ({ ...prev, vehicle_type: 'bike' }))}
+                  className="accent-primary"
+                />
+                <span className="text-sm font-bold text-foreground">Bike</span>
+              </label>
+            </div>
+
             {/* Live plate preview */}
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800/50 dark:to-gray-900/50 rounded-xl p-3 sm:p-4 mb-5 sm:mb-6 flex items-center justify-center border border-border/50">
-              <div className="bg-white dark:bg-card border-2 border-gray-300 dark:border-border rounded-xl px-5 sm:px-6 py-2.5 sm:py-3">
-                <p className="font-mono font-black text-xl sm:text-2xl text-foreground tracking-wider text-center">
-                  {editForm.plate_code && <span>{editForm.plate_code}</span>}
-                  {editForm.plate_code && editForm.plate_number && <span className="mx-2"> </span>}
-                  <span>{editForm.plate_number || '—'}</span>
-                </p>
+              <div className="w-48 h-24 sm:w-64 sm:h-32">
+                <MiniPlatePreview
+                  emirate={editForm.emirate}
+                  code={editForm.plate_code}
+                  number={editForm.plate_number}
+                  vehicleType={editForm.vehicle_type as 'car' | 'bike'}
+                  className="w-full h-full"
+                />
               </div>
             </div>
 
@@ -702,42 +815,63 @@ export default function DashboardPage() {
         ) : (
           <>
             <div className="space-y-3">
-              {pagedListings.map((listing, i) => (
-                <div key={listing.id} className="glass-card border border-border/60 rounded-xl p-3.5 sm:p-4 hover-lift group" style={{ animationDelay: `${i * 0.04}s` }}>
-                  <div className="flex items-center justify-between gap-3">
-                    {/* Info */}
-                    <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-                      <span className="inline-flex items-center bg-gradient-to-br from-surface to-surface-accent border border-border rounded-lg px-2.5 sm:px-3.5 py-1 sm:py-1.5 font-mono font-black text-foreground text-xs sm:text-sm tracking-wide shadow-sm">
-                        {listing.plate_number}
-                      </span>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-1.5 mb-0.5">
-                          <span className={`text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full border ${statusColor(listing.status)}`}>{listing.status.toUpperCase()}</span>
+              {pagedListings.map((listing, i) => {
+                const pParts = listing.plate_number?.split(' ') || [];
+                const pCode = pParts.length > 1 ? pParts[0] : '';
+                const pNum = pParts.length > 1 ? pParts.slice(1).join(' ') : pParts[0] || '';
+                return (
+                  <div key={listing.id} className={`border rounded-xl p-3 sm:p-4 group transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 hover:border-primary/25 bg-white ${listing.status === 'sold' ? 'border-l-4 border-l-red-400 border-t-border/60 border-r-border/60 border-b-border/60' : listing.status === 'hidden' ? 'border-l-4 border-l-zinc-300 border-t-border/60 border-r-border/60 border-b-border/60 opacity-60' : 'border-l-4 border-l-primary border-t-border/60 border-r-border/60 border-b-border/60'}`} style={{ animationDelay: `${i * 0.04}s` }}>
+                    <div className="flex items-center justify-between gap-3">
+                      {/* Plate Thumbnail */}
+                      <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+                        <div className={`flex-shrink-0 w-20 h-10 sm:w-28 sm:h-14 rounded-lg overflow-hidden bg-gray-50 border border-border/40 group-hover:scale-[1.03] transition-transform ${listing.status === 'sold' ? 'opacity-50 grayscale' : ''}`}>
+                          <MiniPlatePreview
+                            emirate={listing.emirate}
+                            code={pCode}
+                            number={pNum}
+                            vehicleType={(listing.vehicle_type as 'car' | 'bike') || 'car'}
+                            className="w-full h-full"
+                          />
                         </div>
-                        <p className="text-[11px] sm:text-xs text-muted-foreground truncate">{listing.emirate} {listing.price ? `• AED ${listing.price.toLocaleString()}` : ''}</p>
+                        <div className="min-w-0">
+                          <p className="text-sm sm:text-base font-black font-mono text-foreground tracking-wide mb-0.5 truncate">{listing.plate_number}</p>
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <span className={`text-[8px] sm:text-[9px] font-black uppercase tracking-wider px-1.5 sm:px-2 py-0.5 rounded-md border ${listing.status === 'active' ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : listing.status === 'sold' ? 'bg-red-500/10 text-red-600 border-red-500/20' : 'bg-zinc-100 text-zinc-500 border-zinc-200'}`}>
+                              {listing.status}
+                            </span>
+                            {listing.vehicle_type === 'bike' && (
+                              <span className="text-[8px] sm:text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-sky-500/10 text-sky-600 border border-sky-500/20">Bike</span>
+                            )}
+                          </div>
+                          <p className="text-[11px] sm:text-xs text-muted-foreground truncate font-medium">
+                            <span className="text-foreground/70">{listing.emirate}</span>
+                            {listing.price && <span className="text-primary mx-1">•</span>}
+                            {listing.price && <span className="font-bold text-foreground">AED {listing.price.toLocaleString()}</span>}
+                          </p>
+                        </div>
+                      </div>
+                      {/* Actions */}
+                      <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0 opacity-60 group-hover:opacity-100 transition-opacity">
+                        <button onClick={() => toggleHidden(listing)}
+                          className={`h-8 w-8 rounded-lg flex items-center justify-center transition-all active:scale-90 ${listing.status === 'hidden' ? 'bg-amber-100 text-amber-600' : 'hover:bg-primary/5 text-muted-foreground hover:text-primary'}`}
+                          title={listing.status === 'hidden' ? 'Show listing' : 'Hide listing'}>
+                          {listing.status === 'hidden' ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                        <button onClick={() => toggleStatus(listing)} className={`h-8 w-8 rounded-lg flex items-center justify-center transition-all active:scale-90 ${listing.status === 'sold' ? 'bg-red-100 text-red-600' : 'hover:bg-primary/5 text-muted-foreground hover:text-green-600'}`}
+                          title={listing.status === 'active' ? 'Mark as sold' : 'Mark as active'}>
+                          <CheckCircle className="h-4 w-4" />
+                        </button>
+                        <button onClick={() => startEdit(listing)} className="h-8 w-8 rounded-lg hover:bg-primary/5 flex items-center justify-center text-muted-foreground hover:text-primary transition-all active:scale-90">
+                          <Pencil className="h-4 w-4" />
+                        </button>
+                        <button onClick={() => setDeleteId(listing.id)} className="h-8 w-8 rounded-lg hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-all active:scale-90">
+                          <Trash2 className="h-4 w-4" />
+                        </button>
                       </div>
                     </div>
-                    {/* Actions */}
-                    <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
-                      <button onClick={() => toggleHidden(listing)}
-                        className={`h-7 w-7 sm:h-8 sm:w-8 rounded-lg flex items-center justify-center transition-all active:scale-90 ${listing.status === 'hidden' ? 'bg-amber-500/10 text-amber-400 hover:bg-amber-500/20' : 'bg-surface border border-border text-muted-foreground hover:text-primary hover:border-primary/30'}`}
-                        title={listing.status === 'hidden' ? 'Show listing' : 'Hide listing'}>
-                        {listing.status === 'hidden' ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-                      </button>
-                      <button onClick={() => toggleStatus(listing)} className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/30 transition-all active:scale-90"
-                        title={listing.status === 'active' ? 'Mark as sold' : 'Mark as active'}>
-                        <CheckCircle className="h-3.5 w-3.5" />
-                      </button>
-                      <button onClick={() => startEdit(listing)} className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/30 transition-all active:scale-90">
-                        <Pencil className="h-3.5 w-3.5" />
-                      </button>
-                      <button onClick={() => setDeleteId(listing.id)} className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-red-400 hover:bg-red-50 hover:border-red-200 transition-all active:scale-90">
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
             {totalPages > 1 && (
               <div className="flex items-center justify-center gap-3 mt-6">
@@ -755,13 +889,13 @@ export default function DashboardPage() {
         <div className="mt-10 sm:mt-12 pt-8 border-t border-border/50 dash-animate dash-animate-delay-4">
           <div className="flex items-center justify-between mb-6 gap-3">
             <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-              <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md">
+              <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center shadow-md">
                 <Smartphone className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
               </div>
               <h2 className="text-lg sm:text-2xl font-display font-bold text-foreground truncate">My Mobile Numbers</h2>
             </div>
             <button onClick={initMobileForm}
-              className="btn-glow bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 hover:shadow-lg hover:shadow-blue-500/20 active:scale-[0.97] transition-all flex-shrink-0">
+              className="btn-glow bg-gradient-to-r from-primary to-primary-hover text-primary-foreground px-3 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 hover:shadow-lg hover:shadow-primary/20 active:scale-[0.97] transition-all flex-shrink-0">
               <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Add</span> Number
             </button>
           </div>
@@ -819,7 +953,7 @@ export default function DashboardPage() {
               </div>
               <div className="flex gap-3">
                 <button onClick={handleMobileEditSave} disabled={saving}
-                  className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold disabled:opacity-50 flex items-center gap-2 hover:shadow-lg hover:shadow-blue-500/20 active:scale-[0.97] transition-all">
+                  className="bg-gradient-to-r from-primary to-primary-hover text-primary-foreground px-6 py-2.5 rounded-xl text-sm font-bold disabled:opacity-50 flex items-center gap-2 hover:shadow-lg hover:shadow-primary/20 active:scale-[0.97] transition-all">
                   {saving && <Loader2 className="h-4 w-4 animate-spin" />} Save Changes
                 </button>
                 <button onClick={() => setMobileEditId(null)}
@@ -916,7 +1050,7 @@ export default function DashboardPage() {
 
               <div className="flex gap-3">
                 <button onClick={saveMobileNumber} disabled={saving}
-                  className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold disabled:opacity-50 flex items-center gap-2 hover:shadow-lg hover:shadow-blue-500/20 active:scale-[0.97] transition-all">
+                  className="bg-gradient-to-r from-primary to-primary-hover text-primary-foreground px-6 py-2.5 rounded-xl text-sm font-bold disabled:opacity-50 flex items-center gap-2 hover:shadow-lg hover:shadow-primary/20 active:scale-[0.97] transition-all">
                   {saving && <Loader2 className="h-4 w-4 animate-spin" />} List Number
                 </button>
                 <button onClick={() => setShowMobileForm(false)}
@@ -930,7 +1064,7 @@ export default function DashboardPage() {
           {/* Mobile Numbers List */}
           {mobileNumbers.length === 0 ? (
             <div className="glass-card border border-border/60 rounded-2xl p-10 text-center">
-              <div className="h-14 w-14 mx-auto rounded-2xl bg-gradient-to-br from-blue-500/10 to-indigo-600/10 flex items-center justify-center mb-3">
+              <div className="h-14 w-14 mx-auto rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center mb-3">
                 <Smartphone className="h-6 w-6 text-muted-foreground/40" />
               </div>
               <p className="text-muted-foreground text-sm">No mobile numbers listed yet</p>
@@ -938,35 +1072,44 @@ export default function DashboardPage() {
           ) : (
             <div className="space-y-3">
               {mobileNumbers.map(mn => (
-                <div key={mn.id} className="glass-card border border-border/60 rounded-2xl p-4 sm:p-5 hover-lift">
+                <div key={mn.id} className={`border rounded-xl p-4 sm:p-5 group transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 hover:border-primary/25 bg-white ${mn.status === 'sold' ? 'border-l-4 border-l-red-400 border-t-border/60 border-r-border/60 border-b-border/60' : 'border-l-4 border-l-primary border-t-border/60 border-r-border/60 border-b-border/60'}`}>
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className={`h-9 w-9 sm:h-10 sm:w-10 rounded-xl flex items-center justify-center overflow-hidden border flex-shrink-0 ${mn.carrier === 'etisalat' ? 'border-emerald-200 bg-emerald-50' : 'border-blue-200 bg-blue-50'}`}>
+                      <div className={`h-10 w-10 sm:h-12 sm:w-12 rounded-xl flex items-center justify-center overflow-hidden border-2 flex-shrink-0 transition-transform group-hover:scale-105 ${mn.carrier === 'etisalat' ? 'border-emerald-200 bg-emerald-50' : 'border-blue-200 bg-blue-50'}`}>
                         <img
                           src={mn.carrier === 'etisalat' ? '/Eand_Logo.svg' : '/du-logo.png'}
                           alt={mn.carrier}
-                          className="h-5 w-5 sm:h-6 sm:w-6 object-contain"
+                          className="h-6 w-6 sm:h-7 sm:w-7 object-contain"
                         />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-foreground font-bold font-mono tracking-wider text-sm sm:text-base truncate">{mn.phone_number}</p>
-                        <p className="text-muted-foreground text-[11px] sm:text-xs capitalize">{mn.carrier} • {mn.price ? `AED ${mn.price.toLocaleString()}` : 'No price'}</p>
+                        <p className="text-foreground font-black font-mono tracking-wider text-sm sm:text-base truncate mb-0.5">{mn.phone_number}</p>
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span className={`text-[8px] sm:text-[9px] font-black uppercase tracking-wider px-1.5 sm:px-2 py-0.5 rounded-md border ${mn.status === 'active' ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : mn.status === 'sold' ? 'bg-red-500/10 text-red-600 border-red-500/20' : 'bg-zinc-100 text-zinc-500 border-zinc-200'}`}>
+                            {mn.status}
+                          </span>
+                        </div>
+                        <p className="text-muted-foreground text-[11px] sm:text-xs capitalize flex items-center gap-1.5">
+                          {mn.carrier}
+                          {mn.price && <span className="text-primary">•</span>}
+                          {mn.price ? <span className="font-bold text-foreground">AED {mn.price.toLocaleString()}</span> : 'No price'}
+                        </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
+                    <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0 opacity-60 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => toggleMobileStatus(mn)}
-                        className={`h-7 w-7 sm:h-8 sm:w-8 rounded-lg flex items-center justify-center transition-colors ${mn.status === 'active' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}
+                        className={`h-8 w-8 rounded-lg flex items-center justify-center transition-all active:scale-90 ${mn.status === 'sold' ? 'bg-red-100 text-red-600' : 'hover:bg-primary/5 text-muted-foreground hover:text-green-600'}`}
                         title={mn.status === 'active' ? 'Mark as sold' : 'Mark as active'}
                       >
-                        {mn.status === 'active' ? <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : <EyeOff className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
+                        <CheckCircle className="h-4 w-4" />
                       </button>
-                      <button onClick={() => startMobileEdit(mn)} className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
-                        <Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      <button onClick={() => startMobileEdit(mn)} className="h-8 w-8 rounded-lg hover:bg-primary/5 flex items-center justify-center text-muted-foreground hover:text-primary transition-all active:scale-90">
+                        <Pencil className="h-4 w-4" />
                       </button>
                       <button onClick={() => setMobileDeleteId(mn.id)}
-                        className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-red-400 hover:text-red-300 transition-colors">
-                        <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                        className="h-8 w-8 rounded-lg hover:bg-red-50 flex items-center justify-center text-red-400 hover:text-red-500 transition-all active:scale-90">
+                        <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
                   </div>
@@ -980,7 +1123,7 @@ export default function DashboardPage() {
         <div className="mt-10 sm:mt-12 pt-8 border-t border-border/50 dash-animate dash-animate-delay-4">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg sm:text-2xl font-display font-bold text-foreground flex items-center gap-2.5">
-              <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center shadow-md">
+              <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center shadow-md">
                 <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
               </div>
               My Favorites
