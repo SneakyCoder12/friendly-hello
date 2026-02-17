@@ -9,6 +9,7 @@ interface SupabaseListing {
   plate_style: string | null;
   price: number | null;
   contact_phone?: string | null;
+  status: string;
 }
 
 interface Props {
@@ -53,6 +54,8 @@ export default function EmirateSection({ section, listings }: Props) {
                 plateUrl={`/plate/${listing.id}`}
                 sellerPhone={listing.contact_phone}
                 plateNumber={listing.plate_number}
+                listingId={listing.id}
+                status={listing.status}
               />
             );
           })

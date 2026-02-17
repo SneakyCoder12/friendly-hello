@@ -231,6 +231,13 @@ export default function DashboardPage() {
     else fetchListings();
   };
 
+  const toggleHidden = async (listing: Listing) => {
+    const nextStatus = listing.status === 'hidden' ? 'active' : 'hidden';
+    const { error } = await supabase.from('listings').update({ status: nextStatus }).eq('id', listing.id);
+    if (error) toast.error(error.message);
+    else { toast.success(nextStatus === 'hidden' ? 'Listing hidden' : 'Listing visible'); fetchListings(); }
+  };
+
   const saveProfile = async () => {
     if (!user) return;
     const { error } = await supabase.from('profiles').update({
@@ -390,113 +397,188 @@ export default function DashboardPage() {
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-6xl mx-auto px-4 py-8 pt-24">
-        {/* Profile Section */}
-        <div className="bg-card border border-border rounded-2xl p-6 mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <h2 className="text-xl font-display font-bold text-foreground">{t('profile')}</h2>
+    <div className="bg-background min-h-screen">
+      {/* ── Gradient Hero Header ── */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-primary/3 border-b border-border/50">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,hsl(var(--primary)/0.08),transparent_60%)]" />
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 pb-8 sm:pb-10 relative">
+          <div className="dash-animate">
+            <p className="text-xs sm:text-sm font-bold uppercase tracking-[0.2em] text-primary/70 mb-1">Dashboard</p>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-display font-black text-foreground">
+              Welcome back, <span className="text-primary">{profile?.full_name?.split(' ')[0] || 'there'}</span>
+            </h1>
+            <p className="text-muted-foreground text-sm sm:text-base mt-1.5">Manage your listings, numbers & favorites</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-16">
+        {/* ── Profile Card ── */}
+        <div className="glass-card border border-border/60 rounded-2xl p-4 sm:p-6 mb-8 dash-animate dash-animate-delay-1 hover-lift -mt-4 sm:-mt-6 relative z-10 shadow-sm">
+          <div className="flex items-center justify-between mb-4 gap-2">
+            <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap">
+              <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center text-white font-bold text-sm shadow-md">
+                {(profile?.full_name?.[0] || 'U').toUpperCase()}
+              </div>
+              <div>
+                <h2 className="text-base sm:text-lg font-display font-bold text-foreground leading-tight">{t('profile')}</h2>
+                <p className="text-[11px] text-muted-foreground">{user?.email}</p>
+              </div>
               {isAdmin && (
-                <span className="flex items-center gap-1 bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full border border-primary/20">
+                <span className="shimmer-badge flex items-center gap-1 text-primary text-[10px] font-bold px-2.5 py-1 rounded-full border border-primary/20">
                   <Shield className="h-3 w-3" /> Admin
                 </span>
               )}
             </div>
-            {isAdmin && (
-              <Link to="/dashboard/admin" className="text-sm font-bold text-primary hover:underline">
-                {t('adminPanel')} →
-              </Link>
-            )}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {isAdmin && (
+                <Link to="/dashboard/admin" className="text-[11px] sm:text-xs font-bold text-primary bg-primary/5 hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-colors">
+                  {t('adminPanel')} →
+                </Link>
+              )}
+            </div>
           </div>
           {editingProfile ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-2">
               <input value={profileForm.full_name} onChange={e => setProfileForm(p => ({ ...p, full_name: e.target.value }))}
-                className="bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                className="bg-surface/80 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-shadow"
                 placeholder={t('fullName')} />
               <PhoneInput value={profileForm.phone_number} onChange={v => setProfileForm(p => ({ ...p, phone_number: v }))} showValidation={false} />
               <div className="flex gap-2 col-span-full">
-                <button onClick={saveProfile} className="bg-primary text-primary-foreground px-6 py-2 rounded-xl text-sm font-bold">{t('save')}</button>
-                <button onClick={() => setEditingProfile(false)} className="bg-surface border border-border px-6 py-2 rounded-xl text-sm font-bold text-foreground">{t('cancel')}</button>
+                <button onClick={saveProfile} className="bg-primary text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-primary-hover active:scale-[0.97] transition-all">{t('save')}</button>
+                <button onClick={() => setEditingProfile(false)} className="bg-surface border border-border px-5 py-2.5 rounded-xl text-sm font-bold text-foreground hover:bg-surface-accent active:scale-[0.97] transition-all">{t('cancel')}</button>
               </div>
             </div>
           ) : (
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-foreground font-medium">{profile?.full_name || 'No name set'}</p>
-                <p className="text-muted-foreground text-sm font-medium">{user?.email}</p>
-                <p className="text-muted-foreground text-sm">{profile?.phone_number || 'No phone set'}</p>
+            <div className="flex items-center justify-between gap-3 pt-1">
+              <div className="min-w-0 space-y-0.5">
+                <p className="text-foreground font-semibold text-sm sm:text-base">{profile?.full_name || 'No name set'}</p>
+                <p className="text-muted-foreground text-xs">{profile?.phone_number || 'No phone set'}</p>
               </div>
-              <button onClick={() => setEditingProfile(true)} className="text-primary text-sm font-bold hover:underline">Edit</button>
+              <button onClick={() => setEditingProfile(true)}
+                className="flex items-center gap-1.5 text-primary text-xs sm:text-sm font-bold bg-primary/5 hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-all active:scale-95">
+                <Pencil className="h-3 w-3" /> Edit
+              </button>
             </div>
           )}
         </div>
 
-        {/* Listings Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-display font-bold text-foreground">{t('myListings')}</h2>
+        {/* ── Listings Header ── */}
+        <div className="flex items-center justify-between mb-5 dash-animate dash-animate-delay-2">
+          <h2 className="text-xl sm:text-2xl font-display font-bold text-foreground">{t('myListings')}</h2>
           <button onClick={initBulkForm}
-            className="bg-primary text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-primary-hover transition-all">
+            className="btn-glow bg-gradient-to-r from-primary to-primary-hover text-primary-foreground px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 hover:shadow-lg hover:shadow-primary/20 active:scale-[0.97] transition-all">
             <Plus className="h-4 w-4" /> Add Listings
           </button>
         </div>
 
         {/* Bulk Form */}
         {showForm && (
-          <div className="bg-card border border-border rounded-2xl p-6 mb-8">
-            <h3 className="font-display font-bold text-foreground mb-4">Add New Listings</h3>
-            <div className="space-y-3 max-h-[60vh] overflow-y-auto">
+          <div className="glass-card border border-border/60 rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-sm dash-animate">
+            <h3 className="font-display font-bold text-foreground mb-4 text-sm sm:text-base flex items-center gap-2">
+              <div className="h-6 w-6 rounded-lg bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center">
+                <Plus className="h-3.5 w-3.5 text-white" />
+              </div>
+              Add New Listings
+            </h3>
+            <div className="space-y-4 max-h-[60vh] overflow-y-auto">
               {rows.map((row, idx) => (
-                <div key={idx} className="grid grid-cols-12 gap-2 items-end bg-surface rounded-xl p-3 border border-border/50">
-                  <div className="col-span-2">
-                    {idx === 0 && <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Number</label>}
-                    <input value={row.plate_number} onChange={e => {
-                      const v = e.target.value.replace(/\D/g, '').slice(0, 5);
-                      updateRow(idx, 'plate_number', v);
-                    }} placeholder="12345" maxLength={5}
-                      className="w-full bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground font-mono font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                <div key={idx} className="bg-surface rounded-xl p-3 sm:p-4 border border-border/50">
+                  <div className="flex items-center justify-between mb-2 sm:hidden">
+                    <span className="text-xs font-bold text-muted-foreground">Listing #{idx + 1}</span>
+                    <button onClick={() => removeRow(idx)} className="h-7 w-7 flex items-center justify-center text-red-400 hover:text-red-300 rounded-lg hover:bg-red-50 transition-colors"
+                      disabled={rows.length <= 1}>
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
                   </div>
-                  <div className="col-span-2">
-                    {idx === 0 && <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Emirate</label>}
-                    <select value={row.emirate} onChange={e => updateRow(idx, 'emirate', e.target.value)}
-                      className="w-full bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
-                      {EMIRATES.map(em => <option key={em} value={em}>{em}</option>)}
-                    </select>
+                  {/* Mobile: stacked layout */}
+                  <div className="grid grid-cols-2 sm:hidden gap-2">
+                    <div>
+                      <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Number</label>
+                      <input value={row.plate_number} onChange={e => {
+                        const v = e.target.value.replace(/\D/g, '').slice(0, 5);
+                        updateRow(idx, 'plate_number', v);
+                      }} placeholder="12345" maxLength={5}
+                        className="w-full bg-card border border-border rounded-lg px-3 py-2.5 text-sm text-foreground font-mono font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Code</label>
+                      <input value={row.plate_style} onChange={e => {
+                        const v = e.target.value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 2);
+                        updateRow(idx, 'plate_style', v.toUpperCase());
+                      }} placeholder="A" maxLength={2}
+                        className="w-full bg-card border border-border rounded-lg px-3 py-2.5 text-sm text-foreground font-mono font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                    </div>
+                    <div className="col-span-2">
+                      <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Emirate</label>
+                      <select value={row.emirate} onChange={e => updateRow(idx, 'emirate', e.target.value)}
+                        className="w-full bg-card border border-border rounded-lg px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
+                        {EMIRATES.map(em => <option key={em} value={em}>{em}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Price</label>
+                      <input type="number" value={row.price} onChange={e => updateRow(idx, 'price', e.target.value)} placeholder="Price"
+                        className="w-full bg-card border border-border rounded-lg px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Description</label>
+                      <input value={row.description} onChange={e => updateRow(idx, 'description', e.target.value)} placeholder="Optional"
+                        className="w-full bg-card border border-border rounded-lg px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                    </div>
                   </div>
-                  <div className="col-span-1">
-                    {idx === 0 && <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Code</label>}
-                    <input value={row.plate_style} onChange={e => {
-                      const v = e.target.value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 2);
-                      updateRow(idx, 'plate_style', v.toUpperCase());
-                    }} placeholder="A" maxLength={2}
-                      className="w-full bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground font-mono font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  {/* Desktop: inline layout */}
+                  <div className="hidden sm:grid grid-cols-12 gap-2 items-end">
+                    <div className="col-span-2">
+                      {idx === 0 && <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Number</label>}
+                      <input value={row.plate_number} onChange={e => {
+                        const v = e.target.value.replace(/\D/g, '').slice(0, 5);
+                        updateRow(idx, 'plate_number', v);
+                      }} placeholder="12345" maxLength={5}
+                        className="w-full bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground font-mono font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                    </div>
+                    <div className="col-span-2">
+                      {idx === 0 && <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Emirate</label>}
+                      <select value={row.emirate} onChange={e => updateRow(idx, 'emirate', e.target.value)}
+                        className="w-full bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
+                        {EMIRATES.map(em => <option key={em} value={em}>{em}</option>)}
+                      </select>
+                    </div>
+                    <div className="col-span-1">
+                      {idx === 0 && <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Code</label>}
+                      <input value={row.plate_style} onChange={e => {
+                        const v = e.target.value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 2);
+                        updateRow(idx, 'plate_style', v.toUpperCase());
+                      }} placeholder="A" maxLength={2}
+                        className="w-full bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground font-mono font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                    </div>
+                    <div className="col-span-2">
+                      {idx === 0 && <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Price</label>}
+                      <input type="number" value={row.price} onChange={e => updateRow(idx, 'price', e.target.value)} placeholder="Price"
+                        className="w-full bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                    </div>
+                    <div className="col-span-4">
+                      {idx === 0 && <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Description</label>}
+                      <input value={row.description} onChange={e => updateRow(idx, 'description', e.target.value)} placeholder="Description"
+                        className="w-full bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                    </div>
+                    <button onClick={() => removeRow(idx)} className="col-span-1 h-9 flex items-center justify-center text-red-400 hover:text-red-300 transition-colors"
+                      disabled={rows.length <= 1}>
+                      <Trash2 className="h-4 w-4" />
+                    </button>
                   </div>
-                  <div className="col-span-2">
-                    {idx === 0 && <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Price</label>}
-                    <input type="number" value={row.price} onChange={e => updateRow(idx, 'price', e.target.value)} placeholder="Price"
-                      className="w-full bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
-                  </div>
-                  <div className="col-span-4">
-                    {idx === 0 && <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Description</label>}
-                    <input value={row.description} onChange={e => updateRow(idx, 'description', e.target.value)} placeholder="Description"
-                      className="w-full bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
-                  </div>
-                  <button onClick={() => removeRow(idx)} className="col-span-1 h-9 flex items-center justify-center text-red-400 hover:text-red-300 transition-colors"
-                    disabled={rows.length <= 1}>
-                    <Trash2 className="h-4 w-4" />
-                  </button>
                 </div>
               ))}
             </div>
-            <div className="flex items-center gap-3 mt-4">
-              <button onClick={addRow} className="bg-surface border border-border px-4 py-2 rounded-xl text-sm font-bold text-foreground hover:bg-surface-accent transition-colors flex items-center gap-1">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-4">
+              <button onClick={addRow} className="bg-surface border border-border px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-foreground hover:bg-surface-accent active:scale-[0.97] transition-all flex items-center gap-1">
                 <Plus className="h-4 w-4" /> Add Another
               </button>
               <div className="flex-1" />
-              <button onClick={() => setShowForm(false)} className="bg-surface border border-border px-6 py-2.5 rounded-xl text-sm font-bold text-foreground">{t('cancel')}</button>
+              <button onClick={() => setShowForm(false)} className="bg-surface border border-border px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-foreground hover:bg-surface-accent active:scale-[0.97] transition-all">{t('cancel')}</button>
               <button onClick={handleBulkSave} disabled={saving}
-                className="bg-primary text-primary-foreground px-6 py-2.5 rounded-xl text-sm font-bold disabled:opacity-50 flex items-center gap-2">
-                {saving && <Loader2 className="h-4 w-4 animate-spin" />} Save All ({rows.filter(r => r.plate_number.trim()).length})
+                className="bg-gradient-to-r from-primary to-primary-hover text-primary-foreground px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold disabled:opacity-50 flex items-center gap-2 hover:shadow-lg hover:shadow-primary/20 active:scale-[0.97] transition-all">
+                {saving && <Loader2 className="h-4 w-4 animate-spin" />} Save ({rows.filter(r => r.plate_number.trim()).length})
               </button>
             </div>
           </div>
@@ -504,13 +586,18 @@ export default function DashboardPage() {
 
         {/* Edit Form */}
         {editId && (
-          <form onSubmit={handleEditSave} className="bg-card border border-border rounded-2xl p-6 mb-8">
-            <h3 className="font-display font-bold text-foreground text-lg mb-5">{t('editListing')}</h3>
+          <form onSubmit={handleEditSave} className="glass-card border border-border/60 rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-sm dash-animate">
+            <h3 className="font-display font-bold text-foreground text-base sm:text-lg mb-4 sm:mb-5 flex items-center gap-2">
+              <div className="h-6 w-6 rounded-lg bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center">
+                <Pencil className="h-3 w-3 text-white" />
+              </div>
+              {t('editListing')}
+            </h3>
 
             {/* Live plate preview */}
-            <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800/50 dark:to-gray-900/50 rounded-xl p-4 mb-6 flex items-center justify-center border border-border/50">
-              <div className="bg-white dark:bg-card border-2 border-gray-300 dark:border-border rounded-xl px-6 py-3">
-                <p className="font-mono font-black text-2xl text-foreground tracking-wider text-center">
+            <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800/50 dark:to-gray-900/50 rounded-xl p-3 sm:p-4 mb-5 sm:mb-6 flex items-center justify-center border border-border/50">
+              <div className="bg-white dark:bg-card border-2 border-gray-300 dark:border-border rounded-xl px-5 sm:px-6 py-2.5 sm:py-3">
+                <p className="font-mono font-black text-xl sm:text-2xl text-foreground tracking-wider text-center">
                   {editForm.plate_code && <span>{editForm.plate_code}</span>}
                   {editForm.plate_code && editForm.plate_number && <span className="mx-2"> </span>}
                   <span>{editForm.plate_number || '—'}</span>
@@ -518,9 +605,9 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-12 gap-4 mb-4">
+            <div className="grid grid-cols-3 sm:grid-cols-12 gap-3 sm:gap-4 mb-4">
               {/* Code */}
-              <div className="col-span-3">
+              <div className="col-span-1 sm:col-span-3">
                 <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Code</label>
                 <input
                   value={editForm.plate_code}
@@ -529,12 +616,12 @@ export default function DashboardPage() {
                     setEditForm(p => ({ ...p, plate_code: v.toUpperCase() }));
                   }}
                   maxLength={2}
-                  className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground font-mono font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full bg-surface border border-border rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm text-foreground font-mono font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/30"
                   placeholder="A"
                 />
               </div>
               {/* Number */}
-              <div className="col-span-5">
+              <div className="col-span-1 sm:col-span-5">
                 <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Number</label>
                 <input
                   required
@@ -544,120 +631,144 @@ export default function DashboardPage() {
                     setEditForm(p => ({ ...p, plate_number: v }));
                   }}
                   maxLength={5}
-                  className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground font-mono font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-full bg-surface border border-border rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm text-foreground font-mono font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/30"
                   placeholder="12345"
                 />
               </div>
               {/* Emirate */}
-              <div className="col-span-4">
+              <div className="col-span-1 sm:col-span-4">
                 <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Emirate</label>
                 <select value={editForm.emirate} onChange={e => setEditForm(p => ({ ...p, emirate: e.target.value }))}
-                  className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
+                  className="w-full bg-surface border border-border rounded-xl px-2 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
                   {EMIRATES.map(em => <option key={em} value={em}>{em}</option>)}
                 </select>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
               <div>
                 <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Price (AED)</label>
                 <input type="number" value={editForm.price} onChange={e => setEditForm(p => ({ ...p, price: e.target.value }))}
-                  className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="22,000" />
+                  className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 sm:py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="22,000" />
               </div>
               <div>
                 <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Description</label>
                 <input value={editForm.description} onChange={e => setEditForm(p => ({ ...p, description: e.target.value }))}
-                  className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Optional description" />
+                  className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 sm:py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Optional description" />
               </div>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex gap-2 sm:gap-3">
               <button type="submit" disabled={saving}
-                className="bg-primary text-primary-foreground px-6 py-2.5 rounded-xl text-sm font-bold disabled:opacity-50 flex items-center gap-2 hover:bg-primary-hover transition-all">
+                className="bg-gradient-to-r from-primary to-primary-hover text-primary-foreground px-5 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold disabled:opacity-50 flex items-center gap-2 hover:shadow-lg hover:shadow-primary/20 active:scale-[0.97] transition-all">
                 {saving && <Loader2 className="h-4 w-4 animate-spin" />} {t('save')}
               </button>
               <button type="button" onClick={() => setEditId(null)}
-                className="bg-surface border border-border px-6 py-2.5 rounded-xl text-sm font-bold text-foreground hover:bg-surface-accent transition-colors">{t('cancel')}</button>
+                className="bg-surface border border-border px-5 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-foreground hover:bg-surface-accent active:scale-[0.97] transition-all">{t('cancel')}</button>
             </div>
           </form>
         )}
 
-        {/* Listing Filters */}
-        <div className="flex flex-wrap items-center gap-3 mb-4">
-          <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        {/* ── Listing Filters ── */}
+        <div className="space-y-3 mb-5 dash-animate dash-animate-delay-3">
+          <div className="relative group">
+            <Search className="absolute start-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
             <input value={searchQuery} onChange={e => { setSearchQuery(e.target.value); setListPage(0); }}
-              className="w-full bg-surface border border-border rounded-xl ps-10 pe-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="w-full bg-surface/80 border border-border rounded-xl ps-10 pe-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all"
               placeholder="Search plate numbers..." />
           </div>
-          {['all', 'active', 'sold', 'hidden'].map(s => (
-            <button key={s} onClick={() => { setStatusFilter(s); setListPage(0); }}
-              className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors ${statusFilter === s ? 'bg-primary text-primary-foreground' : 'bg-surface border border-border text-foreground hover:bg-surface-accent'}`}>
-              {s === 'all' ? 'All' : s}
-            </button>
-          ))}
+          <div className="flex flex-wrap gap-2">
+            {['all', 'active', 'sold', 'hidden'].map(s => (
+              <button key={s} onClick={() => { setStatusFilter(s); setListPage(0); }}
+                className={`px-3.5 sm:px-4 py-2 rounded-xl text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all active:scale-95 ${statusFilter === s ? 'bg-gradient-to-r from-primary to-primary-hover text-primary-foreground shadow-md shadow-primary/15' : 'bg-surface border border-border text-foreground hover:bg-surface-accent hover:border-primary/20'}`}>
+                {s === 'all' ? 'All' : s}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Listing Table */}
+        {/* ── Listing Cards ── */}
         {loading ? (
-          <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+          <div className="flex flex-col items-center justify-center py-16">
+            <Loader2 className="h-8 w-8 animate-spin text-primary mb-3" />
+            <p className="text-sm text-muted-foreground">Loading listings...</p>
+          </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">No listings found.</div>
+          <div className="glass-card border border-border/60 rounded-2xl p-12 text-center">
+            <Search className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
+            <p className="text-muted-foreground font-medium">No listings found</p>
+            <p className="text-xs text-muted-foreground/60 mt-1">Try adjusting your filters or add a new listing</p>
+          </div>
         ) : (
           <>
             <div className="space-y-3">
-              {pagedListings.map(listing => (
-                <div key={listing.id} className="bg-card border border-border rounded-xl p-4 flex items-center justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-1">
-                      <span className="inline-flex items-center bg-surface border border-border rounded-lg px-3 py-1 font-mono font-bold text-foreground text-sm">{listing.plate_number}</span>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${statusColor(listing.status)}`}>{listing.status.toUpperCase()}</span>
+              {pagedListings.map((listing, i) => (
+                <div key={listing.id} className="glass-card border border-border/60 rounded-xl p-3.5 sm:p-4 hover-lift group" style={{ animationDelay: `${i * 0.04}s` }}>
+                  <div className="flex items-center justify-between gap-3">
+                    {/* Info */}
+                    <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                      <span className="inline-flex items-center bg-gradient-to-br from-surface to-surface-accent border border-border rounded-lg px-2.5 sm:px-3.5 py-1 sm:py-1.5 font-mono font-black text-foreground text-xs sm:text-sm tracking-wide shadow-sm">
+                        {listing.plate_number}
+                      </span>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 mb-0.5">
+                          <span className={`text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full border ${statusColor(listing.status)}`}>{listing.status.toUpperCase()}</span>
+                        </div>
+                        <p className="text-[11px] sm:text-xs text-muted-foreground truncate">{listing.emirate} {listing.price ? `• AED ${listing.price.toLocaleString()}` : ''}</p>
+                      </div>
                     </div>
-                    <p className="text-sm text-muted-foreground">{listing.emirate} {listing.price ? `• AED ${listing.price.toLocaleString()}` : ''}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => toggleStatus(listing)} className="h-8 w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-                      title={listing.status === 'active' ? 'Mark as sold' : 'Mark as active'}>
-                      {listing.status === 'active' ? <CheckCircle className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                    <button onClick={() => startEdit(listing)} className="h-8 w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
-                      <Pencil className="h-4 w-4" />
-                    </button>
-                    <button onClick={() => setDeleteId(listing.id)} className="h-8 w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-red-400 hover:text-red-300 transition-colors">
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+                    {/* Actions */}
+                    <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
+                      <button onClick={() => toggleHidden(listing)}
+                        className={`h-7 w-7 sm:h-8 sm:w-8 rounded-lg flex items-center justify-center transition-all active:scale-90 ${listing.status === 'hidden' ? 'bg-amber-500/10 text-amber-400 hover:bg-amber-500/20' : 'bg-surface border border-border text-muted-foreground hover:text-primary hover:border-primary/30'}`}
+                        title={listing.status === 'hidden' ? 'Show listing' : 'Hide listing'}>
+                        {listing.status === 'hidden' ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                      </button>
+                      <button onClick={() => toggleStatus(listing)} className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/30 transition-all active:scale-90"
+                        title={listing.status === 'active' ? 'Mark as sold' : 'Mark as active'}>
+                        <CheckCircle className="h-3.5 w-3.5" />
+                      </button>
+                      <button onClick={() => startEdit(listing)} className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/30 transition-all active:scale-90">
+                        <Pencil className="h-3.5 w-3.5" />
+                      </button>
+                      <button onClick={() => setDeleteId(listing.id)} className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-red-400 hover:bg-red-50 hover:border-red-200 transition-all active:scale-90">
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
             {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-4 mt-6">
+              <div className="flex items-center justify-center gap-3 mt-6">
                 <button onClick={() => setListPage(p => Math.max(0, p - 1))} disabled={listPage === 0}
-                  className="px-3 py-1.5 rounded-lg bg-surface border border-border text-sm font-bold text-foreground disabled:opacity-30">Prev</button>
-                <span className="text-sm text-muted-foreground font-mono">Page {listPage + 1} of {totalPages}</span>
+                  className="px-4 py-2 rounded-xl bg-surface border border-border text-sm font-bold text-foreground disabled:opacity-30 hover:bg-surface-accent active:scale-95 transition-all">Prev</button>
+                <span className="text-xs text-muted-foreground font-mono bg-surface px-3 py-1.5 rounded-lg border border-border">{listPage + 1} / {totalPages}</span>
                 <button onClick={() => setListPage(p => Math.min(totalPages - 1, p + 1))} disabled={listPage >= totalPages - 1}
-                  className="px-3 py-1.5 rounded-lg bg-surface border border-border text-sm font-bold text-foreground disabled:opacity-30">Next</button>
+                  className="px-4 py-2 rounded-xl bg-surface border border-border text-sm font-bold text-foreground disabled:opacity-30 hover:bg-surface-accent active:scale-95 transition-all">Next</button>
               </div>
             )}
           </>
         )}
 
         {/* ─── VIP Mobile Numbers Section ─── */}
-        <div className="mt-12 pt-8 border-t border-border">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <Smartphone className="h-6 w-6 text-primary" />
-              <h2 className="text-2xl font-display font-bold text-foreground">My Mobile Numbers</h2>
+        <div className="mt-10 sm:mt-12 pt-8 border-t border-border/50 dash-animate dash-animate-delay-4">
+          <div className="flex items-center justify-between mb-6 gap-3">
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+              <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md">
+                <Smartphone className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+              </div>
+              <h2 className="text-lg sm:text-2xl font-display font-bold text-foreground truncate">My Mobile Numbers</h2>
             </div>
             <button onClick={initMobileForm}
-              className="bg-primary text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-primary-hover transition-all">
-              <Plus className="h-4 w-4" /> Add Number
+              className="btn-glow bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 hover:shadow-lg hover:shadow-blue-500/20 active:scale-[0.97] transition-all flex-shrink-0">
+              <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Add</span> Number
             </button>
           </div>
 
           {/* Mobile Edit Form */}
           {mobileEditId && (
-            <div className="bg-card border border-border rounded-2xl p-6 mb-8">
+            <div className="glass-card border border-border/60 rounded-2xl p-6 mb-8 shadow-sm dash-animate">
               <h3 className="text-sm font-bold text-foreground mb-5">Edit Mobile Number</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div>
@@ -708,11 +819,11 @@ export default function DashboardPage() {
               </div>
               <div className="flex gap-3">
                 <button onClick={handleMobileEditSave} disabled={saving}
-                  className="bg-primary text-primary-foreground px-6 py-2.5 rounded-xl text-sm font-bold disabled:opacity-50 flex items-center gap-2 hover:bg-primary-hover transition-all">
+                  className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold disabled:opacity-50 flex items-center gap-2 hover:shadow-lg hover:shadow-blue-500/20 active:scale-[0.97] transition-all">
                   {saving && <Loader2 className="h-4 w-4 animate-spin" />} Save Changes
                 </button>
                 <button onClick={() => setMobileEditId(null)}
-                  className="bg-surface border border-border px-6 py-2.5 rounded-xl text-sm font-bold text-foreground hover:bg-surface-accent transition-colors">
+                  className="bg-surface border border-border px-6 py-2.5 rounded-xl text-sm font-bold text-foreground hover:bg-surface-accent active:scale-[0.97] transition-all">
                   Cancel
                 </button>
               </div>
@@ -721,7 +832,7 @@ export default function DashboardPage() {
 
           {/* Mobile Add Form */}
           {showMobileForm && (
-            <div className="bg-card border border-border rounded-2xl p-6 mb-8">
+            <div className="glass-card border border-border/60 rounded-2xl p-6 mb-8 shadow-sm dash-animate">
               <h3 className="text-sm font-bold text-foreground mb-5">List a VIP Mobile Number</h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
@@ -805,11 +916,11 @@ export default function DashboardPage() {
 
               <div className="flex gap-3">
                 <button onClick={saveMobileNumber} disabled={saving}
-                  className="bg-primary text-primary-foreground px-6 py-2.5 rounded-xl text-sm font-bold disabled:opacity-50 flex items-center gap-2 hover:bg-primary-hover transition-all">
+                  className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold disabled:opacity-50 flex items-center gap-2 hover:shadow-lg hover:shadow-blue-500/20 active:scale-[0.97] transition-all">
                   {saving && <Loader2 className="h-4 w-4 animate-spin" />} List Number
                 </button>
                 <button onClick={() => setShowMobileForm(false)}
-                  className="bg-surface border border-border px-6 py-2.5 rounded-xl text-sm font-bold text-foreground hover:bg-surface-accent transition-colors">
+                  className="bg-surface border border-border px-6 py-2.5 rounded-xl text-sm font-bold text-foreground hover:bg-surface-accent active:scale-[0.97] transition-all">
                   Cancel
                 </button>
               </div>
@@ -818,44 +929,46 @@ export default function DashboardPage() {
 
           {/* Mobile Numbers List */}
           {mobileNumbers.length === 0 ? (
-            <div className="bg-card border border-border rounded-2xl p-10 text-center">
-              <Smartphone className="h-10 w-10 mx-auto text-muted-foreground/40 mb-3" />
+            <div className="glass-card border border-border/60 rounded-2xl p-10 text-center">
+              <div className="h-14 w-14 mx-auto rounded-2xl bg-gradient-to-br from-blue-500/10 to-indigo-600/10 flex items-center justify-center mb-3">
+                <Smartphone className="h-6 w-6 text-muted-foreground/40" />
+              </div>
               <p className="text-muted-foreground text-sm">No mobile numbers listed yet</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-3">
               {mobileNumbers.map(mn => (
-                <div key={mn.id} className="bg-card border border-border rounded-2xl p-5 flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center overflow-hidden border ${mn.carrier === 'etisalat' ? 'border-emerald-200 bg-emerald-50' : 'border-blue-200 bg-blue-50'
-                      }`}>
-                      <img
-                        src={mn.carrier === 'etisalat' ? '/Eand_Logo.svg' : '/du-logo.png'}
-                        alt={mn.carrier}
-                        className="h-6 w-6 object-contain"
-                      />
+                <div key={mn.id} className="glass-card border border-border/60 rounded-2xl p-4 sm:p-5 hover-lift">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className={`h-9 w-9 sm:h-10 sm:w-10 rounded-xl flex items-center justify-center overflow-hidden border flex-shrink-0 ${mn.carrier === 'etisalat' ? 'border-emerald-200 bg-emerald-50' : 'border-blue-200 bg-blue-50'}`}>
+                        <img
+                          src={mn.carrier === 'etisalat' ? '/Eand_Logo.svg' : '/du-logo.png'}
+                          alt={mn.carrier}
+                          className="h-5 w-5 sm:h-6 sm:w-6 object-contain"
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-foreground font-bold font-mono tracking-wider text-sm sm:text-base truncate">{mn.phone_number}</p>
+                        <p className="text-muted-foreground text-[11px] sm:text-xs capitalize">{mn.carrier} • {mn.price ? `AED ${mn.price.toLocaleString()}` : 'No price'}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-foreground font-bold font-mono tracking-wider">{mn.phone_number}</p>
-                      <p className="text-muted-foreground text-xs capitalize">{mn.carrier} • {mn.price ? `AED ${mn.price.toLocaleString()}` : 'No price'}</p>
+                    <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
+                      <button
+                        onClick={() => toggleMobileStatus(mn)}
+                        className={`h-7 w-7 sm:h-8 sm:w-8 rounded-lg flex items-center justify-center transition-colors ${mn.status === 'active' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}
+                        title={mn.status === 'active' ? 'Mark as sold' : 'Mark as active'}
+                      >
+                        {mn.status === 'active' ? <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : <EyeOff className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
+                      </button>
+                      <button onClick={() => startMobileEdit(mn)} className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+                        <Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      </button>
+                      <button onClick={() => setMobileDeleteId(mn.id)}
+                        className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-red-400 hover:text-red-300 transition-colors">
+                        <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      </button>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      onClick={() => toggleMobileStatus(mn)}
-                      className={`h-8 w-8 rounded-lg flex items-center justify-center transition-colors ${mn.status === 'active' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'
-                        }`}
-                      title={mn.status === 'active' ? 'Mark as sold' : 'Mark as active'}
-                    >
-                      {mn.status === 'active' ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-                    </button>
-                    <button onClick={() => startMobileEdit(mn)} className="h-8 w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
-                      <Pencil className="h-4 w-4" />
-                    </button>
-                    <button onClick={() => setMobileDeleteId(mn.id)}
-                      className="h-8 w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-red-400 hover:text-red-300 transition-colors">
-                      <Trash2 className="h-4 w-4" />
-                    </button>
                   </div>
                 </div>
               ))}
@@ -864,18 +977,29 @@ export default function DashboardPage() {
         </div>
 
         {/* ─── My Favorites Section ─── */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-display font-bold text-foreground flex items-center gap-2">
-            <Heart className="h-5 w-5 text-red-500" /> My Favorites
-          </h2>
+        <div className="mt-10 sm:mt-12 pt-8 border-t border-border/50 dash-animate dash-animate-delay-4">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg sm:text-2xl font-display font-bold text-foreground flex items-center gap-2.5">
+              <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center shadow-md">
+                <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+              </div>
+              My Favorites
+            </h2>
+          </div>
         </div>
-        <div className="bg-card border border-border rounded-2xl p-6 mb-8">
+        <div className="glass-card border border-border/60 rounded-2xl p-6 mb-8 shadow-sm">
           {favorites.length === 0 ? (
-            <p className="text-muted-foreground text-sm text-center py-6">No favorites saved yet. Browse listings and tap the ❤️ to save.</p>
+            <div className="text-center py-6">
+              <div className="h-14 w-14 mx-auto rounded-2xl bg-gradient-to-br from-rose-500/10 to-pink-600/10 flex items-center justify-center mb-3">
+                <Heart className="h-6 w-6 text-muted-foreground/30" />
+              </div>
+              <p className="text-muted-foreground text-sm font-medium">No favorites saved yet</p>
+              <p className="text-xs text-muted-foreground/60 mt-1">Browse listings and tap the ❤️ to save</p>
+            </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {favorites.map(fav => (
-                <div key={fav.id} className="bg-surface border border-border rounded-xl p-4 flex items-center gap-4 group">
+                <div key={fav.id} className="bg-surface/60 border border-border/60 rounded-xl p-4 flex items-center gap-4 group hover-lift">
                   <Link
                     to={fav.listing_type === 'mobile_number' ? `/mobile-number/${fav.listing_id}` : `/plate/${fav.listing_id}`}
                     className="flex-1 min-w-0"
@@ -905,12 +1029,12 @@ export default function DashboardPage() {
 
         {/* Mobile Delete Modal */}
         {mobileDeleteId && (
-          <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-            <div className="bg-card border border-border rounded-2xl p-6 max-w-sm w-full">
-              <p className="text-foreground font-medium mb-4">Delete this mobile number listing?</p>
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="glass-card border border-border/60 rounded-2xl p-6 max-w-sm w-full shadow-2xl modal-enter">
+              <p className="text-foreground font-semibold mb-4">Delete this mobile number listing?</p>
               <div className="flex gap-3 justify-end">
-                <button onClick={() => setMobileDeleteId(null)} className="px-4 py-2 rounded-xl bg-surface border border-border text-sm font-bold text-foreground">{t('cancel')}</button>
-                <button onClick={handleMobileDelete} className="px-4 py-2 rounded-xl bg-red-500 text-white text-sm font-bold">{t('yes')}, Delete</button>
+                <button onClick={() => setMobileDeleteId(null)} className="px-4 py-2.5 rounded-xl bg-surface border border-border text-sm font-bold text-foreground hover:bg-surface-accent active:scale-95 transition-all">{t('cancel')}</button>
+                <button onClick={handleMobileDelete} className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 text-white text-sm font-bold hover:shadow-lg hover:shadow-red-500/20 active:scale-95 transition-all">{t('yes')}, Delete</button>
               </div>
             </div>
           </div>
@@ -918,12 +1042,12 @@ export default function DashboardPage() {
 
         {/* Delete Modal */}
         {deleteId && (
-          <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-            <div className="bg-card border border-border rounded-2xl p-6 max-w-sm w-full">
-              <p className="text-foreground font-medium mb-4">{t('deleteConfirm')}</p>
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="glass-card border border-border/60 rounded-2xl p-6 max-w-sm w-full shadow-2xl modal-enter">
+              <p className="text-foreground font-semibold mb-4">{t('deleteConfirm')}</p>
               <div className="flex gap-3 justify-end">
-                <button onClick={() => setDeleteId(null)} className="px-4 py-2 rounded-xl bg-surface border border-border text-sm font-bold text-foreground">{t('cancel')}</button>
-                <button onClick={handleDelete} className="px-4 py-2 rounded-xl bg-red-500 text-white text-sm font-bold">{t('yes')}, Delete</button>
+                <button onClick={() => setDeleteId(null)} className="px-4 py-2.5 rounded-xl bg-surface border border-border text-sm font-bold text-foreground hover:bg-surface-accent active:scale-95 transition-all">{t('cancel')}</button>
+                <button onClick={handleDelete} className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 text-white text-sm font-bold hover:shadow-lg hover:shadow-red-500/20 active:scale-95 transition-all">{t('yes')}, Delete</button>
               </div>
             </div>
           </div>

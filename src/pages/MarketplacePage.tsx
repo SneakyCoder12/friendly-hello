@@ -51,7 +51,7 @@ export default function MarketplacePage() {
     let query = supabase
       .from('listings')
       .select('*', { count: 'exact' })
-      .eq('status', 'active')
+      .in('status', ['active', 'sold'])
       .order('created_at', { ascending: false })
       .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
 
@@ -196,6 +196,8 @@ export default function MarketplacePage() {
                   plateUrl={`/plate/${listing.id}`}
                   sellerPhone={listing.contact_phone}
                   plateNumber={listing.plate_number}
+                  listingId={listing.id}
+                  status={listing.status}
                 />
               );
             })}
