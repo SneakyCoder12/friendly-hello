@@ -51,7 +51,7 @@ const CONFIGS: Record<string, EmirateConfig> = {
     verticalCenter: true,
     components: [
       { type: 'code', xRatio: 0.14, align: 'center', fontSizeRatio: 0.12, letterSpacingRatio: 0.0001, baselineOffsetRatio: -0.23, emboss: true },
-      { type: 'number', xRatio: 0.70, align: 'center', emboss: true, letterSpacingRatio: 0.0001, },
+      { type: 'number', xRatio: 0.70, align: 'center', emboss: true, letterSpacingRatio: 0.0001, baselineOffsetRatio: -0.03 },
     ],
   },
   dubai: {

@@ -11,7 +11,6 @@ interface SupabaseListing {
   price: number | null;
   contact_phone: string | null;
   status: string;
-  vehicle_type?: string;
 }
 
 const EMIRATE_KEY_MAP: Record<string, string> = {
@@ -28,31 +27,50 @@ export default function PlateListings() {
   const [listingsByEmirate, setListingsByEmirate] = useState<Record<string, SupabaseListing[]>>({});
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    (async () => {
-      console.log('[PlateListings] Fetching active & sold listings...');
-      const { data, error } = await supabase
-        .from('listings')
-        .select('id, plate_number, emirate, plate_style, price, contact_phone, status, vehicle_type')
-        .in('status', ['active', 'sold'])
-        .order('created_at', { ascending: false })
-        .limit(28);
+  const fetchListings = async () => {
+    console.log('[PlateListings] Fetching active & sold listings...');
+    const { data, error } = await supabase
+      .from('listings')
+      .select('id, plate_number, emirate, plate_style, price, contact_phone, status')
+      .in('status', ['active', 'sold'])
+      .order('created_at', { ascending: false })
+      .limit(28);
 
-      if (error) {
-        console.error('[PlateListings] Query error:', error);
-      } else {
-        console.log('[PlateListings] Raw data:', data);
-        const grouped: Record<string, SupabaseListing[]> = {};
-        ((data || []) as unknown as SupabaseListing[]).forEach((l) => {
-          const key = EMIRATE_KEY_MAP[l.emirate] || l.emirate;
-          if (!grouped[key]) grouped[key] = [];
-          if (grouped[key].length < 4) grouped[key].push(l);
-        });
-        console.log('[PlateListings] Grouped:', grouped);
-        setListingsByEmirate(grouped);
-      }
-      setLoading(false);
-    })();
+    if (error) {
+      console.error('[PlateListings] Query error:', error);
+    } else {
+      console.log('[PlateListings] Raw data:', data);
+      const grouped: Record<string, SupabaseListing[]> = {};
+      ((data || []) as unknown as SupabaseListing[]).forEach((l) => {
+        const key = EMIRATE_KEY_MAP[l.emirate] || l.emirate;
+        if (!grouped[key]) grouped[key] = [];
+        if (grouped[key].length < 4) grouped[key].push(l);
+      });
+      console.log('[PlateListings] Grouped:', grouped);
+      setListingsByEmirate(grouped);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchListings();
+
+    // Real-time subscription: re-fetch when listings change
+    const channel = supabase
+      .channel('realtime-listings')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'listings' },
+        () => {
+          console.log('[PlateListings] Real-time update received, re-fetching...');
+          fetchListings();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   if (loading) {

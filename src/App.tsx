@@ -7,6 +7,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import AnimatedPage from '@/components/AnimatedPage';
+import ScrollToTop from '@/components/ScrollToTop';
 import { Loader2 } from 'lucide-react';
 
 const HomePage = lazy(() => import('@/pages/HomePage'));
@@ -36,6 +37,7 @@ export default function App() {
     <LanguageProvider>
       <AuthProvider>
         <BrowserRouter>
+          <ScrollToTop />
           <div className="flex flex-col min-h-screen">
             <Navbar />
             <Suspense fallback={<Loading />}>

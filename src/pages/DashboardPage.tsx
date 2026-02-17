@@ -170,14 +170,13 @@ export default function DashboardPage() {
       return {
         plate_number: fullPlateNumber,
         emirate: r.emirate,
-        plate_style: r.plate_style || null,
+        plate_style: r.vehicle_type === 'bike' ? 'bike' : (r.plate_style || null),
         price: r.price ? Number(r.price) : null,
         description: r.description || null,
         contact_email: r.contact_email || null,
         contact_phone: r.contact_phone || null,
         user_id: user.id,
         status: 'active' as const,
-        vehicle_type: r.vehicle_type,
       };
     });
 
@@ -219,10 +218,9 @@ export default function DashboardPage() {
     const { error } = await supabase.from('listings').update({
       plate_number: fullPlateNumber,
       emirate: editForm.emirate,
-      plate_style: editForm.plate_code.trim() || null,
+      plate_style: editForm.vehicle_type === 'bike' ? 'bike' : (editForm.plate_code.trim() || null),
       price: editForm.price ? Number(editForm.price) : null,
       description: editForm.description || null,
-      vehicle_type: editForm.vehicle_type,
     }).eq('id', editId);
     if (error) toast.error(error.message);
     else { toast.success('Listing updated'); setEditId(null); fetchListings(); }
@@ -613,8 +611,8 @@ export default function DashboardPage() {
                                 type="button"
                                 onClick={() => updateRow(idx, 'emirate', em)}
                                 className={`px-2.5 py-1.5 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all active:scale-95 ${isSelected
-                                    ? 'bg-gradient-to-r from-primary to-primary-hover text-primary-foreground shadow-md shadow-primary/20'
-                                    : 'bg-surface border border-border text-muted-foreground hover:border-primary/30 hover:text-foreground'
+                                  ? 'bg-gradient-to-r from-primary to-primary-hover text-primary-foreground shadow-md shadow-primary/20'
+                                  : 'bg-surface border border-border text-muted-foreground hover:border-primary/30 hover:text-foreground'
                                   }`}
                               >
                                 {short}
@@ -632,8 +630,8 @@ export default function DashboardPage() {
                             type="button"
                             onClick={() => updateRow(idx, 'vehicle_type', 'car')}
                             className={`px-4 py-2 text-xs font-bold transition-all ${row.vehicle_type === 'car' || !row.vehicle_type
-                                ? 'bg-gradient-to-r from-primary to-primary-hover text-primary-foreground'
-                                : 'bg-surface text-muted-foreground hover:text-foreground'
+                              ? 'bg-gradient-to-r from-primary to-primary-hover text-primary-foreground'
+                              : 'bg-surface text-muted-foreground hover:text-foreground'
                               }`}
                           >
                             🚗 Car
@@ -642,8 +640,8 @@ export default function DashboardPage() {
                             type="button"
                             onClick={() => updateRow(idx, 'vehicle_type', 'bike')}
                             className={`px-4 py-2 text-xs font-bold transition-all ${row.vehicle_type === 'bike'
-                                ? 'bg-gradient-to-r from-primary to-primary-hover text-primary-foreground'
-                                : 'bg-surface text-muted-foreground hover:text-foreground'
+                              ? 'bg-gradient-to-r from-primary to-primary-hover text-primary-foreground'
+                              : 'bg-surface text-muted-foreground hover:text-foreground'
                               }`}
                           >
                             🏍️ Bike

@@ -33,6 +33,7 @@ export default function MarketplacePage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [emirateFilter, setEmirateFilter] = useState('');
+  const [vehicleTypeFilter, setVehicleTypeFilter] = useState('');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [page, setPage] = useState(0);
@@ -44,6 +45,10 @@ export default function MarketplacePage() {
       const match = EMIRATES.find(e => e.toLowerCase() === paramEmirate.toLowerCase());
       if (match) setEmirateFilter(match);
       else setEmirateFilter(paramEmirate);
+    }
+    const paramVehicleType = searchParams.get('vehicleType');
+    if (paramVehicleType === 'bike' || paramVehicleType === 'car') {
+      setVehicleTypeFilter(paramVehicleType);
     }
   }, [searchParams]);
 
@@ -58,6 +63,8 @@ export default function MarketplacePage() {
 
     if (search.trim()) query = query.ilike('plate_number', `%${search.trim()}%`);
     if (emirateFilter) query = query.eq('emirate', emirateFilter);
+    if (vehicleTypeFilter === 'bike') query = query.eq('plate_style', 'bike');
+    else if (vehicleTypeFilter === 'car') query = query.neq('plate_style', 'bike');
     if (minPrice) query = query.gte('price', Number(minPrice));
     if (maxPrice) query = query.lte('price', Number(maxPrice));
 
@@ -68,13 +75,13 @@ export default function MarketplacePage() {
       setTotal(count || 0);
     }
     setLoading(false);
-  }, [search, emirateFilter, minPrice, maxPrice, page]);
+  }, [search, emirateFilter, vehicleTypeFilter, minPrice, maxPrice, page]);
 
   useEffect(() => { fetchListings(); }, [fetchListings]);
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
-  const resetFilters = () => { setSearch(''); setEmirateFilter(''); setMinPrice(''); setMaxPrice(''); setPage(0); };
-  const hasFilters = search || emirateFilter || minPrice || maxPrice;
+  const resetFilters = () => { setSearch(''); setEmirateFilter(''); setVehicleTypeFilter(''); setMinPrice(''); setMaxPrice(''); setPage(0); };
+  const hasFilters = search || emirateFilter || vehicleTypeFilter || minPrice || maxPrice;
 
   return (
     <div className="min-h-screen bg-background">
@@ -148,7 +155,7 @@ export default function MarketplacePage() {
 
         {/* Filters */}
         <div className="bg-card border border-border rounded-2xl p-4 mb-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
             <div className="relative lg:col-span-2">
               <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input value={search} onChange={e => { setSearch(e.target.value); setPage(0); }}
@@ -159,6 +166,12 @@ export default function MarketplacePage() {
               className="bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
               <option value="">{t('allEmirates')}</option>
               {EMIRATES.map(em => <option key={em} value={em}>{em}</option>)}
+            </select>
+            <select value={vehicleTypeFilter} onChange={e => { setVehicleTypeFilter(e.target.value); setPage(0); }}
+              className="bg-surface border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
+              <option value="">{t('allTypes')}</option>
+              <option value="car">{t('car')}</option>
+              <option value="bike">{t('bike')}</option>
             </select>
             <input type="number" value={minPrice} onChange={e => { setMinPrice(e.target.value); setPage(0); }}
               placeholder={t('minPrice')}
@@ -199,6 +212,7 @@ export default function MarketplacePage() {
                   plateNumber={listing.plate_number}
                   listingId={listing.id}
                   status={listing.status}
+                  plateStyle={listing.plate_style === 'bike' ? 'bike' : 'private'}
                 />
               );
             })}

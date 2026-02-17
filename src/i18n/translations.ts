@@ -46,6 +46,8 @@ export const translations = {
     plateType: 'Plate Type',
     car: 'Car',
     bike: 'Bike',
+    bikePlates: 'Bike Plates',
+    allTypes: 'All Types',
 
     // Card
     callSeller: 'Call Seller',
@@ -293,6 +295,8 @@ export const translations = {
     plateType: 'نوع اللوحة',
     car: 'سيارة',
     bike: 'دراجة نارية',
+    bikePlates: 'لوحات الدراجات',
+    allTypes: 'كل الأنواع',
 
     // Card
     callSeller: 'اتصل بالبايع',
