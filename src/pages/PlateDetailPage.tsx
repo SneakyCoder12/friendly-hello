@@ -4,6 +4,7 @@ import { Phone, MessageCircle, Shield, ArrowLeft, Share2, Car, X as XIcon } from
 import ListWithUsBanner from '@/components/ListWithUsBanner';
 import { usePlateImage } from '@/hooks/usePlateGenerator';
 import { supabase } from '@/integrations/supabase/client';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const EMIRATE_KEY_MAP: Record<string, string> = {
     'Abu Dhabi': 'abudhabi',
@@ -42,6 +43,7 @@ export default function PlateDetailPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [showCarPreview, setShowCarPreview] = useState(false);
+    const { t } = useLanguage();
 
     useEffect(() => {
         if (!plateId) return;
@@ -55,7 +57,7 @@ export default function PlateDetailPage() {
                 .single();
 
             if (fetchError || !data) {
-                setError('Listing not found');
+                setError(t('listingNotFound'));
                 setLoading(false);
                 return;
             }
@@ -110,7 +112,7 @@ export default function PlateDetailPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-white pt-24 pb-16">
+            <div className="min-h-screen bg-background pt-24 pb-16">
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="animate-pulse space-y-6">
                         <div className="h-6 bg-gray-200 rounded w-40" />
@@ -131,11 +133,11 @@ export default function PlateDetailPage() {
 
     if (error || !listing) {
         return (
-            <div className="min-h-screen bg-white pt-24 pb-16">
+            <div className="min-h-screen bg-background pt-24 pb-16">
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <p className="text-xl font-bold text-gray-900 mb-4">Listing not found</p>
+                    <p className="text-xl font-bold text-foreground mb-4">{t('listingNotFound')}</p>
                     <Link to="/marketplace" className="text-primary font-bold hover:underline">
-                        ← Back to Marketplace
+                        ← {t('backToMarketplace')}
                     </Link>
                 </div>
             </div>
@@ -143,22 +145,22 @@ export default function PlateDetailPage() {
     }
 
     return (
-        <div className="min-h-screen bg-white pt-24 pb-16">
+        <div className="min-h-screen bg-background pt-24 pb-16">
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 
                 {/* Back Button */}
                 <Link
                     to="/marketplace"
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors mb-8"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors mb-8"
                 >
-                    <ArrowLeft className="h-4 w-4" /> Back to Marketplace
+                    <ArrowLeft className="h-4 w-4" /> {t('backToMarketplace')}
                 </Link>
 
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
 
                     {/* Left: Plate Image (3 cols) */}
                     <div className="lg:col-span-3">
-                        <div className="bg-gray-50 rounded-2xl p-8 flex items-center justify-center border border-gray-100">
+                        <div className="bg-surface rounded-2xl p-8 flex items-center justify-center border border-border">
                             {dataUrl ? (
                                 <img
                                     src={dataUrl}
@@ -175,10 +177,10 @@ export default function PlateDetailPage() {
                         {dataUrl && (
                             <button
                                 onClick={() => setShowCarPreview(true)}
-                                className="mt-4 w-full flex items-center justify-center gap-2 py-3.5 rounded-xl border border-gray-200 bg-white text-gray-800 font-bold text-sm hover:bg-gray-50 hover:border-gray-300 hover:shadow-md transition-all duration-200 group"
+                                className="mt-4 w-full flex items-center justify-center gap-2 py-3.5 rounded-xl border border-border bg-card text-foreground font-bold text-sm hover:bg-surface hover:border-primary/30 hover:shadow-md transition-all duration-200 group"
                             >
-                                <Car className="h-5 w-5 text-gray-500 group-hover:text-gray-800 transition-colors" />
-                                View on Car
+                                <Car className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+                                {t('viewOnCar')}
                             </button>
                         )}
 
@@ -233,25 +235,25 @@ export default function PlateDetailPage() {
 
                         {/* Plate Details */}
                         <div className="mt-6 grid grid-cols-3 gap-4">
-                            <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 text-center">
-                                <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">Emirate</p>
-                                <p className="text-lg font-bold text-gray-900">{emirateDisplay}</p>
+                            <div className="bg-surface rounded-xl p-4 border border-border text-center">
+                                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1">{t('emirate')}</p>
+                                <p className="text-lg font-bold text-foreground">{emirateDisplay}</p>
                             </div>
-                            <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 text-center">
-                                <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">Code</p>
-                                <p className="text-lg font-bold text-gray-900">{code || '—'}</p>
+                            <div className="bg-surface rounded-xl p-4 border border-border text-center">
+                                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1">{t('code')}</p>
+                                <p className="text-lg font-bold text-foreground">{code || '—'}</p>
                             </div>
-                            <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 text-center">
-                                <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">Number</p>
-                                <p className="text-lg font-bold text-gray-900">{number}</p>
+                            <div className="bg-surface rounded-xl p-4 border border-border text-center">
+                                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1">{t('number')}</p>
+                                <p className="text-lg font-bold text-foreground">{number}</p>
                             </div>
                         </div>
 
                         {/* Description */}
                         {listing.description && (
-                            <div className="mt-6 bg-gray-50 rounded-xl p-5 border border-gray-100">
-                                <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-2">Description</p>
-                                <p className="text-sm text-gray-700 leading-relaxed">{listing.description}</p>
+                            <div className="mt-6 bg-surface rounded-xl p-5 border border-border">
+                                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-2">{t('description')}</p>
+                                <p className="text-sm text-foreground/80 leading-relaxed">{listing.description}</p>
                             </div>
                         )}
                     </div>
@@ -260,31 +262,31 @@ export default function PlateDetailPage() {
                     <div className="lg:col-span-2 space-y-6">
 
                         {/* Price */}
-                        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                            <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-2">Price</p>
-                            <p className="text-4xl font-black text-gray-900 font-mono tracking-tight">
-                                {listing.price ? `AED ${listing.price.toLocaleString()}` : 'Contact Seller'}
+                        <div className="bg-card rounded-2xl border border-border p-6">
+                            <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-2">{t('price')}</p>
+                            <p className="text-4xl font-black text-foreground font-mono tracking-tight">
+                                {listing.price ? `AED ${listing.price.toLocaleString()}` : t('contactSeller')}
                             </p>
 
                             <button
                                 onClick={handleShare}
-                                className="mt-4 flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors"
+                                className="mt-4 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
                             >
-                                <Share2 className="h-4 w-4" /> Share this plate
+                                <Share2 className="h-4 w-4" /> {t('shareThisPlate')}
                             </button>
                         </div>
 
                         {/* Seller Info */}
-                        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                            <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-4">Seller Information</p>
+                        <div className="bg-card rounded-2xl border border-border p-6">
+                            <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-4">{t('sellerInformation')}</p>
                             <div className="flex items-center gap-3 mb-4">
-                                <div className="h-12 w-12 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-500 font-bold text-lg">
+                                <div className="h-12 w-12 rounded-full bg-surface border border-border flex items-center justify-center text-muted-foreground font-bold text-lg">
                                     {sellerName.charAt(0).toUpperCase()}
                                 </div>
                                 <div>
-                                    <p className="font-bold text-gray-900">{sellerName}</p>
-                                    <p className="text-xs text-gray-400">
-                                        {memberYear && `Member since ${memberYear} · `}UAE
+                                    <p className="font-bold text-foreground">{sellerName}</p>
+                                    <p className="text-xs text-muted-foreground">
+                                        {memberYear && `${t('memberSince')} ${memberYear} · `}UAE
                                     </p>
                                 </div>
                             </div>
@@ -293,9 +295,9 @@ export default function PlateDetailPage() {
                                 {telUrl && (
                                     <a
                                         href={telUrl}
-                                        className="flex items-center justify-center gap-2 w-full bg-gray-900 text-white py-3.5 rounded-xl font-bold text-sm hover:bg-gray-800 transition-all shadow-sm"
+                                        className="flex items-center justify-center gap-2 w-full bg-foreground text-background py-3.5 rounded-xl font-bold text-sm hover:opacity-90 transition-all shadow-sm"
                                     >
-                                        <Phone className="h-4 w-4" /> Call Seller
+                                        <Phone className="h-4 w-4" /> {t('callNow')}
                                     </a>
                                 )}
                                 {whatsappUrl && (
@@ -305,20 +307,20 @@ export default function PlateDetailPage() {
                                         rel="noopener noreferrer"
                                         className="flex items-center justify-center gap-2 w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold text-sm hover:bg-emerald-700 transition-all shadow-sm"
                                     >
-                                        <MessageCircle className="h-4 w-4" /> WhatsApp
+                                        <MessageCircle className="h-4 w-4" /> {t('whatsapp')}
                                     </a>
                                 )}
                                 {!telUrl && !whatsappUrl && (
-                                    <p className="text-sm text-gray-500 text-center py-2">No contact info available</p>
+                                    <p className="text-sm text-muted-foreground text-center py-2">{t('noContactInfo')}</p>
                                 )}
                             </div>
                         </div>
 
                         {/* Disclaimer */}
-                        <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
-                            <Shield className="h-5 w-5 text-gray-400 flex-shrink-0 mt-0.5" />
-                            <p className="text-xs text-gray-500 leading-relaxed">
-                                <span className="font-bold text-gray-700">NOTICE:</span> We facilitate connections but are not liable for private transactions between buyers and sellers.
+                        <div className="flex items-start gap-3 p-4 bg-surface rounded-xl border border-border">
+                            <Shield className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                            <p className="text-xs text-muted-foreground leading-relaxed">
+                                <span className="font-bold text-foreground/70">{t('noticeDisclaimerTitle')}</span> {t('noticeDisclaimerText')}
                             </p>
                         </div>
                     </div>

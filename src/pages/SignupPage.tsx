@@ -18,11 +18,11 @@ export default function SignupPage() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     if (form.password !== form.confirmPassword) {
-      toast.error('Passwords do not match');
+      toast.error(t('passwordsNoMatch'));
       return;
     }
     if (form.password.length < 6) {
-      toast.error('Password must be at least 6 characters');
+      toast.error(t('passwordMinLength'));
       return;
     }
     setLoading(true);
@@ -87,7 +87,7 @@ export default function SignupPage() {
                 {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
-            <p className="text-xs text-muted-foreground mt-1.5">Password must be at least 6 characters</p>
+            <p className="text-xs text-muted-foreground mt-1.5">{t('passwordMinLength')}</p>
           </div>
           <div>
             <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('confirmPassword')}</label>

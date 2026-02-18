@@ -15,9 +15,24 @@ interface SupabaseListing {
 interface Props {
   section: SectionData;
   listings: SupabaseListing[];
+  loading?: boolean;
 }
 
-export default function EmirateSection({ section, listings }: Props) {
+function SkeletonCard() {
+  return (
+    <div className="h-[280px] bg-card rounded-2xl border border-border overflow-hidden">
+      <div className="flex flex-col items-center justify-center h-full">
+        <div className="w-[80%] h-[100px] bg-muted rounded-lg animate-pulse" />
+        <div className="mt-6 w-full px-4 border-t border-border/50 pt-4">
+          <div className="h-3 bg-muted rounded w-16 animate-pulse mb-2" />
+          <div className="h-6 bg-muted rounded w-28 animate-pulse" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function EmirateSection({ section, listings, loading }: Props) {
   const hasListings = listings.length > 0;
 
   return (
@@ -39,7 +54,9 @@ export default function EmirateSection({ section, listings }: Props) {
         </a>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {hasListings ? (
+        {loading ? (
+          <>{[1, 2, 3, 4].map(i => <SkeletonCard key={i} />)}</>
+        ) : hasListings ? (
           listings.slice(0, 4).map((listing) => {
             const parts = listing.plate_number.split(' ');
             const code = parts.length > 1 ? parts[0] : '';

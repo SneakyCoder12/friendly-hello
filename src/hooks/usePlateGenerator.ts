@@ -35,7 +35,7 @@ function loadAllTemplateImages(): Promise<Record<string, HTMLImageElement>> {
 }
 
 /** Hook for rendering a single plate to a data URL (for cards) */
-export function usePlateImage(emirate: string, code: string, number: string, plateStyle: 'private' | 'bike' = 'private') {
+export function usePlateImage(emirate: string, code: string, number: string, plateStyle: 'private' | 'bike' | 'classic' = 'private') {
     const [dataUrl, setDataUrl] = useState<string | null>(null);
     const mountedRef = useRef(true);
 
@@ -48,6 +48,7 @@ export function usePlateImage(emirate: string, code: string, number: string, pla
             // Select image key based on style
             let imgKey = emirate;
             if (plateStyle === 'bike') imgKey = `${emirate}_bike`;
+            if (plateStyle === 'classic') imgKey = `${emirate}_classic`;
 
 
             const img = images[imgKey] || images[emirate];
@@ -81,7 +82,7 @@ export function usePlateImage(emirate: string, code: string, number: string, pla
 /** Hook for the interactive plate generator with live preview */
 export function usePlateGenerator() {
     const [emirate, setEmirate] = useState('abudhabi');
-    const [plateStyle, setPlateStyle] = useState<'private' | 'bike'>('private');
+    const [plateStyle, setPlateStyle] = useState<'private' | 'bike' | 'classic'>('private');
     const [plateCode, setPlateCode] = useState('B');
     const [plateNumber, setPlateNumber] = useState('6836');
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -93,6 +94,7 @@ export function usePlateGenerator() {
         // Select image key based on style
         let imgKey = emirate;
         if (plateStyle === 'bike') imgKey = `${emirate}_bike`;
+        if (plateStyle === 'classic') imgKey = `${emirate}_classic`;
 
 
         // Fallback if specific bike image missing (though we added them all)

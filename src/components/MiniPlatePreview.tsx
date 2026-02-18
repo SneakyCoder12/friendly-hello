@@ -18,7 +18,7 @@ interface MiniPlatePreviewProps {
     emirate: string;
     code: string;
     number: string;
-    vehicleType?: 'car' | 'bike';
+    vehicleType?: 'car' | 'bike' | 'classic';
     className?: string;
 }
 
@@ -30,7 +30,7 @@ export default function MiniPlatePreview({
     className = '',
 }: MiniPlatePreviewProps) {
     const emirateKey = EMIRATE_KEY_MAP[emirate] || emirate.toLowerCase().replace(/\s+/g, '_');
-    const plateStyle = vehicleType === 'bike' ? 'bike' : 'private';
+    const plateStyle = vehicleType === 'bike' ? 'bike' : (vehicleType === 'classic' ? 'classic' : 'private');
     const dataUrl = usePlateImage(emirateKey, code, number, plateStyle);
 
     if (!dataUrl) {

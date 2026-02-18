@@ -10,7 +10,7 @@ const FONT_FILE = '/fonts/GL-Nummernschild-Mtl.ttf';
 const FONT_FALLBACK = 'sans-serif';
 
 interface ComponentConfig {
-  type: 'code' | 'number';
+  type: 'code' | 'number' | 'arabic_number';
   xRatio: number;
   align: 'center' | 'left' | 'right';
   emboss?: boolean;
@@ -18,6 +18,7 @@ interface ComponentConfig {
   letterSpacingRatio?: number;
   baselineOffsetRatio?: number;
   yRatio?: number; // Explicit Y position ratio (0.0 to 1.0) overrides baseline
+  color?: string; // Override text color (default: '#0a0a0a')
 }
 
 interface EmirateConfig {
@@ -26,6 +27,7 @@ interface EmirateConfig {
   letterSpacingRatio: number;
   verticalCenter: boolean;
   fontFile?: string;
+  arabicFontFile?: string;
   fontWeight?: string;
   baselineRatio?: number;
   components: ComponentConfig[];
@@ -145,7 +147,7 @@ CONFIGS['abudhabi_bike'] = {
   fontFile: '/fonts/GL-Nummernschild-Mtl.ttf',
   components: [
     { type: 'code', xRatio: 0.87, yRatio: 0.39, align: 'center', emboss: true, fontSizeRatio: 0.155 },
-    { type: 'number', xRatio: 0.53, yRatio: 0.90, align: 'center', emboss: true, fontSizeRatio: 0.15 },
+    { type: 'number', xRatio: 0.51, yRatio: 0.90, align: 'center', emboss: true, fontSizeRatio: 0.15 },
   ],
 };
 
@@ -221,7 +223,73 @@ CONFIGS['fujairah_bike'] = {
   ],
 };
 
-export function getConfig(emirate: string, plateStyle: 'private' | 'bike' = 'private'): EmirateConfig {
+// --- Classic Plate Configs ---
+
+// Abu Dhabi Classic
+CONFIGS['abudhabi_classic'] = {
+  hasCode: false,
+  fontHeightRatio: 0.22,
+  letterSpacingRatio: 0.01,
+  fontFile: '/fonts/GL-Nummernschild-Mtl.ttf',
+  arabicFontFile: '/fonts/Amiri-Bold.ttf',
+  verticalCenter: true,
+  components: [
+    { type: 'number', xRatio: 0.20, yRatio: 0.68, align: 'center', emboss: true, fontSizeRatio: 0.14, letterSpacingRatio: 0.001 },
+    { type: 'arabic_number', xRatio: 0.79, yRatio: 0.64, align: 'center', emboss: true, fontSizeRatio: 0.125, letterSpacingRatio: -0.01 },
+  ],
+};
+
+// Dubai Classic
+CONFIGS['dubai_classic'] = {
+  hasCode: false,
+  fontHeightRatio: 0.20,
+  letterSpacingRatio: -0.0001,
+  fontFile: '/fonts/Rough Motion.otf',
+  verticalCenter: true,
+  components: [
+
+    { type: 'number', xRatio: 0.60, align: 'center', emboss: true, fontSizeRatio: 0.2 },
+  ],
+};
+
+// Ajman Classic
+CONFIGS['ajman_classic'] = {
+  hasCode: false,
+  fontHeightRatio: 0.22,
+  letterSpacingRatio: 0.001,
+  fontFile: '/fonts/GL-Nummernschild-Mtl.ttf',
+  verticalCenter: true,
+  components: [
+    { type: 'number', xRatio: 0.50, yRatio: 0.69, align: 'center', emboss: true, fontSizeRatio: 0.16, color: 'white' },
+  ],
+};
+
+// Sharjah Classic
+CONFIGS['sharjah_classic'] = {
+  hasCode: true,
+  fontHeightRatio: 0.22,
+  letterSpacingRatio: 0.005,
+  fontFile: '/fonts/DIN-1451.ttf',
+  verticalCenter: true,
+  components: [
+    { type: 'code', xRatio: 0.10, yRatio: 0.82, align: 'center', emboss: true, fontSizeRatio: 0.10, color: 'white' },
+    { type: 'number', xRatio: 0.72, yRatio: 0.69, align: 'center', emboss: true, fontSizeRatio: 0.13 },
+  ],
+};
+
+// RAK Classic
+CONFIGS['rak_classic'] = {
+  hasCode: false,
+  fontHeightRatio: 0.22,
+  letterSpacingRatio: 0.015,
+  fontFile: '/fonts/GL-Nummernschild-Mtl.ttf',
+  verticalCenter: true,
+  components: [
+    { type: 'number', xRatio: 0.50, yRatio: 0.81, align: 'center', emboss: true, fontSizeRatio: 0.3, color: 'white' },
+  ],
+};
+
+export function getConfig(emirate: string, plateStyle: 'private' | 'bike' | 'classic' = 'private'): EmirateConfig {
   const emId = (emirate || 'ajman').toLowerCase().replace(/\s+/g, '_');
   const styleSuffix = plateStyle && plateStyle !== 'private' ? `_${plateStyle}` : '';
   const configKey = `${emId}${styleSuffix}`;
@@ -257,7 +325,7 @@ export interface GeneratePlateOptions {
   plateNumber: string;
   blankPlateImage: HTMLImageElement;
   emirate: string;
-  plateStyle?: 'private' | 'bike';
+  plateStyle?: 'private' | 'bike' | 'classic';
 }
 
 export async function generatePlate({
@@ -272,6 +340,10 @@ export async function generatePlate({
   const styleSuffix = plateStyle && plateStyle !== 'private' ? `_${plateStyle}` : '';
   const configKey = `${emId}${styleSuffix}`;
   const config = CONFIGS[configKey] || CONFIGS[emId] || CONFIGS['ajman'];
+
+  // English-to-Arabic-Indic digit conversion
+  const ARABIC_DIGITS = ['\u0660', '\u0661', '\u0662', '\u0663', '\u0664', '\u0665', '\u0666', '\u0667', '\u0668', '\u0669'];
+  const toArabicIndic = (str: string) => str.replace(/[0-9]/g, d => ARABIC_DIGITS[parseInt(d)]);
 
   const canvas = document.createElement('canvas');
   canvas.width = OUTPUT_WIDTH;
@@ -304,13 +376,27 @@ export async function generatePlate({
   await font.load();
   document.fonts.add(font);
 
+  // Load Arabic font if needed
+  let arabicFontNameId = '';
+  if (config.arabicFontFile) {
+    arabicFontNameId = `ArabicFont_${emId}`;
+    const arabicFont = new FontFace(arabicFontNameId, `url("${config.arabicFontFile}")`, { weight: 'bold' });
+    await arabicFont.load();
+    document.fonts.add(arabicFont);
+  }
+
   ctx.textBaseline = 'alphabetic';
 
   for (const comp of config.components) {
     let text = '';
     if (comp.type === 'code') text = (plateCode || '').toUpperCase();
     if (comp.type === 'number') text = plateNumber || '';
+    if (comp.type === 'arabic_number') text = toArabicIndic(plateNumber || '');
     if (!text) continue;
+
+    // Use Arabic font for arabic_number components
+    const isArabic = comp.type === 'arabic_number' && arabicFontNameId;
+    const activeFontName = isArabic ? arabicFontNameId : fontNameId;
 
     const compFontSize = comp.fontSizeRatio ? W * comp.fontSizeRatio : globalFontHeight;
     const compSpacing = comp.letterSpacingRatio ? W * comp.letterSpacingRatio : W * config.letterSpacingRatio;
@@ -323,7 +409,7 @@ export async function generatePlate({
       compY = baselineY + H * comp.baselineOffsetRatio;
     }
 
-    ctx.font = `${targetWeight} ${Math.round(compFontSize)}px "${fontNameId}", sans-serif`;
+    ctx.font = `${targetWeight} ${Math.round(compFontSize)}px "${activeFontName}", sans-serif`;
 
     // Calculate alignment
     const width = ctx.measureText(text).width + (text.length - 1) * compSpacing;
@@ -360,15 +446,15 @@ export async function generatePlate({
         ctx.strokeText(char, cursorX, compY);
         ctx.restore();
 
-        // ---- LAYER 3: MAIN TEXT (solid black on top) ----
+        // ---- LAYER 3: MAIN TEXT (solid color on top) ----
         ctx.save();
-        ctx.fillStyle = '#0a0a0a';
+        ctx.fillStyle = comp.color || '#0a0a0a';
         ctx.fillText(char, cursorX, compY);
         ctx.restore();
 
       } else {
         // ===== FLAT (no emboss) =====
-        ctx.fillStyle = '#000000';
+        ctx.fillStyle = comp.color || '#000000';
         ctx.fillText(char, cursorX, compY);
       }
 

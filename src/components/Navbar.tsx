@@ -42,7 +42,7 @@ export default function Navbar() {
   const closeMenu = () => setMenuOpen(false);
 
   const navLinkClass =
-    'relative text-base font-semibold text-gray-500 hover:text-gray-900 transition-colors duration-300 after:content-[""] after:absolute after:left-0 after:bottom-[-4px] after:w-0 after:h-[2px] after:bg-gray-800 after:rounded-full after:transition-all after:duration-300 hover:after:w-full';
+    'relative text-base font-semibold text-gray-500 hover:text-[hsl(40,86%,44%)] transition-colors duration-300 after:content-[""] after:absolute after:left-0 after:bottom-[-4px] after:w-0 after:h-[2px] after:bg-[hsl(40,86%,44%)] after:rounded-full after:transition-all after:duration-300 hover:after:w-full';
 
   return (
     <>
@@ -73,7 +73,7 @@ export default function Navbar() {
               <div className="relative group/market">
                 <Link
                   to="/marketplace"
-                  className="flex items-center gap-1 text-base font-semibold text-gray-500 hover:text-gray-900 transition-colors duration-300"
+                  className="flex items-center gap-1 text-base font-semibold text-gray-500 hover:text-[hsl(40,86%,44%)] transition-colors duration-300"
                 >
                   {t('marketplace')}
                   <ChevronDown className="h-3.5 w-3.5 transition-transform duration-300 group-hover/market:rotate-180" />

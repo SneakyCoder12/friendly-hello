@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import PlateCard from './PlateCard';
-import { Bike, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 interface BikeListing {
     id: string;
@@ -81,8 +81,8 @@ export default function BikePlatesSection() {
         <section>
             <div className="flex items-end justify-between mb-12 border-b border-border pb-6">
                 <div className="flex items-center gap-5">
-                    <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200/60 flex items-center justify-center">
-                        <Bike className="h-8 w-8 text-amber-600" />
+                    <div className="h-16 w-16 rounded-2xl bg-white border border-gray-200 shadow-sm flex items-center justify-center overflow-hidden p-2">
+                        <img src="/bike-icon.svg" alt="Bike" className="w-full h-full object-contain" />
                     </div>
                     <div>
                         <h2 className="text-4xl font-display font-bold text-foreground tracking-tight">{t('bikePlates')}</h2>
@@ -93,7 +93,7 @@ export default function BikePlatesSection() {
                     <ArrowRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
                 </a>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className={`grid gap-6 ${hasListings ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'}`}>
                 {hasListings ? (
                     listings.slice(0, 4).map((listing) => {
                         const parts = listing.plate_number.split(' ');
@@ -119,12 +119,10 @@ export default function BikePlatesSection() {
                 ) : (
                     <>
                         <PlateCard emirate="dubai" code="A" number="1234" plateUrl="#" comingSoon plateStyle="bike" />
-                        <PlateCard emirate="abudhabi" code="1" number="5678" plateUrl="#" comingSoon plateStyle="bike" />
-                        <PlateCard emirate="sharjah" code="2" number="999" plateUrl="#" comingSoon plateStyle="bike" />
-                        <PlateCard emirate="ajman" code="B" number="777" plateUrl="#" comingSoon plateStyle="bike" />
                     </>
                 )}
             </div>
         </section>
     );
 }
+

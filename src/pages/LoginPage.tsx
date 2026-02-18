@@ -20,7 +20,7 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
+
     if (loginMode === 'email') {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) toast.error(error.message);
@@ -29,7 +29,7 @@ export default function LoginPage() {
       // For phone login, we use OTP flow
       const { error } = await supabase.auth.signInWithOtp({ phone });
       if (error) toast.error(error.message);
-      else toast.success('OTP sent to your phone. Check your messages.');
+      else toast.success(t('otpSent'));
     }
     setLoading(false);
   };
@@ -83,7 +83,7 @@ export default function LoginPage() {
                   {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-              <p className="text-xs text-muted-foreground mt-1.5">Password must be at least 6 characters</p>
+              <p className="text-xs text-muted-foreground mt-1.5">{t('passwordMinLength')}</p>
             </div>
           )}
 
@@ -92,7 +92,7 @@ export default function LoginPage() {
               <label className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={rememberMe} onChange={e => setRememberMe(e.target.checked)}
                   className="h-4 w-4 rounded border-border accent-primary" />
-                <span className="text-xs text-muted-foreground font-medium">Remember me</span>
+                <span className="text-xs text-muted-foreground font-medium">{t('rememberMe')}</span>
               </label>
               <Link to="/forgot-password" className="text-xs text-primary hover:underline font-medium">{t('forgotPassword')}</Link>
             </div>
@@ -104,7 +104,7 @@ export default function LoginPage() {
             className="w-full bg-primary text-primary-foreground hover:bg-primary-hover py-3 rounded-xl font-bold text-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-            {loginMode === 'email' ? t('login') : 'Send OTP'}
+            {loginMode === 'email' ? t('login') : t('sendOtp')}
           </button>
 
           <button
@@ -112,7 +112,7 @@ export default function LoginPage() {
             onClick={() => setLoginMode(loginMode === 'email' ? 'phone' : 'email')}
             className="w-full text-center text-sm text-primary font-bold hover:underline"
           >
-            {loginMode === 'email' ? 'Login with Phone Number' : 'Login with Email'}
+            {loginMode === 'email' ? t('loginWithPhone') : t('loginWithEmail')}
           </button>
 
           <p className="text-center text-sm text-muted-foreground">

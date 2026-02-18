@@ -30,7 +30,7 @@ interface BulkRow {
   description: string;
   contact_email: string;
   contact_phone: string;
-  vehicle_type: 'car' | 'bike';
+  vehicle_type: 'car' | 'bike' | 'classic';
 }
 
 const emptyRow = (prev?: BulkRow, email?: string, phone?: string): BulkRow => ({
@@ -170,7 +170,7 @@ export default function DashboardPage() {
       return {
         plate_number: fullPlateNumber,
         emirate: r.emirate,
-        plate_style: r.vehicle_type === 'bike' ? 'bike' : (r.plate_style || null),
+        plate_style: r.vehicle_type === 'bike' ? 'bike' : (r.vehicle_type === 'classic' ? 'classic' : (r.plate_style || null)),
         price: r.price ? Number(r.price) : null,
         description: r.description || null,
         contact_email: r.contact_email || null,
@@ -218,7 +218,7 @@ export default function DashboardPage() {
     const { error } = await supabase.from('listings').update({
       plate_number: fullPlateNumber,
       emirate: editForm.emirate,
-      plate_style: editForm.vehicle_type === 'bike' ? 'bike' : (editForm.plate_code.trim() || null),
+      plate_style: editForm.vehicle_type === 'bike' ? 'bike' : (editForm.vehicle_type === 'classic' ? 'classic' : (editForm.plate_code.trim() || null)),
       price: editForm.price ? Number(editForm.price) : null,
       description: editForm.description || null,
     }).eq('id', editId);
@@ -604,16 +604,19 @@ export default function DashboardPage() {
                         <div className="flex flex-wrap gap-1.5">
                           {EMIRATES.map(em => {
                             const isSelected = row.emirate === em;
+                            const isClassicUnsupported = row.vehicle_type === 'classic' && ['Umm Al Quwain', 'Fujairah'].includes(em);
                             const short = em === 'Ras Al Khaimah' ? 'RAK' : em === 'Umm Al Quwain' ? 'UAQ' : em;
                             return (
                               <button
                                 key={em}
                                 type="button"
-                                onClick={() => updateRow(idx, 'emirate', em)}
+                                disabled={isClassicUnsupported}
+                                onClick={() => !isClassicUnsupported && updateRow(idx, 'emirate', em)}
                                 className={`px-2.5 py-1.5 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all active:scale-95 ${isSelected
                                   ? 'bg-gradient-to-r from-primary to-primary-hover text-primary-foreground shadow-md shadow-primary/20'
                                   : 'bg-surface border border-border text-muted-foreground hover:border-primary/30 hover:text-foreground'
-                                  }`}
+                                  } ${isClassicUnsupported ? 'opacity-40 cursor-not-allowed bg-muted/30 grayscale' : ''}`}
+                                title={isClassicUnsupported ? "Classic not available for this emirate" : ""}
                               >
                                 {short}
                               </button>
@@ -645,6 +648,18 @@ export default function DashboardPage() {
                               }`}
                           >
                             <Bike className="h-3.5 w-3.5" /> Bike Plate
+                          </button>
+                          <button
+                            type="button"
+                            disabled={!['Abu Dhabi', 'Dubai', 'Sharjah', 'Ajman', 'Ras Al Khaimah'].includes(row.emirate)}
+                            onClick={() => updateRow(idx, 'vehicle_type', 'classic')}
+                            className={`px-4 py-2 text-xs font-bold transition-all flex items-center gap-1.5 ${row.vehicle_type === 'classic'
+                              ? 'bg-gradient-to-r from-primary to-primary-hover text-primary-foreground'
+                              : 'bg-surface text-muted-foreground hover:text-foreground'
+                              } ${!['Abu Dhabi', 'Dubai', 'Sharjah', 'Ajman', 'Ras Al Khaimah'].includes(row.emirate) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            title={!['Abu Dhabi', 'Dubai', 'Sharjah', 'Ajman', 'Ras Al Khaimah'].includes(row.emirate) ? "Classic not available for this emirate" : ""}
+                          >
+                            <span className="h-3.5 w-3.5 flex items-center justify-center border border-current rounded text-[8px] font-serif">C</span> Classic
                           </button>
                         </div>
                       </div>
@@ -680,6 +695,7 @@ export default function DashboardPage() {
             </h3>
 
             {/* Type selector for Edit Form */}
+            {/* Type selector for Edit Form */}
             <div className="flex gap-4 mb-4">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -703,6 +719,18 @@ export default function DashboardPage() {
                 <Bike className="h-4 w-4 text-foreground" />
                 <span className="text-sm font-bold text-foreground">Bike Plate</span>
               </label>
+              <label className={`flex items-center gap-2 cursor-pointer ${!['Abu Dhabi', 'Dubai', 'Sharjah', 'Ajman', 'Ras Al Khaimah'].includes(editForm.emirate) ? 'opacity-50 pointer-events-none' : ''}`}>
+                <input
+                  type="radio"
+                  name="editVehicleType"
+                  checked={editForm.vehicle_type === 'classic'}
+                  onChange={() => setEditForm(prev => ({ ...prev, vehicle_type: 'classic' }))}
+                  disabled={!['Abu Dhabi', 'Dubai', 'Sharjah', 'Ajman', 'Ras Al Khaimah'].includes(editForm.emirate)}
+                  className="accent-primary"
+                />
+                <span className="h-4 w-4 flex items-center justify-center border border-current rounded text-[10px] font-serif font-bold">C</span>
+                <span className="text-sm font-bold text-foreground">Classic Plate</span>
+              </label>
             </div>
 
             {/* Live plate preview */}
@@ -712,7 +740,7 @@ export default function DashboardPage() {
                   emirate={editForm.emirate}
                   code={editForm.plate_code}
                   number={editForm.plate_number}
-                  vehicleType={editForm.vehicle_type as 'car' | 'bike'}
+                  vehicleType={editForm.vehicle_type as 'car' | 'bike' | 'classic'}
                   className="w-full h-full"
                 />
               </div>
@@ -751,9 +779,20 @@ export default function DashboardPage() {
               {/* Emirate */}
               <div className="col-span-1 sm:col-span-4">
                 <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Emirate</label>
-                <select value={editForm.emirate} onChange={e => setEditForm(p => ({ ...p, emirate: e.target.value }))}
+                <select value={editForm.emirate} onChange={e => {
+                  const newEmirate = e.target.value;
+                  const classicSupported = ['Abu Dhabi', 'Dubai', 'Sharjah', 'Ajman', 'Ras Al Khaimah'].includes(newEmirate);
+                  setEditForm(p => ({
+                    ...p,
+                    emirate: newEmirate,
+                    vehicle_type: (p.vehicle_type === 'classic' && !classicSupported) ? 'car' : p.vehicle_type,
+                  }));
+                }}
                   className="w-full bg-surface border border-border rounded-xl px-2 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
-                  {EMIRATES.map(em => <option key={em} value={em}>{em}</option>)}
+                  {EMIRATES.map(em => {
+                    const isClassicUnsupported = editForm.vehicle_type === 'classic' && ['Umm Al Quwain', 'Fujairah'].includes(em);
+                    return <option key={em} value={em} disabled={isClassicUnsupported}>{em}{isClassicUnsupported ? ' (Not Available)' : ''}</option>
+                  })}
                 </select>
               </div>
             </div>
@@ -1196,6 +1235,6 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
-    </div>
+    </div >
   );
 }

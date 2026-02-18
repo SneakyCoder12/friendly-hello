@@ -135,6 +135,8 @@ export const translations = {
     markAsActive: 'Mark as active',
     showListing: 'Show listing',
     hideListing: 'Hide listing',
+    classic: 'Classic',
+    classicPlate: 'Classic Plate',
 
     // Mobile Numbers Page
     vipMobileNumbers: 'VIP Mobile Numbers',
@@ -249,6 +251,49 @@ export const translations = {
 
     // Language
     language: 'العربية',
+
+    // Plate Detail (extra)
+    backToMarketplace: 'Back to Marketplace',
+    viewOnCar: 'View on Car',
+    listingNotFound: 'Listing not found',
+    shareThisPlate: 'Share this plate',
+    sellerInformation: 'Seller Information',
+    memberSince: 'Member since',
+    noContactInfo: 'No contact info available',
+    noticeDisclaimerTitle: 'NOTICE:',
+    noticeDisclaimerText: 'We facilitate connections but are not liable for private transactions between buyers and sellers.',
+    premiumPlate: 'Premium Plate',
+
+    // Generator (extra)
+    plateVisualizer: 'Plate Visualizer',
+    createHdPlate: 'Create Your HD Number Plate',
+    configureYourPlate: 'Configure Your Plate',
+    plateStyleLabel: 'Plate Style',
+    generating: 'Generating...',
+    downloadHdPlate: 'Download HD Plate (PNG)',
+    hdExport: 'High resolution PNG export',
+    livePreview: 'Live Preview',
+    plateNumberLabel: 'Plate Number (1 - 5 digits)',
+
+    // Auth (extra)
+    rememberMe: 'Remember me',
+    sendOtp: 'Send OTP',
+    loginWithPhone: 'Login with Phone Number',
+    loginWithEmail: 'Login with Email',
+    otpSent: 'OTP sent to your phone. Check your messages.',
+    passwordMinLength: 'Password must be at least 6 characters',
+    passwordsNoMatch: 'Passwords do not match',
+    resetLinkSent: 'Reset link sent! Check your email.',
+    checkEmailReset: 'Check your email for the reset link.',
+
+    // Dashboard (extra)
+    privatePlate: 'Private Plate',
+    bikePlate: 'Bike Plate',
+
+    // Footer (extra)
+    abuDhabiPlates: 'Abu Dhabi Plates',
+    dubaiPlates: 'Dubai Plates',
+    sharjahPlates: 'Sharjah Plates',
   },
   ar: {
     // Nav
@@ -384,6 +429,8 @@ export const translations = {
     markAsActive: 'تحديد كمتاح',
     showListing: 'إظهار الإعلان',
     hideListing: 'إخفاء الإعلان',
+    classic: 'كلاسيك',
+    classicPlate: 'لوحة كلاسيك',
 
     // Mobile Numbers Page
     vipMobileNumbers: 'أرقام موبايل VIP',
@@ -498,6 +545,49 @@ export const translations = {
 
     // Language
     language: 'English',
+
+    // Plate Detail (extra)
+    backToMarketplace: 'الرجوع للسوق',
+    viewOnCar: 'شوفها على السيارة',
+    listingNotFound: 'الإعلان مو موجود',
+    shareThisPlate: 'شارك هالرقم',
+    sellerInformation: 'معلومات البايع',
+    memberSince: 'عضو من',
+    noContactInfo: 'ما في معلومات تواصل',
+    noticeDisclaimerTitle: 'تنبيه:',
+    noticeDisclaimerText: 'نحن نسهّل التواصل ولا نتحمّل مسؤولية المعاملات الخاصة بين البائع والمشتري.',
+    premiumPlate: 'لوحة مميّزة',
+
+    // Generator (extra)
+    plateVisualizer: 'عارض الأرقام',
+    createHdPlate: 'صمّم لوحة رقمك بدقة عالية',
+    configureYourPlate: 'خصّص لوحتك',
+    plateStyleLabel: 'نوع اللوحة',
+    generating: 'جاري التحميل...',
+    downloadHdPlate: 'حمّل اللوحة HD (PNG)',
+    hdExport: 'تصدير بدقة عالية PNG',
+    livePreview: 'معاينة مباشرة',
+    plateNumberLabel: 'رقم اللوحة (١ - ٥ أرقام)',
+
+    // Auth (extra)
+    rememberMe: 'تذكّرني',
+    sendOtp: 'إرسال رمز التحقق',
+    loginWithPhone: 'دخول برقم الهاتف',
+    loginWithEmail: 'دخول بالبريد الإلكتروني',
+    otpSent: 'تم إرسال رمز التحقق. تفقّد رسائلك.',
+    passwordMinLength: 'كلمة السر لازم تكون ٦ حروف على الأقل',
+    passwordsNoMatch: 'كلمات السر ما تتطابق',
+    resetLinkSent: 'تم إرسال الرابط! تفقّد بريدك.',
+    checkEmailReset: 'تفقّد بريدك الإلكتروني لرابط إعادة التعيين.',
+
+    // Dashboard (extra)
+    privatePlate: 'لوحة خاصة',
+    bikePlate: 'لوحة دراجة',
+
+    // Footer (extra)
+    abuDhabiPlates: 'لوحات أبوظبي',
+    dubaiPlates: 'لوحات دبي',
+    sharjahPlates: 'لوحات الشارقة',
   },
 } as const;
 

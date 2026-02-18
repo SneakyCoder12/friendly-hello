@@ -24,9 +24,9 @@ export default function Footer() {
           <div>
             <h4 className="font-bold text-foreground mb-6 text-sm uppercase tracking-wider">{t('marketplaceTitle')}</h4>
             <ul className="space-y-4 text-sm text-muted-foreground font-medium">
-              <li><Link className="hover:text-primary transition-colors" to="/marketplace?emirate=Abu+Dhabi">Abu Dhabi Plates</Link></li>
-              <li><Link className="hover:text-primary transition-colors" to="/marketplace?emirate=Dubai">Dubai Plates</Link></li>
-              <li><Link className="hover:text-primary transition-colors" to="/marketplace?emirate=Sharjah">Sharjah Plates</Link></li>
+              <li><Link className="hover:text-primary transition-colors" to="/marketplace?emirate=Abu+Dhabi">{t('abuDhabiPlates')}</Link></li>
+              <li><Link className="hover:text-primary transition-colors" to="/marketplace?emirate=Dubai">{t('dubaiPlates')}</Link></li>
+              <li><Link className="hover:text-primary transition-colors" to="/marketplace?emirate=Sharjah">{t('sharjahPlates')}</Link></li>
             </ul>
           </div>
           <div>

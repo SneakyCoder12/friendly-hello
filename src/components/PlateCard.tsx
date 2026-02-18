@@ -17,7 +17,7 @@ interface PlateCardProps {
   plateNumber?: string;
   listingId?: string;
   status?: string;
-  plateStyle?: 'private' | 'bike';
+  plateStyle?: 'private' | 'bike' | 'classic';
 }
 
 function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerPhone, plateNumber, listingId, status, plateStyle = 'private' }: PlateCardProps) {
@@ -100,7 +100,7 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
 
   return (
     <div
-      className="perspective-1000 h-[260px] cursor-pointer"
+      className="perspective-1000 h-[280px] cursor-pointer"
       onMouseEnter={() => setFlipped(true)}
       onMouseLeave={() => setFlipped(false)}
       onClick={handleCardClick}
@@ -147,7 +147,32 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
                     <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold mb-1">Price</p>
                     <p className="text-xl font-bold text-foreground font-mono tracking-tight">{price || 'Contact'}</p>
                   </div>
-                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider group-hover:text-primary transition-colors">View →</p>
+                  <div className="flex items-center gap-1.5">
+                    {/* Small hover action buttons */}
+                    {telUrl && (
+                      <a
+                        href={telUrl}
+                        onClick={e => e.stopPropagation()}
+                        className="hidden group-hover:flex h-8 w-8 rounded-full bg-emerald-500 hover:bg-emerald-600 items-center justify-center text-white transition-all shadow-sm hover:shadow-md hover:scale-110 active:scale-95"
+                        title="Call Now"
+                      >
+                        <Phone className="h-3.5 w-3.5" />
+                      </a>
+                    )}
+                    {whatsappUrl && (
+                      <a
+                        href={whatsappUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={e => e.stopPropagation()}
+                        className="hidden group-hover:flex h-8 w-8 rounded-full bg-[#25D366] hover:bg-[#1da851] items-center justify-center text-white transition-all shadow-sm hover:shadow-md hover:scale-110 active:scale-95"
+                        title="WhatsApp"
+                      >
+                        <MessageCircle className="h-3.5 w-3.5" />
+                      </a>
+                    )}
+                    <p className={`text-[10px] text-muted-foreground font-bold uppercase tracking-wider group-hover:text-primary transition-colors ${(telUrl || whatsappUrl) ? 'hidden group-hover:hidden sm:group-hover:block' : ''}`}>View →</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -156,26 +181,25 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
 
         {/* BACK SIDE — contact options */}
         <div className="absolute inset-0 backface-hidden rotate-y-180">
-          <div className={`h-full bg-card rounded-2xl border border-border flex flex-col items-center justify-center px-5 py-4 overflow-hidden relative ${isSold ? 'opacity-80' : ''}`}>
+          <div className={`h-full bg-card rounded-2xl border border-border flex flex-col items-center px-5 pt-6 pb-4 relative ${isSold ? 'opacity-80' : ''}`}>
             {/* SOLD Ribbon */}
             {isSold && (
               <div className="sold-ribbon">
                 <span>SOLD</span>
               </div>
             )}
-            {/* Header with heart */}
-            <div className="w-full flex items-center justify-between mb-1">
-              <p className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-bold">Contact Seller</p>
-              {listingId && (
+            {/* Heart button — top right */}
+            {listingId && (
+              <div className="w-full flex justify-end mb-3">
                 <button
                   onClick={toggleFavorite}
-                  className="h-8 w-8 rounded-full bg-surface border border-border/60 flex items-center justify-center transition-all hover:scale-110 active:scale-90"
+                  className="h-9 w-9 rounded-full bg-white border border-border shadow-sm flex items-center justify-center transition-all hover:scale-110 active:scale-90"
                   title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                 >
-                  <Heart className={`h-4 w-4 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-muted-foreground hover:text-red-400'}`} />
+                  <Heart className={`h-4.5 w-4.5 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400 hover:text-red-400'}`} />
                 </button>
-              )}
-            </div>
+              </div>
+            )}
             <p className="text-sm font-display font-bold text-foreground mb-0.5">Premium Plate</p>
             <p className="text-[10px] text-muted-foreground font-medium mb-3">{emirate}</p>
 
@@ -217,9 +241,9 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
             <Link
               to={plateUrl}
               onClick={e => e.stopPropagation()}
-              className="text-[11px] font-bold text-muted-foreground hover:text-primary transition-colors uppercase tracking-wider"
+              className="text-xs font-bold text-foreground/70 hover:text-primary transition-colors uppercase tracking-wider"
             >
-              View Details →
+              VIEW DETAILS →
             </Link>
 
             {/* Phone number at bottom */}

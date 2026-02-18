@@ -73,21 +73,6 @@ export default function PlateListings() {
     };
   }, []);
 
-  if (loading) {
-    return (
-      <div className="space-y-32">
-        {SECTIONS.map((section) => (
-          <div key={section.emirateKey} className="animate-pulse">
-            <div className="h-8 bg-muted rounded w-48 mb-12" />
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[1, 2, 3, 4].map(i => <div key={i} className="h-[260px] bg-muted rounded-2xl" />)}
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-32">
       {SECTIONS.map((section) => {
@@ -97,6 +82,7 @@ export default function PlateListings() {
             key={section.emirateKey}
             section={section}
             listings={listings}
+            loading={loading}
           />
         );
       })}
