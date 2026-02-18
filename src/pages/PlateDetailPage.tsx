@@ -79,14 +79,20 @@ export default function PlateDetailPage() {
         })();
     }, [plateId]);
 
+    // Derive plate type from DB plate_style
+    const isClassic = listing?.plate_style === 'classic';
+    const isBike = listing?.plate_style === 'bike';
+    const plateStyle: 'private' | 'bike' | 'classic' = isClassic ? 'classic' : isBike ? 'bike' : 'private';
+
     // Parse plate_number → code + number (e.g. "A 12345" → code="A", number="12345")
+    // Classic plates have no code — plate_number is just the number
     const parts = listing?.plate_number?.split(' ') || [];
-    const code = parts.length > 1 ? parts[0] : '';
-    const number = parts.length > 1 ? parts.slice(1).join(' ') : parts[0] || '';
+    const code = isClassic ? '' : (parts.length > 1 ? parts[0] : '');
+    const number = isClassic ? (listing?.plate_number || '') : (parts.length > 1 ? parts.slice(1).join(' ') : parts[0] || '');
     const emirateKey = listing ? (EMIRATE_KEY_MAP[listing.emirate] || listing.emirate.toLowerCase().replace(/\s+/g, '_')) : '';
     const emirateDisplay = listing?.emirate || '';
 
-    const dataUrl = usePlateImage(emirateKey, code, number);
+    const dataUrl = usePlateImage(emirateKey, code, number, plateStyle);
 
     // Contact info — prefer listing contact_phone, fall back to seller phone_number
     const phone = listing?.contact_phone || seller?.phone_number || '';
@@ -173,8 +179,8 @@ export default function PlateDetailPage() {
                             )}
                         </div>
 
-                        {/* View on Car Button */}
-                        {dataUrl && (
+                        {/* View on Car Button — only for car (private) plates */}
+                        {dataUrl && !isClassic && !isBike && (
                             <button
                                 onClick={() => setShowCarPreview(true)}
                                 className="mt-4 w-full flex items-center justify-center gap-2 py-3.5 rounded-xl border border-border bg-card text-foreground font-bold text-sm hover:bg-surface hover:border-primary/30 hover:shadow-md transition-all duration-200 group"
@@ -234,19 +240,27 @@ export default function PlateDetailPage() {
                         )}
 
                         {/* Plate Details */}
-                        <div className="mt-6 grid grid-cols-3 gap-4">
+                        <div className={`mt-6 grid gap-4 ${isClassic ? 'grid-cols-2' : 'grid-cols-3'}`}>
                             <div className="bg-surface rounded-xl p-4 border border-border text-center">
                                 <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1">{t('emirate')}</p>
                                 <p className="text-lg font-bold text-foreground">{emirateDisplay}</p>
                             </div>
+                            {!isClassic && (
+                                <div className="bg-surface rounded-xl p-4 border border-border text-center">
+                                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1">{t('code')}</p>
+                                    <p className="text-lg font-bold text-foreground">{code || '—'}</p>
+                                </div>
+                            )}
                             <div className="bg-surface rounded-xl p-4 border border-border text-center">
-                                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1">{t('code')}</p>
-                                <p className="text-lg font-bold text-foreground">{code || '—'}</p>
+                                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1">{isClassic ? 'PLATE TYPE' : t('number')}</p>
+                                <p className="text-lg font-bold text-foreground">{isClassic ? 'Classic' : number}</p>
                             </div>
-                            <div className="bg-surface rounded-xl p-4 border border-border text-center">
-                                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1">{t('number')}</p>
-                                <p className="text-lg font-bold text-foreground">{number}</p>
-                            </div>
+                            {isClassic && (
+                                <div className="bg-surface rounded-xl p-4 border border-border text-center col-span-2">
+                                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1">{t('number')}</p>
+                                    <p className="text-lg font-bold text-foreground">{number}</p>
+                                </div>
+                            )}
                         </div>
 
                         {/* Description */}

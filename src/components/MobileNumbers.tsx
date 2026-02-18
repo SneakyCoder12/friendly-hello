@@ -50,28 +50,30 @@ export default function MobileNumbers() {
   }, []);
   return (
     <section id="numbers">
-      <div className="flex items-end justify-between mb-12 border-b border-border pb-6">
-        <div className="flex items-center gap-5">
-          <div className="h-16 w-16 bg-card border border-border rounded-2xl flex flex-col items-center justify-center shadow-md overflow-hidden p-1">
+      <div className="flex items-end justify-between mb-6 sm:mb-12 border-b border-border pb-4 sm:pb-6">
+        <div className="flex items-center gap-3 sm:gap-5">
+          <div className="h-10 w-10 sm:h-16 sm:w-16 bg-card border border-border rounded-2xl flex flex-col items-center justify-center shadow-md overflow-hidden p-1">
             <div className="w-full h-full bg-primary/10 rounded-xl flex items-center justify-center">
-              <Smartphone className="h-8 w-8 text-primary" />
+              <Smartphone className="h-5 w-5 sm:h-8 sm:w-8 text-primary" />
             </div>
           </div>
           <div>
-            <h2 className="text-4xl font-display font-bold text-foreground tracking-tight">VIP Mobile Numbers</h2>
-            <p className="text-sm font-bold uppercase tracking-[0.2em] mt-1 text-muted-foreground">Exclusive Platinum &amp; Diamond</p>
+            <h2 className="text-xl sm:text-4xl font-display font-bold text-foreground tracking-tight">VIP Mobile Numbers</h2>
+            <p className="text-[10px] sm:text-sm font-bold uppercase tracking-[0.2em] mt-0.5 sm:mt-1 text-muted-foreground">Exclusive Platinum &amp; Diamond</p>
           </div>
         </div>
-        <a className="group flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-primary transition-colors" href="#">
+        <a className="group flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-bold text-muted-foreground hover:text-primary transition-colors whitespace-nowrap" href="#">
           VIEW ALL
-          <ArrowRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
+          <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 transform group-hover:translate-x-1 transition-transform" />
         </a>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+      {/* Mobile: horizontal scroll | Desktop: grid */}
+      <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-6 sm:overflow-visible sm:pb-0">
         {loading ? (
-          [1, 2, 3, 4].map(i => <div key={i} className="h-64 bg-muted animate-pulse rounded-xl" />)
+          [1, 2, 3, 4].map(i => <div key={i} className="min-w-[220px] sm:min-w-0 snap-start h-64 bg-muted animate-pulse rounded-xl" />)
         ) : numbers.length === 0 ? (
-          <div className="col-span-full py-12 text-center bg-card rounded-2xl border border-dashed border-border/60">
+          <div className="col-span-full py-12 text-center bg-card rounded-2xl border border-dashed border-border/60 min-w-full">
             <Smartphone className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
             <h3 className="text-lg font-bold text-foreground">Coming Soon</h3>
             <p className="text-muted-foreground text-sm max-w-md mx-auto mt-2">
@@ -85,23 +87,22 @@ export default function MobileNumbers() {
             return (
               <div
                 key={item.id}
-                className={`relative bg-card backdrop-blur-md border border-border rounded-xl p-8 hover:bg-surface hover:shadow-xl transition-all cursor-pointer group shadow-sm hover:border-primary/30 overflow-hidden ${isSold ? 'opacity-80' : ''}`}
+                className={`min-w-[220px] sm:min-w-0 snap-start relative bg-card backdrop-blur-md border border-border rounded-xl p-6 sm:p-8 hover:bg-surface hover:shadow-xl transition-all cursor-pointer group shadow-sm hover:border-primary/30 overflow-hidden ${isSold ? 'opacity-80' : ''}`}
               >
                 {isSold && (
                   <div className="sold-ribbon">
                     <span>SOLD</span>
                   </div>
                 )}
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex justify-between items-center mb-4 sm:mb-6">
                   <CarrierLogo carrier={item.carrier} />
-                  {/* Star/featured logic could be added here if DB supported it */}
                   <Star className="h-5 w-5 text-amber-400 fill-amber-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
-                <p className="text-2xl font-black tracking-widest text-foreground mb-2 font-mono transition-colors group-hover:text-primary truncate">
+                <p className="text-lg sm:text-2xl font-black tracking-widest text-foreground mb-2 font-mono transition-colors group-hover:text-primary truncate">
                   {item.phone_number}
                 </p>
-                <div className="h-px w-full bg-border my-4" />
-                <p className="text-foreground font-mono font-bold text-xl">
+                <div className="h-px w-full bg-border my-3 sm:my-4" />
+                <p className="text-foreground font-mono font-bold text-base sm:text-xl">
                   {item.price ? `AED ${item.price.toLocaleString()}` : 'Contact for Price'}
                 </p>
                 <div className="absolute inset-0 border-2 border-primary/0 group-hover:border-primary/5 rounded-xl transition-all pointer-events-none" />

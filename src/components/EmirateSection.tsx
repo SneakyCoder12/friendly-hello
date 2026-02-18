@@ -37,54 +37,59 @@ export default function EmirateSection({ section, listings, loading }: Props) {
 
   return (
     <section>
-      <div className="flex items-end justify-between mb-12 border-b border-border pb-6">
-        <div className="flex items-center gap-5">
+      <div className="flex items-end justify-between mb-6 sm:mb-12 border-b border-border pb-4 sm:pb-6">
+        <div className="flex items-center gap-3 sm:gap-5">
           <img
             alt={`${section.name} Logo`}
-            className={`${section.emirateKey === 'ajman' ? 'h-9' : 'h-16'} w-auto object-contain flex-shrink-0`}
+            className={`${section.emirateKey === 'ajman' ? 'h-7 sm:h-9' : 'h-10 sm:h-16'} w-auto object-contain flex-shrink-0`}
             src={section.logo}
           />
           <div>
-            <h2 className="text-4xl font-display font-bold text-foreground tracking-tight">{section.name}</h2>
+            <h2 className="text-xl sm:text-4xl font-display font-bold text-foreground tracking-tight">{section.name}</h2>
           </div>
         </div>
-        <a className="group flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-primary transition-colors" href={`/marketplace?emirate=${encodeURIComponent(section.name)}`}>
+        <a className="group flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-bold text-muted-foreground hover:text-primary transition-colors whitespace-nowrap" href={`/marketplace?emirate=${encodeURIComponent(section.name)}`}>
           VIEW ALL
-          <ArrowRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
+          <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 transform group-hover:translate-x-1 transition-transform" />
         </a>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+      {/* Mobile: horizontal scroll | Desktop: grid */}
+      <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-6 sm:overflow-visible sm:pb-0">
         {loading ? (
-          <>{[1, 2, 3, 4].map(i => <SkeletonCard key={i} />)}</>
+          <>{[1, 2, 3, 4].map(i => <div key={i} className="min-w-[220px] sm:min-w-0 snap-start"><SkeletonCard /></div>)}</>
         ) : hasListings ? (
           listings.slice(0, 4).map((listing) => {
             const parts = listing.plate_number.split(' ');
             const code = parts.length > 1 ? parts[0] : '';
             const number = parts.length > 1 ? parts.slice(1).join(' ') : parts[0];
             return (
-              <PlateCard
-                key={listing.id}
-                emirate={section.emirateKey}
-                code={code}
-                number={number}
-                price={listing.price ? `AED ${listing.price.toLocaleString()}` : undefined}
-                plateUrl={`/plate/${listing.id}`}
-                sellerPhone={listing.contact_phone}
-                plateNumber={listing.plate_number}
-                listingId={listing.id}
-                status={listing.status}
-                plateStyle={listing.plate_style === 'bike' ? 'bike' : 'private'}
-              />
+              <div key={listing.id} className="min-w-[220px] sm:min-w-0 snap-start">
+                <PlateCard
+                  emirate={section.emirateKey}
+                  code={code}
+                  number={number}
+                  price={listing.price ? `AED ${listing.price.toLocaleString()}` : undefined}
+                  plateUrl={`/plate/${listing.id}`}
+                  sellerPhone={listing.contact_phone}
+                  plateNumber={listing.plate_number}
+                  listingId={listing.id}
+                  status={listing.status}
+                  plateStyle={listing.plate_style === 'bike' ? 'bike' : 'private'}
+                />
+              </div>
             );
           })
         ) : (
-          <PlateCard
-            emirate={section.emirateKey}
-            code="X"
-            number="XXX"
-            plateUrl="#"
-            comingSoon
-          />
+          <div className="min-w-[220px] sm:min-w-0 snap-start">
+            <PlateCard
+              emirate={section.emirateKey}
+              code="X"
+              number="XXX"
+              plateUrl="#"
+              comingSoon
+            />
+          </div>
         )}
       </div>
     </section>

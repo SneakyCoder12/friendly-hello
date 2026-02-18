@@ -126,10 +126,13 @@ export default function DashboardPage() {
       .order('created_at', { ascending: false });
     if (error) toast.error(error.message);
     else {
-      const typedData = (data || []).map(d => ({
-        ...d,
-        vehicle_type: (d as any).vehicle_type || 'car'
-      })) as Listing[];
+      const typedData = (data || []).map(d => {
+        const ps = (d as any).plate_style;
+        return {
+          ...d,
+          vehicle_type: ps === 'classic' ? 'classic' : ps === 'bike' ? 'bike' : 'car'
+        };
+      }) as Listing[];
       setListings(typedData);
     }
     setLoading(false);
@@ -164,13 +167,16 @@ export default function DashboardPage() {
 
     setSaving(true);
     const payload = valid.map(r => {
-      const fullPlateNumber = r.plate_style.trim()
-        ? `${r.plate_style.trim()} ${r.plate_number.trim()}`
-        : r.plate_number.trim();
+      // Classic plates have no code — just store the number
+      const isClassic = r.vehicle_type === 'classic';
+      const isBike = r.vehicle_type === 'bike';
+      const fullPlateNumber = isClassic
+        ? r.plate_number.trim()
+        : (r.plate_style.trim() ? `${r.plate_style.trim()} ${r.plate_number.trim()}` : r.plate_number.trim());
       return {
         plate_number: fullPlateNumber,
         emirate: r.emirate,
-        plate_style: r.vehicle_type === 'bike' ? 'bike' : (r.vehicle_type === 'classic' ? 'classic' : (r.plate_style || null)),
+        plate_style: isBike ? 'bike' : isClassic ? 'classic' : (r.plate_style || null),
         price: r.price ? Number(r.price) : null,
         description: r.description || null,
         contact_email: r.contact_email || null,
@@ -193,9 +199,11 @@ export default function DashboardPage() {
 
   // Edit single listing
   const startEdit = (listing: Listing) => {
+    const isClassic = listing.plate_style === 'classic';
     const pParts = listing.plate_number?.split(' ') || [];
-    const pCode = pParts.length > 1 ? pParts[0] : '';
-    const pNum = pParts.length > 1 ? pParts.slice(1).join(' ') : pParts[0] || '';
+    // Classic plates have no code — plate_number is just the number
+    const pCode = isClassic ? '' : (pParts.length > 1 ? pParts[0] : '');
+    const pNum = isClassic ? (listing.plate_number || '') : (pParts.length > 1 ? pParts.slice(1).join(' ') : pParts[0] || '');
     setEditForm({
       plate_code: pCode,
       plate_number: pNum,
@@ -212,13 +220,16 @@ export default function DashboardPage() {
     if (!user || !editId) return;
     if (!editForm.plate_number.trim()) { toast.error('Number is required'); return; }
     setSaving(true);
-    const fullPlateNumber = editForm.plate_code.trim()
-      ? `${editForm.plate_code.trim()} ${editForm.plate_number.trim()}`
-      : editForm.plate_number.trim();
+    const isClassic = editForm.vehicle_type === 'classic';
+    const isBike = editForm.vehicle_type === 'bike';
+    // Classic plates: just number, no code prefix
+    const fullPlateNumber = isClassic
+      ? editForm.plate_number.trim()
+      : (editForm.plate_code.trim() ? `${editForm.plate_code.trim()} ${editForm.plate_number.trim()}` : editForm.plate_number.trim());
     const { error } = await supabase.from('listings').update({
       plate_number: fullPlateNumber,
       emirate: editForm.emirate,
-      plate_style: editForm.vehicle_type === 'bike' ? 'bike' : (editForm.vehicle_type === 'classic' ? 'classic' : (editForm.plate_code.trim() || null)),
+      plate_style: isBike ? 'bike' : isClassic ? 'classic' : (editForm.plate_code.trim() || null),
       price: editForm.price ? Number(editForm.price) : null,
       description: editForm.description || null,
     }).eq('id', editId);
@@ -552,7 +563,7 @@ export default function DashboardPage() {
                       <div className="flex-shrink-0 sm:w-48 h-24 sm:h-28 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-border/50 flex items-center justify-center overflow-hidden">
                         <MiniPlatePreview
                           emirate={row.emirate}
-                          code={row.plate_style}
+                          code={row.vehicle_type === 'classic' ? '' : row.plate_style}
                           number={row.plate_number}
                           vehicleType={row.vehicle_type || 'car'}
                           className="w-full h-full p-1"
@@ -562,15 +573,17 @@ export default function DashboardPage() {
                       {/* Code + Number */}
                       <div className="flex-1 space-y-3">
                         <div className="grid grid-cols-3 gap-2">
-                          <div className="col-span-1">
-                            <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Code</label>
-                            <input value={row.plate_style} onChange={e => {
-                              const v = e.target.value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 2);
-                              updateRow(idx, 'plate_style', v.toUpperCase());
-                            }} placeholder="A" maxLength={2}
-                              className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-base text-foreground font-mono font-black text-center focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all" />
-                          </div>
-                          <div className="col-span-2">
+                          {row.vehicle_type !== 'classic' && (
+                            <div className="col-span-1">
+                              <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Code</label>
+                              <input value={row.plate_style} onChange={e => {
+                                const v = e.target.value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 2);
+                                updateRow(idx, 'plate_style', v.toUpperCase());
+                              }} placeholder="A" maxLength={2}
+                                className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-base text-foreground font-mono font-black text-center focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all" />
+                            </div>
+                          )}
+                          <div className={row.vehicle_type === 'classic' ? 'col-span-3' : 'col-span-2'}>
                             <label className="block text-[9px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Number</label>
                             <input value={row.plate_number} onChange={e => {
                               const v = e.target.value.replace(/\D/g, '').slice(0, 5);
@@ -738,7 +751,7 @@ export default function DashboardPage() {
               <div className="w-48 h-24 sm:w-64 sm:h-32">
                 <MiniPlatePreview
                   emirate={editForm.emirate}
-                  code={editForm.plate_code}
+                  code={editForm.vehicle_type === 'classic' ? '' : editForm.plate_code}
                   number={editForm.plate_number}
                   vehicleType={editForm.vehicle_type as 'car' | 'bike' | 'classic'}
                   className="w-full h-full"
@@ -747,22 +760,24 @@ export default function DashboardPage() {
             </div>
 
             <div className="grid grid-cols-3 sm:grid-cols-12 gap-3 sm:gap-4 mb-4">
-              {/* Code */}
-              <div className="col-span-1 sm:col-span-3">
-                <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Code</label>
-                <input
-                  value={editForm.plate_code}
-                  onChange={e => {
-                    const v = e.target.value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 2);
-                    setEditForm(p => ({ ...p, plate_code: v.toUpperCase() }));
-                  }}
-                  maxLength={2}
-                  className="w-full bg-surface border border-border rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm text-foreground font-mono font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/30"
-                  placeholder="A"
-                />
-              </div>
+              {/* Code — hidden for classic plates */}
+              {editForm.vehicle_type !== 'classic' && (
+                <div className="col-span-1 sm:col-span-3">
+                  <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Code</label>
+                  <input
+                    value={editForm.plate_code}
+                    onChange={e => {
+                      const v = e.target.value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 2);
+                      setEditForm(p => ({ ...p, plate_code: v.toUpperCase() }));
+                    }}
+                    maxLength={2}
+                    className="w-full bg-surface border border-border rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm text-foreground font-mono font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    placeholder="A"
+                  />
+                </div>
+              )}
               {/* Number */}
-              <div className="col-span-1 sm:col-span-5">
+              <div className={editForm.vehicle_type === 'classic' ? 'col-span-2 sm:col-span-8' : 'col-span-1 sm:col-span-5'}>
                 <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-1.5">Number</label>
                 <input
                   required
@@ -868,7 +883,7 @@ export default function DashboardPage() {
                             emirate={listing.emirate}
                             code={pCode}
                             number={pNum}
-                            vehicleType={(listing.vehicle_type as 'car' | 'bike') || 'car'}
+                            vehicleType={(listing.vehicle_type as 'car' | 'bike' | 'classic') || 'car'}
                             className="w-full h-full"
                           />
                         </div>
@@ -880,6 +895,9 @@ export default function DashboardPage() {
                             </span>
                             {listing.vehicle_type === 'bike' && (
                               <span className="text-[8px] sm:text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-sky-500/10 text-sky-600 border border-sky-500/20">Bike</span>
+                            )}
+                            {listing.vehicle_type === 'classic' && (
+                              <span className="text-[8px] sm:text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-amber-500/10 text-amber-700 border border-amber-500/20">Classic</span>
                             )}
                           </div>
                           <p className="text-[11px] sm:text-xs text-muted-foreground truncate font-medium">

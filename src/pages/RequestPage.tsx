@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Send, ArrowLeft, CheckCircle } from 'lucide-react';
+import { Send, ArrowLeft, CheckCircle, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { toast } from 'sonner';
 
 export default function RequestPage() {
     const { t } = useLanguage();
     const [submitted, setSubmitted] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [form, setForm] = useState({
         name: '',
         email: '',
@@ -20,10 +22,40 @@ export default function RequestPage() {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Form submitted:', form);
-        setSubmitted(true);
+        setLoading(true);
+        try {
+            const payload = {
+                access_key: '97c1db95-559a-4011-b96d-20fe68a2cf51',
+                subject: `Plate Request: ${form.plateDetails}`,
+                from_name: 'Alnuami Groups Website',
+                name: form.name,
+                email: form.email,
+                'Phone Number': form.phone,
+                'Preferred Emirate': form.emirate,
+                'Plate / Number Details': form.plateDetails,
+                Budget: form.budget || 'Not specified',
+                'Additional Notes': form.message || 'None',
+            };
+
+            const response = await fetch('https://api.web3forms.com/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            const data = await response.json();
+            if (data.success) {
+                setSubmitted(true);
+            } else {
+                toast.error(data.message || 'Failed to submit request. Please try again.');
+            }
+        } catch (err) {
+            console.error('Web3Forms error:', err);
+            toast.error('Network error. Please try again.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (submitted) {
@@ -185,9 +217,10 @@ export default function RequestPage() {
                     {/* Submit */}
                     <button
                         type="submit"
-                        className="w-full flex items-center justify-center gap-2 bg-gray-900 text-white py-4 rounded-xl font-bold text-lg hover:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300"
+                        disabled={loading}
+                        className="w-full flex items-center justify-center gap-2 bg-gray-900 text-white py-4 rounded-xl font-bold text-lg hover:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                        <Send className="h-5 w-5" /> {t('submitRequestBtn')}
+                        {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />} {loading ? 'Submitting...' : t('submitRequestBtn')}
                     </button>
 
                     {/* Disclaimer */}

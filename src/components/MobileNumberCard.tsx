@@ -1,6 +1,6 @@
 import { memo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Phone, MessageCircle, ExternalLink, Heart } from 'lucide-react';
+import { Phone, MessageCircle, Heart } from 'lucide-react';
 
 interface MobileNumberCardProps {
     id: string;
@@ -81,12 +81,36 @@ function MobileNumberCard({
 
                         <div className="mt-auto">
                             <div className="h-px w-full bg-gray-100 mb-4" />
-                            {/* Price + view hint */}
+                            {/* Price + view hint + hover buttons */}
                             <div className="flex justify-between items-center">
                                 <p className="text-gray-900 font-mono font-bold text-xl">
                                     {price ? `AED ${price.toLocaleString()}` : 'Call for Price'}
                                 </p>
-                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider group-hover:text-gray-600 transition-colors">View →</p>
+                                <div className="flex items-center gap-1.5">
+                                    {telUrl && (
+                                        <a
+                                            href={telUrl}
+                                            onClick={e => e.stopPropagation()}
+                                            className="hidden group-hover:flex h-8 w-8 rounded-full bg-emerald-500 hover:bg-emerald-600 items-center justify-center text-white transition-all shadow-sm hover:shadow-md hover:scale-110 active:scale-95"
+                                            title="Call Now"
+                                        >
+                                            <Phone className="h-3.5 w-3.5" />
+                                        </a>
+                                    )}
+                                    {whatsappUrl && (
+                                        <a
+                                            href={whatsappUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            onClick={e => e.stopPropagation()}
+                                            className="hidden group-hover:flex h-8 w-8 rounded-full bg-[#25D366] hover:bg-[#1da851] items-center justify-center text-white transition-all shadow-sm hover:shadow-md hover:scale-110 active:scale-95"
+                                            title="WhatsApp"
+                                        >
+                                            <MessageCircle className="h-3.5 w-3.5" />
+                                        </a>
+                                    )}
+                                    <p className={`text-[10px] text-gray-400 font-bold uppercase tracking-wider group-hover:text-primary transition-colors ${(telUrl || whatsappUrl) ? 'hidden group-hover:hidden sm:group-hover:block' : ''}`}>View →</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -94,9 +118,19 @@ function MobileNumberCard({
 
                 {/* ── BACK SIDE ── contact options */}
                 <div className="absolute inset-0 backface-hidden rotate-y-180">
-                    <div className="h-full bg-white rounded-2xl border border-gray-200 flex flex-col items-center justify-center px-5 py-4">
+                    <div className="h-full bg-white rounded-2xl border border-gray-200 flex flex-col items-center px-5 pt-5 pb-4 relative">
+                        {/* Heart button — top right */}
+                        <div className="w-full flex justify-end mb-2">
+                            <button
+                                onClick={(e) => { e.stopPropagation(); onToggleFavorite(e, id); }}
+                                className="h-9 w-9 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center flex-shrink-0 transition-all hover:scale-110 active:scale-90"
+                                title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                            >
+                                <Heart className={`h-4 w-4 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400 hover:text-red-400'}`} />
+                            </button>
+                        </div>
+
                         {/* Header */}
-                        <p className="text-[10px] text-gray-400 uppercase tracking-[0.2em] font-bold mb-1">Contact Seller</p>
                         <p className="text-sm font-display font-bold text-gray-900 mb-0.5">VIP Number</p>
                         <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full mb-3 ${carrier === 'etisalat' ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-700'}`}>
                             <img src={carrier === 'etisalat' ? '/Eand_Logo.svg' : '/du-logo.png'} alt={carrier} className="h-3 w-3 object-contain" />
@@ -104,7 +138,7 @@ function MobileNumberCard({
                         </span>
 
                         {/* Large phone number */}
-                        <div className="bg-gray-50 border border-gray-200 rounded-xl px-5 py-2.5 mb-4">
+                        <div className="bg-gray-50 border border-gray-200 rounded-xl px-5 py-2 mb-3">
                             <p className="font-mono font-black text-gray-900 text-xl tracking-wider text-center">
                                 {phoneNumber}
                             </p>
@@ -133,20 +167,20 @@ function MobileNumberCard({
                                     <MessageCircle className="h-4 w-4" /> WhatsApp
                                 </a>
                             )}
-
-                            {/* View Details — always visible */}
-                            <Link
-                                to={detailUrl}
-                                onClick={e => e.stopPropagation()}
-                                className="w-full flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 text-white py-2.5 rounded-full font-bold text-sm transition-all"
-                            >
-                                <ExternalLink className="h-4 w-4" /> View Details
-                            </Link>
                         </div>
+
+                        {/* View Details — small text link */}
+                        <Link
+                            to={detailUrl}
+                            onClick={e => e.stopPropagation()}
+                            className="text-xs font-bold text-gray-500 hover:text-primary transition-colors uppercase tracking-wider"
+                        >
+                            VIEW DETAILS →
+                        </Link>
 
                         {/* Phone number at bottom */}
                         {phoneDigits && (
-                            <p className="text-[10px] text-gray-400 font-mono tracking-wide">+{phoneDigits}</p>
+                            <p className="text-[10px] text-gray-400 font-mono tracking-wide mt-1">+{phoneDigits}</p>
                         )}
                     </div>
                 </div>

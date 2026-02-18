@@ -42,6 +42,8 @@ export default function PlateListings() {
       console.log('[PlateListings] Raw data:', data);
       const grouped: Record<string, SupabaseListing[]> = {};
       ((data || []) as unknown as SupabaseListing[]).forEach((l) => {
+        // Skip classic & bike plates — they have their own dedicated sections
+        if (l.plate_style === 'classic' || l.plate_style === 'bike') return;
         const key = EMIRATE_KEY_MAP[l.emirate] || l.emirate;
         if (!grouped[key]) grouped[key] = [];
         if (grouped[key].length < 4) grouped[key].push(l);
@@ -74,7 +76,7 @@ export default function PlateListings() {
   }, []);
 
   return (
-    <div className="space-y-32">
+    <div className="space-y-16 sm:space-y-32">
       {SECTIONS.map((section) => {
         const listings = listingsByEmirate[section.emirateKey] || [];
         return (

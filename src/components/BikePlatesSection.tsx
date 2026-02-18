@@ -79,21 +79,23 @@ export default function BikePlatesSection() {
 
     return (
         <section>
-            <div className="flex items-end justify-between mb-12 border-b border-border pb-6">
-                <div className="flex items-center gap-5">
-                    <div className="h-16 w-16 rounded-2xl bg-white border border-gray-200 shadow-sm flex items-center justify-center overflow-hidden p-2">
+            <div className="flex items-end justify-between mb-6 sm:mb-12 border-b border-border pb-4 sm:pb-6">
+                <div className="flex items-center gap-3 sm:gap-5">
+                    <div className="h-10 w-10 sm:h-16 sm:w-16 rounded-2xl bg-white border border-gray-200 shadow-sm flex items-center justify-center overflow-hidden p-1.5 sm:p-2">
                         <img src="/bike-icon.svg" alt="Bike" className="w-full h-full object-contain" />
                     </div>
                     <div>
-                        <h2 className="text-4xl font-display font-bold text-foreground tracking-tight">{t('bikePlates')}</h2>
+                        <h2 className="text-xl sm:text-4xl font-display font-bold text-foreground tracking-tight">{t('bikePlates')}</h2>
                     </div>
                 </div>
-                <a className="group flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-primary transition-colors" href="/marketplace?vehicleType=bike">
+                <a className="group flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-bold text-muted-foreground hover:text-primary transition-colors whitespace-nowrap" href="/marketplace?vehicleType=bike">
                     {t('viewAll')}
-                    <ArrowRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 transform group-hover:translate-x-1 transition-transform" />
                 </a>
             </div>
-            <div className={`grid gap-6 ${hasListings ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'}`}>
+
+            {/* Mobile: horizontal scroll | Desktop: grid */}
+            <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-6 sm:overflow-visible sm:pb-0">
                 {hasListings ? (
                     listings.slice(0, 4).map((listing) => {
                         const parts = listing.plate_number.split(' ');
@@ -101,25 +103,26 @@ export default function BikePlatesSection() {
                         const number = parts.length > 1 ? parts.slice(1).join(' ') : parts[0];
                         const emirateKey = EMIRATE_KEY_MAP[listing.emirate] || listing.emirate;
                         return (
-                            <PlateCard
-                                key={listing.id}
-                                emirate={emirateKey}
-                                code={code}
-                                number={number}
-                                price={listing.price ? `AED ${listing.price.toLocaleString()}` : undefined}
-                                plateUrl={`/plate/${listing.id}`}
-                                sellerPhone={listing.contact_phone}
-                                plateNumber={listing.plate_number}
-                                listingId={listing.id}
-                                status={listing.status}
-                                plateStyle="bike"
-                            />
+                            <div key={listing.id} className="min-w-[220px] sm:min-w-0 snap-start">
+                                <PlateCard
+                                    emirate={emirateKey}
+                                    code={code}
+                                    number={number}
+                                    price={listing.price ? `AED ${listing.price.toLocaleString()}` : undefined}
+                                    plateUrl={`/plate/${listing.id}`}
+                                    sellerPhone={listing.contact_phone}
+                                    plateNumber={listing.plate_number}
+                                    listingId={listing.id}
+                                    status={listing.status}
+                                    plateStyle="bike"
+                                />
+                            </div>
                         );
                     })
                 ) : (
-                    <>
+                    <div className="min-w-[220px] sm:min-w-0 snap-start">
                         <PlateCard emirate="dubai" code="A" number="1234" plateUrl="#" comingSoon plateStyle="bike" />
-                    </>
+                    </div>
                 )}
             </div>
         </section>

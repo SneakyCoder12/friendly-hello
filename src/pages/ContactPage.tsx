@@ -1,20 +1,48 @@
 import { useState } from 'react';
-import { Send, CheckCircle, MapPin, Phone, Mail } from 'lucide-react';
+import { Send, CheckCircle, MapPin, Phone, Mail, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { toast } from 'sonner';
 
 export default function ContactPage() {
   const { t } = useLanguage();
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Contact form:', form);
-    setSubmitted(true);
+    setLoading(true);
+    try {
+      const payload = {
+        access_key: '97c1db95-559a-4011-b96d-20fe68a2cf51',
+        subject: `Contact Form: ${form.subject}`,
+        from_name: 'Alnuami Groups Website',
+        name: form.name,
+        email: form.email,
+        message: form.message,
+      };
+
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setSubmitted(true);
+      } else {
+        toast.error(data.message || 'Failed to send message. Please try again.');
+      }
+    } catch (err) {
+      console.error('Web3Forms error:', err);
+      toast.error('Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (submitted) {
@@ -69,9 +97,9 @@ export default function ContactPage() {
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-900 font-medium focus:outline-none focus:border-gray-400 focus:bg-white transition-all resize-none"
                   placeholder="Tell us more..." />
               </div>
-              <button type="submit"
-                className="w-full flex items-center justify-center gap-2 bg-gray-900 text-white py-4 rounded-xl font-bold text-lg hover:bg-gray-800 shadow-lg transition-all duration-300">
-                <Send className="h-5 w-5" /> {t('sendMessage')}
+              <button type="submit" disabled={loading}
+                className="w-full flex items-center justify-center gap-2 bg-gray-900 text-white py-4 rounded-xl font-bold text-lg hover:bg-gray-800 shadow-lg transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed">
+                {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />} {loading ? 'Sending...' : t('sendMessage')}
               </button>
             </form>
 
