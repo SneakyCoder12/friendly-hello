@@ -13,7 +13,7 @@ export default function Hero() {
 
   return (
     <div className="relative w-full overflow-hidden bg-gray-900">
-      <div className="relative h-[700px] w-full">
+      <div className="relative h-[500px] sm:h-[600px] md:h-[700px] w-full">
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
@@ -24,7 +24,7 @@ export default function Hero() {
         <div className="absolute inset-0 bg-black/30" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
 
-        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4 pt-20">
+        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4 sm:px-6 pt-20">
           {/* Group 1: Badge + Title */}
           <div
             className={`transition-all duration-700 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
@@ -35,7 +35,7 @@ export default function Hero() {
                 {t('livePlatform')}
               </span>
             </div>
-            <h2 className="text-white text-5xl md:text-6xl lg:text-8xl font-display font-black mb-6 tracking-tighter leading-[1.05]" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
+            <h2 className="text-white text-3xl sm:text-5xl md:text-6xl lg:text-8xl font-display font-black mb-4 sm:mb-6 tracking-tighter leading-[1.05]" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
               {t('heroTitle')} <br />
               <span className="text-white">{t('heroTitleAccent')}</span>
             </h2>
@@ -43,7 +43,7 @@ export default function Hero() {
 
           {/* Group 2: Subtitle */}
           <p
-            className={`text-white/80 text-lg md:text-xl font-medium tracking-wide max-w-2xl mx-auto mb-10 transition-all duration-700 ease-out delay-200 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
+            className={`text-white/80 text-base sm:text-lg md:text-xl font-medium tracking-wide max-w-2xl mx-auto mb-8 sm:mb-10 transition-all duration-700 ease-out delay-200 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
           >
             {t('heroSubtitle')}
           </p>
@@ -53,13 +53,13 @@ export default function Hero() {
             className={`flex flex-col sm:flex-row gap-4 justify-center transition-all duration-700 ease-out delay-[400ms] ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
           >
             <Link
-              className="bg-white text-gray-900 px-8 py-4 rounded-2xl font-bold text-lg hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
+              className="bg-white text-gray-900 px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-bold text-base sm:text-lg hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
               to="/marketplace"
             >
               {t('browsePlates')} <ArrowDown className="h-4 w-4" />
             </Link>
             <Link
-              className="bg-white/10 text-white border-2 border-white/30 px-8 py-4 rounded-2xl font-bold text-lg hover:bg-white/20 hover:border-white/50 backdrop-blur-sm transition-all duration-300"
+              className="bg-white/10 text-white border-2 border-white/30 px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-bold text-base sm:text-lg hover:bg-white/20 hover:border-white/50 backdrop-blur-sm transition-all duration-300"
               to="/dashboard"
             >
               {t('listYourPlate')}

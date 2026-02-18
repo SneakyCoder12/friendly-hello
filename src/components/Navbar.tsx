@@ -241,11 +241,11 @@ export default function Navbar() {
 
       {/* Slide-in Panel (from right) */}
       <div
-        className={`fixed top-0 right-0 h-full w-full max-w-sm bg-white z-[55] lg:hidden shadow-2xl transition-transform duration-400 ease-[cubic-bezier(0.32,0.72,0,1)] ${menuOpen ? 'translate-x-0' : 'translate-x-full'
+        className={`fixed top-0 right-0 h-full w-full max-w-sm bg-white z-[55] lg:hidden shadow-2xl transition-transform duration-400 ease-[cubic-bezier(0.32,0.72,0,1)] flex flex-col ${menuOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
       >
         {/* Panel Header */}
-        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100">
+        <div className="flex-shrink-0 flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100">
           <Link to="/" className="flex items-center group" onClick={closeMenu}>
             <img src="/Logo.png" alt="Alnuami Groups" className="h-16 w-auto object-contain" />
             <div className="-ml-3 leading-none">
@@ -261,8 +261,8 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* Nav Links */}
-        <div className="flex-1 overflow-y-auto px-6 py-6">
+        {/* Nav Links — scrollable area */}
+        <div className="flex-1 overflow-y-auto overscroll-contain px-6 py-6 -webkit-overflow-scrolling-touch">
           <div className="space-y-1">
             {/* Home */}
             <Link

@@ -20,7 +20,7 @@ interface Props {
 
 function SkeletonCard() {
   return (
-    <div className="h-[280px] bg-card rounded-2xl border border-border overflow-hidden">
+    <div className="h-[240px] sm:h-[280px] bg-card rounded-2xl border border-border overflow-hidden">
       <div className="flex flex-col items-center justify-center h-full">
         <div className="w-[80%] h-[100px] bg-muted rounded-lg animate-pulse" />
         <div className="mt-6 w-full px-4 border-t border-border/50 pt-4">
@@ -55,16 +55,16 @@ export default function EmirateSection({ section, listings, loading }: Props) {
       </div>
 
       {/* Mobile: horizontal scroll | Desktop: grid */}
-      <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-6 sm:overflow-visible sm:pb-0">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4 lg:gap-6">
         {loading ? (
-          <>{[1, 2, 3, 4].map(i => <div key={i} className="min-w-[220px] sm:min-w-0 snap-start"><SkeletonCard /></div>)}</>
+          <>{[1, 2, 3, 4].map(i => <div key={i} className=""><SkeletonCard /></div>)}</>
         ) : hasListings ? (
           listings.slice(0, 4).map((listing) => {
             const parts = listing.plate_number.split(' ');
             const code = parts.length > 1 ? parts[0] : '';
             const number = parts.length > 1 ? parts.slice(1).join(' ') : parts[0];
             return (
-              <div key={listing.id} className="min-w-[220px] sm:min-w-0 snap-start">
+              <div key={listing.id} className="">
                 <PlateCard
                   emirate={section.emirateKey}
                   code={code}
@@ -81,7 +81,7 @@ export default function EmirateSection({ section, listings, loading }: Props) {
             );
           })
         ) : (
-          <div className="min-w-[220px] sm:min-w-0 snap-start">
+          <div className="">
             <PlateCard
               emirate={section.emirateKey}
               code="X"

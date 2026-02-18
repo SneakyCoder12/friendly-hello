@@ -81,7 +81,7 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
 
   if (comingSoon) {
     return (
-      <div className="h-[260px] bg-card/50 rounded-2xl border border-border/50 flex flex-col items-center justify-center opacity-60">
+      <div className="h-[240px] sm:h-[260px] bg-card/50 rounded-2xl border border-border/50 flex flex-col items-center justify-center opacity-60">
         <div className="w-[90%] mx-auto h-[120px] flex items-center justify-center">
           {dataUrl ? (
             <img src={dataUrl} alt="Coming Soon" className="w-full h-full object-contain object-center opacity-40" />
@@ -105,13 +105,13 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
 
   return (
     <div
-      className="perspective-1000 h-[280px] cursor-pointer"
+      className="perspective-1000 h-[260px] sm:h-[280px] cursor-pointer"
       onMouseEnter={() => setFlipped(true)}
       onMouseLeave={() => setFlipped(false)}
       onClick={handleCardClick}
     >
       <div
-        className={`relative w-full h-full transition-transform duration-500 ease-out transform-style-3d ${flipped ? 'rotate-y-180' : ''}`}
+        className={`relative w-full h-full transition-transform duration-500 ease-out transform-style-3d will-change-transform ${flipped ? 'rotate-y-180' : ''}`}
       >
         {/* FRONT SIDE — plate card */}
         <div className="absolute inset-0 backface-hidden">

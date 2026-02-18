@@ -19,6 +19,7 @@ const VisualizerPage = lazy(() => import('@/pages/VisualizerPage'));
 const LoginPage = lazy(() => import('@/pages/LoginPage'));
 const SignupPage = lazy(() => import('@/pages/SignupPage'));
 const ForgotPasswordPage = lazy(() => import('@/pages/ForgotPasswordPage'));
+const ResetPasswordPage = lazy(() => import('@/pages/ResetPasswordPage'));
 const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
 const AdminPage = lazy(() => import('@/pages/AdminPage'));
 const MobileNumbersPage = lazy(() => import('@/pages/MobileNumbersPage'));
@@ -38,7 +39,7 @@ export default function App() {
       <AuthProvider>
         <BrowserRouter>
           <ScrollToTop />
-          <div className="flex flex-col min-h-screen">
+          <div className="flex flex-col min-h-screen overflow-x-hidden w-full max-w-full">
             <Navbar />
             <Suspense fallback={<Loading />}>
               <AnimatedPage>
@@ -54,6 +55,7 @@ export default function App() {
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/signup" element={<SignupPage />} />
                   <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                  <Route path="/reset-password" element={<ResetPasswordPage />} />
                   <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
                   <Route path="/dashboard/admin" element={<ProtectedRoute adminOnly><AdminPage /></ProtectedRoute>} />
                 </Routes>

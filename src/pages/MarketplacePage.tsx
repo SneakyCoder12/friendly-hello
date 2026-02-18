@@ -84,11 +84,11 @@ export default function MarketplacePage() {
   const hasFilters = search || emirateFilter || vehicleTypeFilter || minPrice || maxPrice;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4 py-8 pt-24">
+    <div className="min-h-screen bg-background overflow-x-hidden">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8 pt-24">
 
         {/* ─── Premium Plate Banner ─── */}
-        <div className="relative rounded-3xl overflow-hidden mb-10 border border-gray-200/60 shadow-sm" style={{ background: 'linear-gradient(135deg, #fafaf9 0%, #ffffff 30%, #f5f3ef 60%, #faf8f5 100%)' }}>
+        <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden mb-8 sm:mb-10 border border-gray-200/60 shadow-sm" style={{ background: 'linear-gradient(135deg, #fafaf9 0%, #ffffff 30%, #f5f3ef 60%, #faf8f5 100%)' }}>
           {/* Skyline silhouette overlay (right) */}
           <div className="absolute inset-0 opacity-[0.06]"
             style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 200'%3E%3Cpath d='M0,200 L0,180 L30,180 L30,120 L35,120 L35,100 L40,100 L40,120 L45,120 L45,180 L80,180 L80,140 L85,140 L85,60 L87,55 L89,60 L89,140 L95,140 L95,180 L130,180 L130,150 L140,150 L140,130 L150,130 L150,150 L160,150 L160,180 L200,180 L200,160 L210,160 L210,40 L213,10 L216,40 L216,160 L220,160 L220,180 L260,180 L260,150 L280,150 L280,130 L290,130 L290,170 L310,170 L310,140 L325,140 L325,170 L340,170 L340,180 L380,180 L380,160 L400,160 L400,120 L405,120 L405,80 L410,75 L415,80 L415,120 L420,120 L420,160 L440,160 L440,180 L500,180 L500,140 L520,140 L520,110 L540,110 L540,140 L560,140 L560,180 L600,180 L600,155 L620,155 L620,130 L630,130 L630,155 L650,155 L650,180 L700,180 L700,160 L730,160 L730,140 L750,140 L750,160 L780,160 L780,180 L800,180 L800,200 Z' fill='%23000' opacity='0.5'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right bottom', backgroundSize: '70% auto' }} />
@@ -109,14 +109,14 @@ export default function MarketplacePage() {
           {/* UAE flag stripe accent (top) */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 via-white to-red-500 opacity-30" />
 
-          <div className="relative px-8 md:px-14 py-12 md:py-16 flex flex-col md:flex-row items-center gap-8">
+          <div className="relative px-5 sm:px-8 md:px-14 py-8 sm:py-12 md:py-16 flex flex-col md:flex-row items-center gap-6 sm:gap-8">
             {/* Left: Text content */}
             <div className="flex-1 text-center md:text-start z-10">
               <div className="inline-flex items-center gap-2 mb-4 px-4 py-1.5 rounded-full border border-amber-200/80 bg-gradient-to-r from-amber-50 to-white">
                 <Sparkles className="h-3.5 w-3.5 text-amber-500" />
                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-600">Premium Collection</span>
               </div>
-              <h1 className="text-3xl md:text-5xl font-display font-black text-gray-900 tracking-tight mb-3 leading-tight">
+              <h1 className="text-2xl sm:text-3xl md:text-5xl font-display font-black text-gray-900 tracking-tight mb-3 leading-tight">
                 Number Plate<br />Marketplace
               </h1>
               <p className="text-gray-500 text-sm md:text-base leading-relaxed max-w-md">
@@ -193,7 +193,7 @@ export default function MarketplacePage() {
         ) : listings.length === 0 ? (
           <div className="text-center py-20 text-muted-foreground">{t('noResults')}</div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6 mb-8">
             {listings.map(listing => {
               const parts = listing.plate_number.split(' ');
               const code = parts.length > 1 ? parts[0] : '';

@@ -12,7 +12,7 @@ export default function HomePage() {
     <>
       <Hero />
       <NoticeBanner />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-20 space-y-16 sm:space-y-32" id="plates">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-20 space-y-12 sm:space-y-32" id="plates">
         <PlateListings />
         <ClassicPlatesSection />
         <BikePlatesSection />
