@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
-import { Loader2, Plus, Pencil, Trash2, Eye, EyeOff, CheckCircle, Search, X, Shield, Smartphone, Heart, BarChart3, TrendingUp, Hash, Car } from 'lucide-react';
+import { Loader2, Plus, Pencil, Trash2, Eye, EyeOff, CheckCircle, Search, X, Shield, Smartphone, Heart, BarChart3, TrendingUp, Hash, Car, Bike } from 'lucide-react';
 import PhoneInput from '@/components/PhoneInput';
 import MiniPlatePreview from '@/components/MiniPlatePreview';
 
@@ -629,22 +629,22 @@ export default function DashboardPage() {
                           <button
                             type="button"
                             onClick={() => updateRow(idx, 'vehicle_type', 'car')}
-                            className={`px-4 py-2 text-xs font-bold transition-all ${row.vehicle_type === 'car' || !row.vehicle_type
+                            className={`px-4 py-2 text-xs font-bold transition-all flex items-center gap-1.5 ${row.vehicle_type === 'car' || !row.vehicle_type
                               ? 'bg-gradient-to-r from-primary to-primary-hover text-primary-foreground'
                               : 'bg-surface text-muted-foreground hover:text-foreground'
                               }`}
                           >
-                            🚗 Car
+                            <Car className="h-3.5 w-3.5" /> Private Plate
                           </button>
                           <button
                             type="button"
                             onClick={() => updateRow(idx, 'vehicle_type', 'bike')}
-                            className={`px-4 py-2 text-xs font-bold transition-all ${row.vehicle_type === 'bike'
+                            className={`px-4 py-2 text-xs font-bold transition-all flex items-center gap-1.5 ${row.vehicle_type === 'bike'
                               ? 'bg-gradient-to-r from-primary to-primary-hover text-primary-foreground'
                               : 'bg-surface text-muted-foreground hover:text-foreground'
                               }`}
                           >
-                            🏍️ Bike
+                            <Bike className="h-3.5 w-3.5" /> Bike Plate
                           </button>
                         </div>
                       </div>
@@ -689,7 +689,8 @@ export default function DashboardPage() {
                   onChange={() => setEditForm(prev => ({ ...prev, vehicle_type: 'car' }))}
                   className="accent-primary"
                 />
-                <span className="text-sm font-bold text-foreground">Car</span>
+                <Car className="h-4 w-4 text-foreground" />
+                <span className="text-sm font-bold text-foreground">Private Plate</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -699,7 +700,8 @@ export default function DashboardPage() {
                   onChange={() => setEditForm(prev => ({ ...prev, vehicle_type: 'bike' }))}
                   className="accent-primary"
                 />
-                <span className="text-sm font-bold text-foreground">Bike</span>
+                <Bike className="h-4 w-4 text-foreground" />
+                <span className="text-sm font-bold text-foreground">Bike Plate</span>
               </label>
             </div>
 

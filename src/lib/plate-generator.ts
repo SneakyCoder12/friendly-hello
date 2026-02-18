@@ -38,7 +38,7 @@ const CONFIGS: Record<string, EmirateConfig> = {
     letterSpacingRatio: 0.015,
     verticalCenter: true,
     components: [
-      { type: 'code', xRatio: 0.09, align: 'center', emboss: true },
+      { type: 'code', xRatio: 0.09, align: 'center', emboss: true, fontSizeRatio: 0.17 },
       { type: 'number', xRatio: 0.43, align: 'center', emboss: true },
     ],
   },

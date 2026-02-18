@@ -1,15 +1,15 @@
-import { Download, Palette, Loader2, Building2, Landmark, BookOpen, ShieldCheck, Waves, Mountain, Anchor } from 'lucide-react';
+import { Download, Palette, Loader2 } from 'lucide-react';
 import { usePlateGenerator } from '@/hooks/usePlateGenerator';
 import { getConfig } from '@/lib/plate-generator';
 
 const EMIRATES_CONFIG = [
-  { value: 'abudhabi', label: 'Abu Dhabi', icon: Landmark, color: 'text-amber-500' },
-  { value: 'dubai', label: 'Dubai', icon: Building2, color: 'text-sky-500' },
-  { value: 'sharjah', label: 'Sharjah', icon: BookOpen, color: 'text-blue-600' },
-  { value: 'ajman', label: 'Ajman', icon: ShieldCheck, color: 'text-red-500' },
-  { value: 'umm_al_quwain', label: 'Umm Al Quwain', icon: Waves, color: 'text-teal-500' },
-  { value: 'rak', label: 'Ras Al Khaimah', icon: Mountain, color: 'text-stone-500' },
-  { value: 'fujairah', label: 'Fujairah', icon: Anchor, color: 'text-indigo-500' },
+  { value: 'abudhabi', label: 'Abu Dhabi', logo: '/Abu_Dhabi-logo.png' },
+  { value: 'dubai', label: 'Dubai', logo: '/dubai-logo.png' },
+  { value: 'sharjah', label: 'Sharjah', logo: '/SHARJAH-LOGO.png' },
+  { value: 'ajman', label: 'Ajman', logo: '/ajman-logo.png' },
+  { value: 'umm_al_quwain', label: 'Umm Al Quwain', logo: '/ummalquein-logo.png' },
+  { value: 'rak', label: 'Ras Al Khaimah', logo: '/rak-logo.png' },
+  { value: 'fujairah', label: 'Fujairah', logo: '/fujairah-logo.png' },
 ];
 
 export default function PlateGeneratorSection() {
@@ -51,7 +51,6 @@ export default function PlateGeneratorSection() {
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {EMIRATES_CONFIG.map((item) => {
-                const Icon = item.icon;
                 const isSelected = emirate === item.value;
                 return (
                   <button
@@ -62,7 +61,11 @@ export default function PlateGeneratorSection() {
                       : 'bg-surface border-border hover:bg-surface-accent hover:border-primary/30'
                       }`}
                   >
-                    <Icon className={`h-6 w-6 ${isSelected ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'} transition-colors`} />
+                    <img
+                      src={item.logo}
+                      alt={`${item.label} Logo`}
+                      className={`${item.value === 'ajman' ? 'h-5' : 'h-8'} w-auto object-contain transition-opacity ${isSelected ? 'opacity-100' : 'opacity-60'}`}
+                    />
                     <span className={`text-xs font-bold text-center leading-tight ${isSelected ? 'text-primary' : 'text-foreground'}`}>
                       {item.label}
                     </span>
