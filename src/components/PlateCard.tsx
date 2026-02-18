@@ -1,7 +1,8 @@
 import { memo, useState, useEffect } from 'react';
+
 import { Link, useNavigate } from 'react-router-dom';
 import { usePlateImage } from '@/hooks/usePlateGenerator';
-import { Phone, MessageCircle, Heart } from 'lucide-react';
+import { Phone, MessageCircle, Heart, Car, Bike } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -18,9 +19,13 @@ interface PlateCardProps {
   listingId?: string;
   status?: string;
   plateStyle?: 'private' | 'bike' | 'classic';
+  /** Explicit vehicle type for icon display; derived from plateStyle if omitted */
+  vehicleType?: 'car' | 'bike' | 'classic';
 }
 
-function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerPhone, plateNumber, listingId, status, plateStyle = 'private' }: PlateCardProps) {
+function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerPhone, plateNumber, listingId, status, plateStyle = 'private', vehicleType }: PlateCardProps) {
+  // Resolve display type for icons — always reflect stored data, no defaults
+  const displayType: 'car' | 'bike' | 'classic' = vehicleType ?? (plateStyle === 'bike' ? 'bike' : plateStyle === 'classic' ? 'classic' : 'car');
   const isSold = status === 'sold';
   const dataUrl = usePlateImage(emirate, code, number, plateStyle);
   const [flipped, setFlipped] = useState(false);
@@ -118,6 +123,17 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
               </div>
             )}
             <div className="flex flex-col items-center justify-center h-full relative">
+              {/* Vehicle type badge — top-left */}
+              <div className="absolute top-3 left-3 z-10 flex items-center gap-1 px-2 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider border
+                            bg-card/90 backdrop-blur-sm shadow-sm border-border/60 text-muted-foreground">
+                {displayType === 'bike' ? (
+                  <><Bike className="h-3 w-3" /> Bike</>
+                ) : displayType === 'classic' ? (
+                  <><span className="text-[9px] font-serif italic">C</span> Classic</>
+                ) : (
+                  <><Car className="h-3 w-3" /> Car</>
+                )}
+              </div>
               {/* Mobile-only heart button (visible on front since mobile can't hover-flip) */}
               {listingId && (
                 <button
