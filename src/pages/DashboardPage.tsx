@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
-import { Loader2, Plus, Pencil, Trash2, Eye, EyeOff, CheckCircle, Search, X, Shield, Smartphone, Heart, BarChart3, TrendingUp, Hash, Car, Bike } from 'lucide-react';
+import { Loader2, Plus, Pencil, Trash2, Eye, EyeOff, CheckCircle, Search, X, Shield, Smartphone, Heart, BarChart3, TrendingUp, Hash, Car, Bike, ChevronRight, LayoutDashboard, ListFilter, Phone as PhoneIcon } from 'lucide-react';
 import PhoneInput from '@/components/PhoneInput';
 import MiniPlatePreview from '@/components/MiniPlatePreview';
 
@@ -50,6 +50,9 @@ export default function DashboardPage() {
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
+  // Sidebar navigation
+  const [activeSection, setActiveSection] = useState<'plates' | 'mobile' | 'favorites' | 'profile'>('plates');
 
   // Bulk rows
   const [rows, setRows] = useState<BulkRow[]>([]);
@@ -419,24 +422,137 @@ export default function DashboardPage() {
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
 
   return (
-    <div className="bg-background min-h-screen">
-      {/* ── Gradient Hero Header ── */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-primary/3 border-b border-border/50">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,hsl(var(--primary)/0.08),transparent_60%)]" />
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 pb-8 sm:pb-10 relative">
-          <div className="dash-animate">
-            <p className="text-xs sm:text-sm font-bold uppercase tracking-[0.2em] text-primary/70 mb-1">Dashboard</p>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-display font-black text-foreground">
-              Welcome back, <span className="text-primary">{profile?.full_name?.split(' ')[0] || 'there'}</span>
-            </h1>
-            <p className="text-muted-foreground text-sm sm:text-base mt-1.5">Manage your listings, numbers & favorites</p>
-          </div>
-        </div>
-      </div>
+    <div className="bg-background min-h-screen pt-16 sm:pt-20">
+      <div className="flex min-h-[calc(100vh-4rem)] sm:min-h-[calc(100vh-5rem)]">
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-16">
+        {/* ── LEFT SIDEBAR ── */}
+        <aside className="hidden lg:flex flex-col w-64 xl:w-72 border-r border-border/60 bg-card/50 flex-shrink-0 sticky top-16 sm:top-20 h-[calc(100vh-4rem)] sm:h-[calc(100vh-5rem)] overflow-y-auto">
+          {/* User Profile Block */}
+          <div className="p-6 border-b border-border/60">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center text-white font-black text-lg shadow-lg shadow-primary/20 flex-shrink-0">
+                {(profile?.full_name?.[0] || user?.email?.[0] || 'U').toUpperCase()}
+              </div>
+              <div className="min-w-0">
+                <p className="font-display font-bold text-foreground text-sm leading-tight truncate">{profile?.full_name || 'My Account'}</p>
+                <p className="text-[11px] text-muted-foreground truncate">{user?.email}</p>
+              </div>
+            </div>
+            {isAdmin && (
+              <Link to="/dashboard/admin" className="flex items-center justify-between w-full mt-3 px-3 py-2 rounded-xl bg-primary/5 border border-primary/20 text-primary text-xs font-bold hover:bg-primary/10 transition-colors group">
+                <span className="flex items-center gap-1.5"><Shield className="h-3.5 w-3.5" /> Admin Panel</span>
+                <ChevronRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            )}
+          </div>
+
+          {/* Stats Quick View */}
+          <div className="px-6 py-4 border-b border-border/60">
+            <p className="text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground/60 mb-3">Overview</p>
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground font-medium">Plate Listings</span>
+                <span className="text-xs font-black text-foreground font-mono bg-surface rounded-lg px-2 py-0.5 border border-border/50">{listings.length}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground font-medium">Active</span>
+                <span className="text-xs font-black text-emerald-600 font-mono bg-emerald-500/5 rounded-lg px-2 py-0.5 border border-emerald-500/20">{listings.filter(l => l.status === 'active').length}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground font-medium">Mobile Numbers</span>
+                <span className="text-xs font-black text-foreground font-mono bg-surface rounded-lg px-2 py-0.5 border border-border/50">{mobileNumbers.length}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground font-medium">Favorites</span>
+                <span className="text-xs font-black text-foreground font-mono bg-surface rounded-lg px-2 py-0.5 border border-border/50">{favorites.length}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Nav Links */}
+          <nav className="flex-1 px-4 py-4 space-y-1">
+            {[
+              { id: 'plates', icon: Car, label: 'Number Plates', count: listings.length },
+              { id: 'mobile', icon: PhoneIcon, label: 'Mobile Numbers', count: mobileNumbers.length },
+              { id: 'favorites', icon: Heart, label: 'Favorites', count: favorites.length },
+              { id: 'profile', icon: Pencil, label: 'My Profile', count: null },
+            ].map(({ id, icon: Icon, label, count }) => {
+              const isActive = activeSection === id;
+              return (
+                <button
+                  key={id}
+                  onClick={() => setActiveSection(id as typeof activeSection)}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold transition-all group ${
+                    isActive
+                      ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-surface'
+                  }`}
+                >
+                  <span className="flex items-center gap-2.5">
+                    <Icon className="h-4 w-4 flex-shrink-0" />
+                    {label}
+                  </span>
+                  {count !== null && count > 0 && (
+                    <span className={`text-[10px] font-black rounded-full px-1.5 py-0.5 min-w-[20px] text-center ${isActive ? 'bg-white/20 text-white' : 'bg-surface-accent text-muted-foreground'}`}>
+                      {count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* Bottom: Quick Links */}
+          <div className="px-4 py-4 border-t border-border/60">
+            <Link to="/marketplace" className="flex items-center gap-2 text-xs text-muted-foreground font-semibold hover:text-foreground transition-colors py-1.5">
+              <LayoutDashboard className="h-3.5 w-3.5" /> Marketplace
+            </Link>
+            <Link to="/request" className="flex items-center gap-2 text-xs text-muted-foreground font-semibold hover:text-foreground transition-colors py-1.5">
+              <ListFilter className="h-3.5 w-3.5" /> Request a Plate
+            </Link>
+          </div>
+        </aside>
+
+        {/* ── MAIN CONTENT ── */}
+        <main className="flex-1 min-w-0">
+          {/* Mobile tab bar */}
+          <div className="lg:hidden sticky top-16 sm:top-20 z-30 bg-card/95 backdrop-blur border-b border-border/60 px-4 overflow-x-auto">
+            <div className="flex gap-1 py-2">
+              {[
+                { id: 'plates', label: 'Plates' },
+                { id: 'mobile', label: 'Mobile' },
+                { id: 'favorites', label: 'Favorites' },
+                { id: 'profile', label: 'Profile' },
+              ].map(({ id, label }) => (
+                <button key={id} onClick={() => setActiveSection(id as typeof activeSection)}
+                  className={`flex-shrink-0 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${activeSection === id ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}>
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Page title bar */}
+          <div className="px-6 lg:px-8 py-5 border-b border-border/40 bg-background/80 backdrop-blur-sm">
+            <div className="flex items-center gap-3">
+              <div>
+                <div className="flex items-center gap-2 text-[10px] text-muted-foreground/60 font-bold uppercase tracking-widest mb-0.5">
+                  <span>My Account</span><ChevronRight className="h-3 w-3" />
+                  <span className="text-foreground/70">{activeSection === 'plates' ? 'Number Plates' : activeSection === 'mobile' ? 'Mobile Numbers' : activeSection === 'favorites' ? 'Favorites' : 'Profile'}</span>
+                </div>
+                <h1 className="text-xl sm:text-2xl font-display font-black text-foreground leading-tight">
+                  {activeSection === 'plates' ? 'My Plate Listings' : activeSection === 'mobile' ? 'My Mobile Numbers' : activeSection === 'favorites' ? 'Saved Favorites' : 'My Profile'}
+                </h1>
+              </div>
+            </div>
+          </div>
+
+      <div className="px-4 sm:px-6 lg:px-8 py-6 pb-16">
+
         {/* ── Profile Card ── */}
-        <div className="glass-card border border-border/60 rounded-2xl p-4 sm:p-6 mb-8 dash-animate dash-animate-delay-1 hover-lift -mt-4 sm:-mt-6 relative z-10 shadow-sm">
+        {/* ── PROFILE SECTION ── */}
+        {activeSection === 'profile' && (
+        <div className="glass-card border border-border/60 rounded-2xl p-4 sm:p-6 mb-8 dash-animate dash-animate-delay-1 hover-lift relative z-10 shadow-sm">
           <div className="flex items-center justify-between mb-4 gap-2">
             <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap">
               <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center text-white font-bold text-sm shadow-md">
@@ -484,7 +600,11 @@ export default function DashboardPage() {
             </div>
           )}
         </div>
+        )} {/* end profile section */}
 
+        {/* ── Plates + Mobile sections visible per activeSection ── */}
+        {(activeSection === 'plates') && (
+        <div>
         {/* ── Stats Strip ── */}
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-8 dash-animate dash-animate-delay-2">
           <div className="bg-gradient-to-br from-primary/5 to-primary/[0.02] border border-primary/15 rounded-xl p-3 sm:p-4 text-center group hover:border-primary/30 transition-all">
@@ -941,9 +1061,12 @@ export default function DashboardPage() {
             )}
           </>
         )}
+        </div>
+        )}
 
         {/* ─── VIP Mobile Numbers Section ─── */}
-        <div className="mt-10 sm:mt-12 pt-8 border-t border-border/50 dash-animate dash-animate-delay-4">
+        {activeSection === 'mobile' && (
+        <div className="dash-animate dash-animate-delay-4">
           <div className="flex items-center justify-between mb-6 gap-3">
             <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
               <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center shadow-md">
@@ -1175,9 +1298,12 @@ export default function DashboardPage() {
             </div>
           )}
         </div>
+        )} {/* end mobile section */}
 
         {/* ─── My Favorites Section ─── */}
-        <div className="mt-10 sm:mt-12 pt-8 border-t border-border/50 dash-animate dash-animate-delay-4">
+        {activeSection === 'favorites' && (
+        <div>
+        <div className="dash-animate dash-animate-delay-4">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg sm:text-2xl font-display font-bold text-foreground flex items-center gap-2.5">
               <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center shadow-md">
@@ -1226,7 +1352,10 @@ export default function DashboardPage() {
             </div>
           )}
         </div>
+        </div>
+        )} {/* end favorites section */}
 
+        {/* Modals — always rendered regardless of section */}
         {/* Mobile Delete Modal */}
         {mobileDeleteId && (
           <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
@@ -1253,6 +1382,8 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
-    </div >
+        </main>
+      </div>
+    </div>
   );
 }

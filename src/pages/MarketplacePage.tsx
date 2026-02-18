@@ -200,6 +200,11 @@ export default function MarketplacePage() {
               const number = parts.length > 1 ? parts.slice(1).join(' ') : parts[0];
               const emirateKey = EMIRATE_KEY_MAP[listing.emirate] || listing.emirate.toLowerCase().replace(/\s+/g, '_');
 
+              // Strict plate style mapping — no fallback, no re-interpretation
+              const rawStyle = listing.plate_style;
+              const resolvedPlateStyle: 'private' | 'bike' | 'classic' =
+                rawStyle === 'bike' ? 'bike' : rawStyle === 'classic' ? 'classic' : 'private';
+
               return (
                 <PlateCard
                   key={listing.id}
@@ -212,7 +217,8 @@ export default function MarketplacePage() {
                   plateNumber={listing.plate_number}
                   listingId={listing.id}
                   status={listing.status}
-                  plateStyle={listing.plate_style === 'bike' ? 'bike' : 'private'}
+                  plateStyle={resolvedPlateStyle}
+                  vehicleType={rawStyle === 'bike' ? 'bike' : rawStyle === 'classic' ? 'classic' : 'car'}
                 />
               );
             })}
