@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import EmirateSection from './EmirateSection';
 import { SECTIONS } from '@/data/listings';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,9 +23,32 @@ const EMIRATE_KEY_MAP: Record<string, string> = {
   'Fujairah': 'fujairah',
 };
 
+/** Mobile-first ordering: Dubai → Abu Dhabi → Sharjah → rest */
+const MOBILE_ORDER: string[] = ['dubai', 'abudhabi', 'sharjah', 'ajman', 'umm_al_quwain', 'rak', 'fujairah'];
+
 export default function PlateListings() {
   const [listingsByEmirate, setListingsByEmirate] = useState<Record<string, SupabaseListing[]>>({});
   const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile viewport
+  useEffect(() => {
+    const mql = window.matchMedia('(max-width: 639px)');
+    const handler = (e: MediaQueryListEvent | MediaQueryList) => setIsMobile(e.matches);
+    handler(mql);
+    mql.addEventListener('change', handler as (e: MediaQueryListEvent) => void);
+    return () => mql.removeEventListener('change', handler as (e: MediaQueryListEvent) => void);
+  }, []);
+
+  const orderedSections = useMemo(() => {
+    if (!isMobile) return SECTIONS;
+    // Reorder for mobile: Dubai first, then Abu Dhabi, Sharjah, rest
+    return [...SECTIONS].sort((a, b) => {
+      const ai = MOBILE_ORDER.indexOf(a.emirateKey);
+      const bi = MOBILE_ORDER.indexOf(b.emirateKey);
+      return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+    });
+  }, [isMobile]);
 
   const fetchListings = async () => {
     console.log('[PlateListings] Fetching active & sold listings...');
@@ -76,8 +99,8 @@ export default function PlateListings() {
   }, []);
 
   return (
-    <div className="space-y-16 sm:space-y-32">
-      {SECTIONS.map((section) => {
+    <div className="space-y-10 sm:space-y-32">
+      {orderedSections.map((section) => {
         const listings = listingsByEmirate[section.emirateKey] || [];
         return (
           <EmirateSection

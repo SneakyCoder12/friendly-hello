@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Search, ChevronLeft, ChevronRight, Loader2, X, Sparkles } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Loader2, X, Sparkles, Settings } from 'lucide-react';
 import PlateCard from '@/components/PlateCard';
 
 const EMIRATES = ['Abu Dhabi', 'Dubai', 'Sharjah', 'Ajman', 'Umm Al Quwain', 'Ras Al Khaimah', 'Fujairah'];
@@ -38,6 +38,7 @@ export default function MarketplacePage() {
   const [maxPrice, setMaxPrice] = useState('');
   const [page, setPage] = useState(0);
   const [total, setTotal] = useState(0);
+  const [filterPanelOpen, setFilterPanelOpen] = useState(false);
 
   useEffect(() => {
     const paramEmirate = searchParams.get('emirate');
@@ -150,8 +151,98 @@ export default function MarketplacePage() {
 
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl font-display font-bold text-foreground">{t('activeListings')}</h2>
-          <span className="text-sm text-muted-foreground font-mono">{total} plates</span>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-muted-foreground font-mono hidden sm:block">{total} plates</span>
+            {/* Mobile filter gear button */}
+            <button
+              onClick={() => setFilterPanelOpen(true)}
+              className="sm:hidden flex items-center justify-center w-10 h-10 rounded-xl bg-card border border-border shadow-sm hover:shadow-md transition-all"
+            >
+              <Settings className="h-5 w-5 text-muted-foreground" />
+            </button>
+          </div>
         </div>
+
+        {/* ── Mobile slide-out filter panel ── */}
+        {filterPanelOpen && (
+          <>
+            {/* Backdrop */}
+            <div className="sm:hidden fixed inset-0 z-50 bg-black/50" onClick={() => setFilterPanelOpen(false)} />
+            {/* Panel */}
+            <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl max-h-[80vh] overflow-y-auto animate-slide-up">
+              <div className="sticky top-0 bg-white p-4 border-b border-border flex items-center justify-between">
+                <h3 className="font-bold text-lg">Filters</h3>
+                <button onClick={() => setFilterPanelOpen(false)} className="p-2">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <div className="p-4 space-y-4">
+                {/* Search */}
+                <div className="relative">
+                  <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <input value={search} onChange={e => { setSearch(e.target.value); setPage(0); }}
+                    className="w-full bg-surface border border-border rounded-xl ps-10 pe-4 py-3 text-sm"
+                    placeholder="Search plate..." />
+                </div>
+                {/* Emirate */}
+                <div>
+                  <label className="text-xs font-bold text-muted-foreground uppercase mb-2 block">Emirate</label>
+                  <div className="flex flex-wrap gap-2">
+                    {EMIRATES.map(em => (
+                      <button
+                        key={em}
+                        onClick={() => { setEmirateFilter(emirateFilter === em ? '' : em); setPage(0); }}
+                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${emirateFilter === em ? 'bg-primary text-white' : 'bg-surface border border-border'
+                          }`}
+                      >
+                        {em}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {/* Vehicle Type */}
+                <div>
+                  <label className="text-xs font-bold text-muted-foreground uppercase mb-2 block">Type</label>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => { setVehicleTypeFilter(vehicleTypeFilter === 'car' ? '' : 'car'); setPage(0); }}
+                      className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${vehicleTypeFilter === 'car' ? 'bg-primary text-white' : 'bg-surface border border-border'
+                        }`}
+                    >
+                      Car
+                    </button>
+                    <button
+                      onClick={() => { setVehicleTypeFilter(vehicleTypeFilter === 'bike' ? '' : 'bike'); setPage(0); }}
+                      className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${vehicleTypeFilter === 'bike' ? 'bg-primary text-white' : 'bg-surface border border-border'
+                        }`}
+                    >
+                      Bike
+                    </button>
+                  </div>
+                </div>
+                {/* Price Range */}
+                <div>
+                  <label className="text-xs font-bold text-muted-foreground uppercase mb-2 block">Price Range</label>
+                  <div className="flex gap-2">
+                    <input type="number" value={minPrice} onChange={e => { setMinPrice(e.target.value); setPage(0); }}
+                      placeholder="Min" className="flex-1 bg-surface border border-border rounded-xl px-3 py-2 text-sm" />
+                    <input type="number" value={maxPrice} onChange={e => { setMaxPrice(e.target.value); setPage(0); }}
+                      placeholder="Max" className="flex-1 bg-surface border border-border rounded-xl px-3 py-2 text-sm" />
+                  </div>
+                </div>
+                {/* Clear & Apply */}
+                <div className="flex gap-2 pt-2">
+                  <button onClick={resetFilters} className="flex-1 py-3 rounded-xl border border-border text-sm font-medium">
+                    Clear
+                  </button>
+                  <button onClick={() => setFilterPanelOpen(false)} className="flex-1 py-3 rounded-xl bg-primary text-white text-sm font-medium">
+                    Show {total} Results
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Filters */}
         <div className="bg-card border border-border rounded-2xl p-4 mb-8">

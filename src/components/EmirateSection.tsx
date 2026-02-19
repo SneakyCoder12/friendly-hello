@@ -32,39 +32,93 @@ function SkeletonCard() {
   );
 }
 
+function MobileSkeletonCard() {
+  return (
+    <div className="mobile-plate-card h-[220px] bg-card rounded-2xl border border-border overflow-hidden flex-shrink-0">
+      <div className="flex flex-col items-center justify-center h-full">
+        <div className="w-[80%] h-[90px] bg-muted rounded-lg animate-pulse" />
+        <div className="mt-4 w-full px-3 border-t border-border/50 pt-3">
+          <div className="h-3 bg-muted rounded w-14 animate-pulse mb-2" />
+          <div className="h-5 bg-muted rounded w-24 animate-pulse" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function EmirateSection({ section, listings, loading }: Props) {
   const hasListings = listings.length > 0;
 
   return (
     <section>
-      <div className="flex items-end justify-between mb-6 sm:mb-12 border-b border-border pb-4 sm:pb-6">
-        <div className="flex items-center gap-3 sm:gap-5">
+      {/* Header row: Flag + Name (left) | View All → (right) */}
+      <div className="flex items-center justify-between mb-4 sm:mb-12 border-b border-border pb-3 sm:pb-6">
+        <div className="flex items-center gap-2.5 sm:gap-5">
           <img
             alt={`${section.name} Logo`}
-            className={`${section.emirateKey === 'ajman' ? 'h-7 sm:h-9' : 'h-10 sm:h-16'} w-auto object-contain flex-shrink-0`}
+            className={`${section.emirateKey === 'ajman' ? 'h-6 sm:h-9' : 'h-8 sm:h-16'} w-auto object-contain flex-shrink-0`}
             src={section.logo}
           />
-          <div>
-            <h2 className="text-xl sm:text-4xl font-display font-bold text-foreground tracking-tight">{section.name}</h2>
-          </div>
+          <h2 className="text-lg sm:text-4xl font-display font-bold text-foreground tracking-tight">{section.name}</h2>
         </div>
-        <a className="group flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-bold text-muted-foreground hover:text-primary transition-colors whitespace-nowrap" href={`/marketplace?emirate=${encodeURIComponent(section.name)}`}>
-          VIEW ALL
+        <a className="group flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-bold text-muted-foreground hover:text-primary transition-colors whitespace-nowrap" href={`/marketplace?emirate=${encodeURIComponent(section.name)}`}>
+          View All
           <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 transform group-hover:translate-x-1 transition-transform" />
         </a>
       </div>
 
-      {/* Mobile: horizontal scroll | Desktop: grid */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4 lg:gap-6">
+      {/* ── Mobile: horizontal scroll carousel ── */}
+      <div className="sm:hidden">
+        <div className="mobile-scroll-row flex gap-3 scrollbar-hide pb-2 -mx-3 px-3">
+          {loading ? (
+            <>{[1, 2, 3, 4].map(i => <MobileSkeletonCard key={i} />)}</>
+          ) : hasListings ? (
+            listings.slice(0, 4).map((listing) => {
+              const parts = listing.plate_number.split(' ');
+              const code = parts.length > 1 ? parts[0] : '';
+              const number = parts.length > 1 ? parts.slice(1).join(' ') : parts[0];
+              return (
+                <div key={listing.id} className="mobile-plate-card flex-shrink-0 snap-start">
+                  <PlateCard
+                    emirate={section.emirateKey}
+                    code={code}
+                    number={number}
+                    price={listing.price ? `AED ${listing.price.toLocaleString()}` : undefined}
+                    plateUrl={`/plate/${listing.id}`}
+                    sellerPhone={listing.contact_phone}
+                    plateNumber={listing.plate_number}
+                    listingId={listing.id}
+                    status={listing.status}
+                    plateStyle={listing.plate_style === 'bike' ? 'bike' : 'private'}
+                  />
+                </div>
+              );
+            })
+          ) : (
+            <div className="mobile-plate-card flex-shrink-0">
+              <PlateCard
+                emirate={section.emirateKey}
+                code="X"
+                number="XXX"
+                plateUrl="#"
+                comingSoon
+              />
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── Desktop/Tablet: original grid (unchanged) ── */}
+      <div className="hidden sm:grid sm:grid-cols-2 sm:gap-4 lg:grid-cols-4 lg:gap-6">
         {loading ? (
-          <>{[1, 2, 3, 4].map(i => <div key={i} className=""><SkeletonCard /></div>)}</>
+          <>{[1, 2, 3, 4].map(i => <div key={i}><SkeletonCard /></div>)}</>
         ) : hasListings ? (
           listings.slice(0, 4).map((listing) => {
             const parts = listing.plate_number.split(' ');
             const code = parts.length > 1 ? parts[0] : '';
             const number = parts.length > 1 ? parts.slice(1).join(' ') : parts[0];
             return (
-              <div key={listing.id} className="">
+              <div key={listing.id}>
                 <PlateCard
                   emirate={section.emirateKey}
                   code={code}
@@ -81,7 +135,7 @@ export default function EmirateSection({ section, listings, loading }: Props) {
             );
           })
         ) : (
-          <div className="">
+          <div>
             <PlateCard
               emirate={section.emirateKey}
               code="X"

@@ -8,6 +8,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import AnimatedPage from '@/components/AnimatedPage';
 import ScrollToTop from '@/components/ScrollToTop';
+import MobileBottomNav from '@/components/MobileBottomNav';
 import { Loader2 } from 'lucide-react';
 
 const HomePage = lazy(() => import('@/pages/HomePage'));
@@ -24,6 +25,7 @@ const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
 const AdminPage = lazy(() => import('@/pages/AdminPage'));
 const MobileNumbersPage = lazy(() => import('@/pages/MobileNumbersPage'));
 const MobileNumberDetailPage = lazy(() => import('@/pages/MobileNumberDetailPage'));
+const FeaturesPage = lazy(() => import('@/pages/FeaturesPage'));
 
 function Loading() {
   return (
@@ -58,11 +60,15 @@ export default function App() {
                   <Route path="/reset-password" element={<ResetPasswordPage />} />
                   <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
                   <Route path="/dashboard/admin" element={<ProtectedRoute adminOnly><AdminPage /></ProtectedRoute>} />
+                  <Route path="/features" element={<FeaturesPage />} />
                 </Routes>
               </AnimatedPage>
             </Suspense>
             <Footer />
+            {/* Mobile bottom spacer to prevent content hiding behind fixed nav */}
+            <div className="sm:hidden h-16" />
           </div>
+          <MobileBottomNav />
           <Toaster position="top-center" richColors />
         </BrowserRouter>
       </AuthProvider>

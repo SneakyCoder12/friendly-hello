@@ -94,16 +94,48 @@ export default function ClassicPlatesSection() {
                 </a>
             </div>
 
-            {/* Mobile: horizontal scroll | Desktop: grid */}
-            <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-6 sm:overflow-visible sm:pb-0">
+            {/* ── Mobile: horizontal scroll carousel ── */}
+            <div className="sm:hidden">
+                <div className="mobile-scroll-row flex gap-3 scrollbar-hide pb-2 -mx-3 px-3">
+                    {hasListings ? (
+                        listings.slice(0, 4).map((listing) => {
+                            const code = '';
+                            const number = listing.plate_number;
+                            const emirateKey = EMIRATE_KEY_MAP[listing.emirate] || listing.emirate;
+                            return (
+                                <div key={listing.id} className="mobile-plate-card flex-shrink-0 snap-start">
+                                    <PlateCard
+                                        emirate={emirateKey}
+                                        code=""
+                                        number={number}
+                                        price={listing.price ? `AED ${listing.price.toLocaleString()}` : undefined}
+                                        plateUrl={`/plate/${listing.id}`}
+                                        sellerPhone={listing.contact_phone}
+                                        plateNumber={listing.plate_number}
+                                        listingId={listing.id}
+                                        status={listing.status}
+                                        plateStyle="classic"
+                                    />
+                                </div>
+                            );
+                        })
+                    ) : (
+                        <div className="mobile-plate-card flex-shrink-0">
+                            <PlateCard emirate="dubai" code="A" number="1234" plateUrl="#" comingSoon plateStyle="classic" />
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* ── Desktop/Tablet: original grid (unchanged) ── */}
+            <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-6">
                 {hasListings ? (
                     listings.slice(0, 4).map((listing) => {
-                        // Classic plates have no code — plate_number is just the number
                         const code = '';
                         const number = listing.plate_number;
                         const emirateKey = EMIRATE_KEY_MAP[listing.emirate] || listing.emirate;
                         return (
-                            <div key={listing.id} className="min-w-[220px] sm:min-w-0 snap-start">
+                            <div key={listing.id}>
                                 <PlateCard
                                     emirate={emirateKey}
                                     code=""
@@ -120,7 +152,7 @@ export default function ClassicPlatesSection() {
                         );
                     })
                 ) : (
-                    <div className="min-w-[220px] sm:min-w-0 snap-start">
+                    <div>
                         <PlateCard emirate="dubai" code="A" number="1234" plateUrl="#" comingSoon plateStyle="classic" />
                     </div>
                 )}

@@ -123,8 +123,8 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
               </div>
             )}
             <div className="flex flex-col items-center justify-center h-full relative">
-              {/* Vehicle type badge — top-left */}
-              <div className="absolute top-3 left-3 z-10 flex items-center gap-1 px-2 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider border
+              {/* Vehicle type badge — top-left (hidden on mobile for cleaner look) */}
+              <div className="absolute top-2 sm:top-3 left-2 sm:left-3 z-10 hidden sm:flex items-center gap-1 px-2 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider border
                             bg-card/90 backdrop-blur-sm shadow-sm border-border/60 text-muted-foreground">
                 {displayType === 'bike' ? (
                   <><Bike className="h-3 w-3" /> Bike</>
@@ -134,18 +134,19 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
                   <><Car className="h-3 w-3" /> Car</>
                 )}
               </div>
-              {/* Mobile-only heart button (visible on front since mobile can't hover-flip) */}
+              {/* Mobile-only heart button — subtle, top-right */}
               {listingId && (
                 <button
                   onClick={toggleFavorite}
-                  className="sm:hidden absolute top-3 right-3 z-10 h-8 w-8 rounded-full bg-white/90 border border-border/60 shadow-sm flex items-center justify-center transition-all active:scale-90"
+                  className="sm:hidden absolute top-2 right-2 z-10 h-7 w-7 rounded-full bg-white/80 border border-border/40 shadow-sm flex items-center justify-center transition-all active:scale-90"
                   title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                 >
-                  <Heart className={`h-4 w-4 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
+                  <Heart className={`h-3.5 w-3.5 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
                 </button>
               )}
 
-              <div className="w-[90%] mx-auto h-[120px] flex items-center justify-center">
+              {/* Plate image — smaller on mobile */}
+              <div className="w-[90%] mx-auto h-[90px] sm:h-[120px] flex items-center justify-center">
                 {dataUrl ? (
                   <img
                     src={dataUrl}
@@ -157,11 +158,12 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
                   <div className="animate-pulse bg-muted rounded w-full h-full" />
                 )}
               </div>
-              <div className="mt-4 p-4 w-full border-t border-border/50">
+              {/* Price section — compact on mobile */}
+              <div className="mt-2 sm:mt-4 p-2.5 sm:p-4 w-full border-t border-border/50">
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold mb-1">Price</p>
-                    <p className="text-xl font-bold text-foreground font-mono tracking-tight">{price || 'Contact'}</p>
+                    <p className="hidden sm:block text-[10px] text-muted-foreground uppercase tracking-wider font-bold mb-1">Price</p>
+                    <p className="text-sm sm:text-xl font-bold text-foreground font-mono tracking-tight">{price || 'Contact'}</p>
                   </div>
                   <div className="flex items-center gap-1.5">
                     {/* Small hover action buttons */}
@@ -190,6 +192,7 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
                     <p className={`text-[10px] text-muted-foreground font-bold uppercase tracking-wider group-hover:text-primary transition-colors ${(telUrl || whatsappUrl) ? 'hidden group-hover:hidden sm:group-hover:block' : ''}`}>View →</p>
                   </div>
                 </div>
+
               </div>
             </div>
           </Link>

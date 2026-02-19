@@ -12,6 +12,7 @@
     "@vitejs/plugin-react-swc": "^3.7.0",
     "autoprefixer": "^10.4.24",
     "lucide-react": "^0.564.0",
+    "new-dirham-symbol": "^1.0.3",
     "postcss": "^8.5.6",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
