@@ -277,20 +277,26 @@ export default function MarketplacePage() {
         {/* ── MOBILE SLIDE-UP FILTER PANEL ── */}
         {filterPanelOpen && (
           <>
-            <div className="sm:hidden fixed inset-0 z-50 bg-black/50" onClick={() => setFilterPanelOpen(false)} />
-            <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-card rounded-t-3xl max-h-[80vh] overflow-y-auto animate-slide-up shadow-2xl">
-              <div className="sticky top-0 bg-card p-4 border-b border-border flex items-center justify-between">
+            <div
+              className="sm:hidden fixed inset-0 z-[60] bg-black/50"
+              onClick={() => setFilterPanelOpen(false)}
+            />
+            <div className="sm:hidden fixed inset-x-0 bottom-0 z-[61] bg-card rounded-t-3xl shadow-2xl"
+              style={{ maxHeight: 'calc(100dvh - 80px)', overflowY: 'auto' }}
+            >
+              <div className="sticky top-0 bg-card px-4 pt-4 pb-3 border-b border-border flex items-center justify-between z-10">
                 <h3 className="font-bold text-lg text-foreground">Filters</h3>
-                <button onClick={() => setFilterPanelOpen(false)} className="p-2">
+                <button onClick={() => setFilterPanelOpen(false)} className="p-2 rounded-xl hover:bg-surface transition-colors">
                   <X className="h-5 w-5 text-foreground" />
                 </button>
               </div>
-              <div className="p-4 space-y-5">
+
+              <div className="p-4 space-y-5 pb-8">
                 {/* Search */}
                 <div className="relative">
                   <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <input value={search} onChange={e => { setSearch(e.target.value); setPage(0); }}
-                    className="w-full bg-surface border border-border rounded-xl ps-10 pe-4 py-3 text-sm text-foreground"
+                    className="w-full bg-surface border border-border rounded-xl ps-10 pe-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
                     placeholder="Search plate number..." />
                 </div>
 
@@ -332,9 +338,9 @@ export default function MarketplacePage() {
                   <label className="text-xs font-bold text-muted-foreground uppercase mb-2 block">Price Range (AED)</label>
                   <div className="flex gap-2 mb-3">
                     <input type="number" value={minPrice} onChange={e => { setMinPrice(e.target.value); setPage(0); }}
-                      placeholder="Min" className="flex-1 bg-surface border border-border rounded-xl px-3 py-2 text-sm text-foreground" />
+                      placeholder="Min" className="flex-1 bg-surface border border-border rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
                     <input type="number" value={maxPrice} onChange={e => { setMaxPrice(e.target.value); setPage(0); }}
-                      placeholder="Max" className="flex-1 bg-surface border border-border rounded-xl px-3 py-2 text-sm text-foreground" />
+                      placeholder="Max" className="flex-1 bg-surface border border-border rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
                   </div>
                   {availableCodes.length > 0 && (
                     <>
@@ -355,7 +361,7 @@ export default function MarketplacePage() {
 
                 {/* Actions */}
                 <div className="flex gap-2 pt-2">
-                  <button onClick={resetFilters} className="flex-1 py-3 rounded-xl border border-border text-sm font-medium text-foreground">
+                  <button onClick={resetFilters} className="flex-1 py-3 rounded-xl border border-border text-sm font-medium text-foreground hover:bg-surface transition-colors">
                     Clear All
                   </button>
                   <button onClick={() => setFilterPanelOpen(false)} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-medium">

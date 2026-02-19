@@ -13,9 +13,9 @@ export default function Hero() {
   }, []);
 
   return (
-    <div className="relative w-full overflow-hidden bg-gray-900">
+    <div className="relative w-full overflow-x-hidden bg-gray-900">
       {/* Mobile: bigger banner ~45vh, left-aligned | Tablet+: original heights, centered */}
-      <div className="relative h-[45vh] min-h-[300px] max-h-[400px] sm:h-[600px] sm:min-h-0 sm:max-h-none md:h-[700px] w-full">
+      <div className="relative h-[45vh] min-h-[300px] max-h-[420px] sm:h-[600px] sm:min-h-0 sm:max-h-none md:h-[700px] w-full overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
@@ -28,7 +28,7 @@ export default function Hero() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent sm:from-black/50 sm:via-transparent sm:to-black/20" />
 
         {/* Mobile: left-aligned layout | Desktop: original centered layout */}
-        <div className="relative z-10 h-full flex flex-col items-start sm:items-center justify-end sm:justify-center text-left sm:text-center px-5 sm:px-6 pb-8 sm:pb-0 pt-10 sm:pt-20">
+        <div className="relative z-10 h-full w-full flex flex-col items-start sm:items-center justify-end sm:justify-center text-left sm:text-center px-5 sm:px-6 pb-8 sm:pb-0 pt-10 sm:pt-20">
           {/* Group 1: Badge + Title */}
           <div
             className={`transition-all duration-700 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
@@ -52,7 +52,7 @@ export default function Hero() {
 
           {/* Group 2: Subtitle */}
           <p
-            className={`text-white/80 text-sm sm:text-lg md:text-xl font-medium tracking-wide max-w-2xl sm:mx-auto mb-4 sm:mb-10 transition-all duration-700 ease-out delay-200 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
+            className={`text-white/80 text-sm sm:text-lg md:text-xl font-medium tracking-wide w-full sm:max-w-2xl sm:mx-auto mb-4 sm:mb-10 transition-all duration-700 ease-out delay-200 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
           >
             <span className="sm:hidden">Buy & sell exclusive number plates</span>
             <span className="hidden sm:inline">{t('heroSubtitle')}</span>
@@ -60,16 +60,16 @@ export default function Hero() {
 
           {/* Group 3: Buttons — mobile: both buttons side by side | Desktop: both buttons */}
           <div
-            className={`flex flex-row gap-3 sm:gap-4 sm:justify-center transition-all duration-700 ease-out delay-[400ms] ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
+            className={`flex flex-row gap-3 sm:gap-4 sm:justify-center w-full sm:w-auto transition-all duration-700 ease-out delay-[400ms] ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
           >
             <Link
-              className="bg-white text-gray-900 px-4 sm:px-8 py-2.5 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-lg hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-1.5"
+              className="flex-1 sm:flex-none bg-white text-gray-900 px-4 sm:px-8 py-2.5 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-lg hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-1.5 whitespace-nowrap"
               to="/marketplace"
             >
               {t('browsePlates')} <ArrowDown className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Link>
             <Link
-              className="bg-white/10 text-white border border-white/30 px-4 sm:px-8 py-2.5 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-lg hover:bg-white/20 hover:border-white/50 backdrop-blur-sm transition-all duration-300 flex items-center justify-center"
+              className="flex-1 sm:flex-none bg-white/10 text-white border border-white/30 px-4 sm:px-8 py-2.5 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-lg hover:bg-white/20 hover:border-white/50 backdrop-blur-sm transition-all duration-300 flex items-center justify-center whitespace-nowrap"
               to="/dashboard"
             >
               <span className="sm:hidden">List Your Number</span>

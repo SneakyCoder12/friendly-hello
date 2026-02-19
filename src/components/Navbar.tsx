@@ -180,7 +180,7 @@ export default function Navbar() {
 
             {/* Right Side */}
             <div className="flex items-center gap-2">
-              {/* Dashboard Icon (logged in, desktop only) */}
+            {/* Dashboard Icon (logged in, desktop only) */}
               {user && (
                 <Link
                   to="/dashboard"
@@ -191,6 +191,7 @@ export default function Navbar() {
                 </Link>
               )}
 
+              {/* Language toggle — shown on all screen sizes */}
               <button
                 onClick={toggleLang}
                 className="h-10 w-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-500 hover:text-foreground hover:bg-gray-200 transition-all duration-300"

@@ -34,7 +34,6 @@ export default function Footer() {
             <ul className="space-y-4 text-sm text-muted-foreground font-medium">
               <li><Link className="hover:text-primary transition-colors" to="/contact">{t('contactUs')}</Link></li>
               <li><Link className="hover:text-primary transition-colors" to="/request">{t('submitRequest') || 'Submit Request'}</Link></li>
-              <li><Link className="hover:text-primary transition-colors" to="/visualizer">{t('generator')}</Link></li>
               <li><a className="hover:text-primary transition-colors" href="#">{t('terms')}</a></li>
               <li><a className="hover:text-primary transition-colors" href="#">{t('privacy')}</a></li>
             </ul>

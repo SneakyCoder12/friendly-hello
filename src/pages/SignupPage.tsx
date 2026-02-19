@@ -30,7 +30,7 @@ export default function SignupPage() {
       email: form.email,
       password: form.password,
       options: {
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: 'https://friendly-hello-ten.vercel.app',
         data: { full_name: form.fullName },
       },
     });
@@ -47,7 +47,7 @@ export default function SignupPage() {
     setGoogleLoading(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/dashboard` },
+      options: { redirectTo: 'https://friendly-hello-ten.vercel.app/dashboard' },
     });
     if (error) {
       toast.error(error.message);

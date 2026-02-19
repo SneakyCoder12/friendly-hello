@@ -28,7 +28,7 @@ export default function LoginPage() {
     setGoogleLoading(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/dashboard` },
+      options: { redirectTo: 'https://friendly-hello-ten.vercel.app/dashboard' },
     });
     if (error) {
       toast.error(error.message);

@@ -10,14 +10,14 @@ import ListWithUsBanner from '@/components/ListWithUsBanner';
 
 export default function HomePage() {
   return (
-    <>
+    <div className="w-full overflow-x-hidden">
       <Hero />
       <FeaturedNumbersStrip />
       {/* NoticeBanner hidden on mobile - now shown inside Hero banner */}
       <div className="hidden sm:block">
         <NoticeBanner />
       </div>
-      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-20 space-y-8 sm:space-y-32" id="plates">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-16 space-y-6 sm:space-y-24 overflow-x-hidden" id="plates">
         <PlateListings />
         <ClassicPlatesSection />
         <BikePlatesSection />
@@ -25,6 +25,6 @@ export default function HomePage() {
         <RequestBanner />
         <ListWithUsBanner />
       </main>
-    </>
+    </div>
   );
 }
