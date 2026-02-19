@@ -18,7 +18,7 @@ export default function ListWithUsBanner() {
     };
 
     return (
-        <section className="relative w-full rounded-3xl overflow-hidden border border-primary/20 shadow-xl shadow-primary/5 mt-8">
+        <section className="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden border border-primary/20 shadow-xl shadow-primary/5 mt-8">
             {/* Rich gold gradient background */}
             <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.06] via-primary/[0.02] to-primary/[0.08]" />
 
@@ -32,7 +32,7 @@ export default function ListWithUsBanner() {
             {/* Floating dots pattern */}
             <div className="absolute inset-0 opacity-[0.02] bg-[radial-gradient(#b8860b_1.5px,transparent_1.5px)] [background-size:24px_24px]" />
 
-            <div className="relative px-6 sm:px-8 md:px-14 py-10 md:py-14">
+            <div className="relative px-4 sm:px-8 md:px-14 py-8 md:py-14">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-8">
 
                     {/* Left side — text */}
@@ -66,11 +66,11 @@ export default function ListWithUsBanner() {
                     </div>
 
                     {/* Right side — CTA */}
-                    <div className="flex shrink-0">
+                    <div className="flex shrink-0 w-full md:w-auto justify-center md:justify-end">
                         <Link
                             to={user ? '/dashboard' : '/login'}
                             onClick={handleListClick}
-                            className="relative inline-flex items-center gap-2 bg-gradient-to-r from-primary to-primary-hover text-primary-foreground px-8 py-4 rounded-2xl font-bold text-base hover:shadow-xl hover:shadow-primary/25 hover:scale-[1.02] transition-all duration-300 group overflow-hidden"
+                            className="relative inline-flex items-center gap-2 bg-gradient-to-r from-primary to-primary-hover text-primary-foreground px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-bold text-sm sm:text-base hover:shadow-xl hover:shadow-primary/25 hover:scale-[1.02] transition-all duration-300 group overflow-hidden"
                         >
                             {/* Shimmer effect */}
                             <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />

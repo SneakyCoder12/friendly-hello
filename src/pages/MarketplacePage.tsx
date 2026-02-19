@@ -49,6 +49,8 @@ export default function MarketplacePage() {
   const [emirateFilter, setEmirateFilter] = useState('');
   const [vehicleTypeFilter, setVehicleTypeFilter] = useState('');
   const [digitCountFilter, setDigitCountFilter] = useState('');
+  const [codeFilter, setCodeFilter] = useState('');
+  const [availableCodes, setAvailableCodes] = useState<string[]>([]);
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [page, setPage] = useState(0);
@@ -67,6 +69,22 @@ export default function MarketplacePage() {
     }
   }, [searchParams]);
 
+  // Fetch available plate codes for filter dropdown
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from('listings')
+        .select('plate_style')
+        .in('status', ['active', 'sold']);
+      if (data) {
+        const codes = [...new Set(
+          data.map(d => d.plate_style).filter((s): s is string => !!s && s !== 'bike' && s !== 'classic')
+        )].sort();
+        setAvailableCodes(codes);
+      }
+    })();
+  }, []);
+
   const fetchListings = useCallback(async () => {
     setLoading(true);
     let query = supabase
@@ -81,6 +99,7 @@ export default function MarketplacePage() {
     if (vehicleTypeFilter === 'bike') query = query.eq('plate_style', 'bike');
     else if (vehicleTypeFilter === 'classic') query = query.eq('plate_style', 'classic');
     else if (vehicleTypeFilter === 'car') query = query.not('plate_style', 'in', '("bike","classic")');
+    if (codeFilter) query = query.eq('plate_style', codeFilter);
     if (minPrice) query = query.gte('price', Number(minPrice));
     if (maxPrice) query = query.lte('price', Number(maxPrice));
 
@@ -88,7 +107,6 @@ export default function MarketplacePage() {
     if (error) { console.error(error); setLoading(false); return; }
 
     let result = (data || []) as unknown as ListingWithSeller[];
-    // Client-side digit count filter
     if (digitCountFilter) {
       result = result.filter(l => {
         const numPart = l.plate_number.split(' ').pop() || l.plate_number;
@@ -98,17 +116,17 @@ export default function MarketplacePage() {
     setListings(result);
     setTotal(digitCountFilter ? result.length : (count || 0));
     setLoading(false);
-  }, [search, emirateFilter, vehicleTypeFilter, digitCountFilter, minPrice, maxPrice, page]);
+  }, [search, emirateFilter, vehicleTypeFilter, digitCountFilter, codeFilter, minPrice, maxPrice, page]);
 
   useEffect(() => { fetchListings(); }, [fetchListings]);
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
   const resetFilters = () => {
     setSearch(''); setEmirateFilter(''); setVehicleTypeFilter('');
-    setDigitCountFilter(''); setMinPrice(''); setMaxPrice(''); setPage(0);
+    setDigitCountFilter(''); setCodeFilter(''); setMinPrice(''); setMaxPrice(''); setPage(0);
   };
-  const hasFilters = search || emirateFilter || vehicleTypeFilter || digitCountFilter || minPrice || maxPrice;
-  const activeFilterCount = [emirateFilter, vehicleTypeFilter, digitCountFilter, minPrice || maxPrice].filter(Boolean).length;
+  const hasFilters = search || emirateFilter || vehicleTypeFilter || digitCountFilter || codeFilter || minPrice || maxPrice;
+  const activeFilterCount = [emirateFilter, vehicleTypeFilter, digitCountFilter, codeFilter, minPrice || maxPrice].filter(Boolean).length;
 
   const Chip = ({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) => (
     <button
@@ -209,6 +227,13 @@ export default function MarketplacePage() {
               <option value="">{t('allEmirates')}</option>
               {EMIRATES.map(em => <option key={em} value={em}>{em}</option>)}
             </select>
+            {availableCodes.length > 0 && (
+              <select value={codeFilter} onChange={e => { setCodeFilter(e.target.value); setPage(0); }}
+                className="bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 min-w-[120px]">
+                <option value="">All Codes</option>
+                {availableCodes.map(code => <option key={code} value={code}>{code}</option>)}
+              </select>
+            )}
             <div className="flex gap-2 items-center">
               <input type="number" value={minPrice} onChange={e => { setMinPrice(e.target.value); setPage(0); }}
                 placeholder="Min AED"
@@ -253,7 +278,7 @@ export default function MarketplacePage() {
         {filterPanelOpen && (
           <>
             <div className="sm:hidden fixed inset-0 z-50 bg-black/50" onClick={() => setFilterPanelOpen(false)} />
-            <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-card rounded-t-3xl max-h-[85vh] overflow-y-auto animate-slide-up">
+            <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-card rounded-t-3xl max-h-[80vh] overflow-y-auto animate-slide-up shadow-2xl">
               <div className="sticky top-0 bg-card p-4 border-b border-border flex items-center justify-between">
                 <h3 className="font-bold text-lg text-foreground">Filters</h3>
                 <button onClick={() => setFilterPanelOpen(false)} className="p-2">
@@ -302,15 +327,30 @@ export default function MarketplacePage() {
                   </div>
                 </div>
 
-                {/* Price Range */}
+                {/* Price Range + Code */}
                 <div>
                   <label className="text-xs font-bold text-muted-foreground uppercase mb-2 block">Price Range (AED)</label>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 mb-3">
                     <input type="number" value={minPrice} onChange={e => { setMinPrice(e.target.value); setPage(0); }}
                       placeholder="Min" className="flex-1 bg-surface border border-border rounded-xl px-3 py-2 text-sm text-foreground" />
                     <input type="number" value={maxPrice} onChange={e => { setMaxPrice(e.target.value); setPage(0); }}
                       placeholder="Max" className="flex-1 bg-surface border border-border rounded-xl px-3 py-2 text-sm text-foreground" />
                   </div>
+                  {availableCodes.length > 0 && (
+                    <>
+                      <label className="text-xs font-bold text-muted-foreground uppercase mb-2 block">Plate Code</label>
+                      <select
+                        value={codeFilter}
+                        onChange={e => { setCodeFilter(e.target.value); setPage(0); }}
+                        className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                      >
+                        <option value="">All Codes</option>
+                        {availableCodes.map(code => (
+                          <option key={code} value={code}>{code}</option>
+                        ))}
+                      </select>
+                    </>
+                  )}
                 </div>
 
                 {/* Actions */}

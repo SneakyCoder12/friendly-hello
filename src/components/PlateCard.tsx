@@ -172,7 +172,7 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
                       <span className="text-foreground">{price.replace(/^AED\s*/, '')}</span>
                     </>
                   ) : (
-                    <span className="text-muted-foreground text-xs">Contact</span>
+                    <span className="text-muted-foreground text-xs">Contact for price</span>
                   )}
                 </p>
               </div>
@@ -197,7 +197,7 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
 
   return (
     <div
-      className="perspective-1000 h-[260px] sm:h-[280px] cursor-pointer"
+      className="perspective-1000 h-[240px] sm:h-[280px] cursor-pointer"
       onMouseEnter={() => setFlipped(true)}
       onMouseLeave={() => setFlipped(false)}
       onClick={handleCardClick}
@@ -251,8 +251,8 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
                           <AedLogo />
                           <span>{price.replace(/^AED\s*/, '')}</span>
                         </>
-                      ) : 'Contact'}
-                    </p>
+                  ) : <span className="text-muted-foreground text-xs">Contact for price</span>}
+                </p>
                   </div>
                   <div className="flex items-center gap-1.5">
                     {telUrl && (
@@ -287,58 +287,52 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
 
         {/* BACK SIDE — contact options (same fixed size as front) */}
         <div className="absolute inset-0 backface-hidden rotate-y-180">
-          <div className={`h-full bg-card rounded-2xl border border-border flex flex-col items-center px-5 pt-6 pb-4 relative ${isSold ? 'opacity-80' : ''}`}>
-            {/* SOLD Ribbon */}
+          <div className={`h-full bg-card rounded-2xl border border-border flex flex-col items-center justify-center px-4 py-3 relative ${isSold ? 'opacity-80' : ''}`}>
             {isSold && (
-              <div className="sold-ribbon">
-                <span>SOLD</span>
-              </div>
+              <div className="sold-ribbon"><span>SOLD</span></div>
             )}
             {/* Heart button — top right */}
             {listingId && (
-              <div className="w-full flex justify-end mb-3">
-                <button
-                  onClick={toggleFavorite}
-                  className="h-9 w-9 rounded-full bg-white border border-border shadow-sm flex items-center justify-center transition-all hover:scale-110 active:scale-90"
-                  title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
-                >
-                  <Heart className={`h-4.5 w-4.5 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400 hover:text-red-400'}`} />
-                </button>
-              </div>
+              <button
+                onClick={toggleFavorite}
+                className="absolute top-2 right-2 h-8 w-8 rounded-full bg-white border border-border shadow-sm flex items-center justify-center transition-all hover:scale-110 active:scale-90 z-10"
+                title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+              >
+                <Heart className={`h-3.5 w-3.5 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400 hover:text-red-400'}`} />
+              </button>
             )}
-            <p className="text-sm font-display font-bold text-foreground mb-0.5">Premium Plate</p>
-            <p className="text-[10px] text-muted-foreground font-medium mb-3">{emirate}</p>
+            <p className="text-xs font-display font-bold text-foreground mb-0.5">Premium Plate</p>
+            <p className="text-[9px] text-muted-foreground font-medium mb-2">{emirate}</p>
 
-            {/* Large plate number */}
-            <div className="bg-surface border border-border rounded-xl px-5 py-2.5 mb-4">
-              <p className="font-mono font-black text-foreground text-2xl tracking-wider text-center">
+            {/* Plate number */}
+            <div className="bg-surface border border-border rounded-xl px-4 py-1.5 mb-3">
+              <p className="font-mono font-black text-foreground text-lg tracking-wider text-center">
                 {code && <span>{code}</span>}
-                {code && number && <span className="mx-1.5"> </span>}
+                {code && number && <span className="mx-1"> </span>}
                 <span>{number}</span>
               </p>
             </div>
 
-            {/* Action buttons */}
-            <div className="w-full space-y-2 mb-3">
+            {/* Action buttons — horizontal */}
+            <div className="w-full flex gap-2 mb-2">
               {telUrl && (
                 <a
                   href={telUrl}
                   onClick={e => e.stopPropagation()}
-                  className="w-full flex items-center justify-center gap-2.5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white py-2.5 rounded-full font-bold text-sm transition-all shadow-sm hover:shadow-md"
+                  className="flex-1 flex items-center justify-center gap-1.5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white py-2 rounded-full font-bold text-xs transition-all shadow-sm hover:shadow-md"
                 >
-                  <Phone className="h-4 w-4" /> Call Now
+                  <Phone className="h-3.5 w-3.5" /> Call
                 </a>
               )}
-
               {whatsappUrl && (
                 <a
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={e => e.stopPropagation()}
-                  className="w-full flex items-center justify-center gap-2.5 bg-gradient-to-r from-[#25D366] to-[#20BD5A] hover:from-[#1da851] hover:to-[#189E49] text-white py-2.5 rounded-full font-bold text-sm transition-all shadow-sm hover:shadow-md"
+                  className="flex-1 flex items-center justify-center gap-1.5 bg-gradient-to-r from-[#25D366] to-[#20BD5A] hover:from-[#1da851] hover:to-[#189E49] text-white py-2 rounded-full font-bold text-xs transition-all shadow-sm hover:shadow-md"
                 >
-                  <MessageCircle className="h-4 w-4" /> WhatsApp
+                  <MessageCircle className="h-3.5 w-3.5" /> WhatsApp
                 </a>
               )}
             </div>
@@ -347,15 +341,10 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
             <Link
               to={plateUrl}
               onClick={e => e.stopPropagation()}
-              className="text-xs font-bold text-foreground/70 hover:text-primary transition-colors uppercase tracking-wider"
+              className="text-[10px] font-bold text-foreground/70 hover:text-primary transition-colors uppercase tracking-wider"
             >
               VIEW DETAILS →
             </Link>
-
-            {/* Phone number at bottom */}
-            {phoneDigits && (
-              <p className="text-[10px] text-muted-foreground font-mono tracking-wide mt-2">{phoneDigits}</p>
-            )}
           </div>
         </div>
       </div>

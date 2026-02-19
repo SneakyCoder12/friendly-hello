@@ -533,7 +533,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Page title bar */}
-          <div className="px-6 lg:px-8 py-5 border-b border-border/40 bg-background/80 backdrop-blur-sm">
+          <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-5 border-b border-border/40 bg-background/80 backdrop-blur-sm">
             <div className="flex items-center gap-3">
               <div>
                 <div className="flex items-center gap-2 text-[10px] text-muted-foreground/60 font-bold uppercase tracking-widest mb-0.5">

@@ -6,7 +6,7 @@ export default function RequestBanner() {
   const { t } = useLanguage();
 
   return (
-    <section className="relative w-full rounded-3xl overflow-hidden border border-primary/20 shadow-xl shadow-primary/5">
+    <section className="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden border border-primary/20 shadow-xl shadow-primary/5">
       {/* Gold gradient background */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.04] via-transparent to-primary/[0.08]" />
 
@@ -18,7 +18,7 @@ export default function RequestBanner() {
       {/* Bottom-left glow */}
       <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-primary/5 rounded-full blur-2xl" />
 
-      <div className="relative px-6 sm:px-8 md:px-14 py-10 md:py-14">
+      <div className="relative px-4 sm:px-8 md:px-14 py-8 md:py-14">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
 
           {/* Left side — text */}
@@ -48,9 +48,9 @@ export default function RequestBanner() {
           </div>
 
           {/* Right side — plate images + CTA */}
-          <div className="flex flex-col items-center gap-5">
-            {/* Decorative plates stack */}
-            <div className="relative w-[200px] h-[70px]">
+          <div className="flex flex-col items-center gap-5 w-full md:w-auto">
+            {/* Decorative plates stack — hidden on mobile */}
+            <div className="relative w-[200px] h-[70px] hidden md:block">
               <img
                 src="/dubai-plate.png"
                 alt=""
@@ -64,7 +64,7 @@ export default function RequestBanner() {
             </div>
             <Link
               to="/request"
-              className="relative flex-shrink-0 inline-flex items-center gap-2 bg-gradient-to-r from-primary to-primary-hover text-primary-foreground px-8 py-4 rounded-2xl font-bold text-base hover:shadow-xl hover:shadow-primary/25 hover:scale-[1.02] transition-all duration-300 group overflow-hidden"
+              className="relative flex-shrink-0 inline-flex items-center gap-2 bg-gradient-to-r from-primary to-primary-hover text-primary-foreground px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-bold text-sm sm:text-base hover:shadow-xl hover:shadow-primary/25 hover:scale-[1.02] transition-all duration-300 group overflow-hidden"
             >
               {/* Shimmer effect */}
               <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />

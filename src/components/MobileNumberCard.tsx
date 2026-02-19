@@ -93,7 +93,7 @@ function MobileNumberCard({
                                     <AedLogo />
                                     <span>{price.toLocaleString()}</span>
                                 </>
-                            ) : <span className="text-sm text-gray-500">Call for Price</span>}
+                            ) : <span className="text-sm text-gray-500">Contact for price</span>}
                         </p>
                         <span className="text-[10px] font-bold uppercase tracking-wider text-white bg-primary px-2.5 py-1 rounded-full">
                             View →
@@ -107,7 +107,7 @@ function MobileNumberCard({
     // ── DESKTOP: flip card ──
     return (
         <div
-            className="perspective-1000 h-[280px] cursor-pointer"
+            className="perspective-1000 h-[240px] cursor-pointer"
             onMouseEnter={() => setFlipped(true)}
             onMouseLeave={() => setFlipped(false)}
             onClick={handleCardClick}
@@ -147,7 +147,7 @@ function MobileNumberCard({
                                             <AedLogo />
                                             <span>{price.toLocaleString()}</span>
                                         </>
-                                    ) : 'Call for Price'}
+                                    ) : <span className="text-muted-foreground text-sm">Contact for price</span>}
                                 </p>
                                 <div className="flex items-center gap-1.5">
                                     {telUrl && (
@@ -181,38 +181,35 @@ function MobileNumberCard({
 
                 {/* ── BACK SIDE — same fixed size as front ── */}
                 <div className="absolute inset-0 backface-hidden rotate-y-180">
-                    <div className="h-full bg-white rounded-2xl border border-gray-200 flex flex-col items-center px-5 pt-5 pb-4 relative">
+                    <div className="h-full bg-white rounded-2xl border border-gray-200 flex flex-col items-center justify-center px-4 py-3 relative">
                         {/* Heart button — top right */}
-                        <div className="w-full flex justify-end mb-2">
-                            <button
-                                onClick={(e) => { e.stopPropagation(); onToggleFavorite(e, id); }}
-                                className="h-9 w-9 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center flex-shrink-0 transition-all hover:scale-110 active:scale-90"
-                                title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
-                            >
-                                <Heart className={`h-4 w-4 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400 hover:text-red-400'}`} />
-                            </button>
-                        </div>
+                        <button
+                            onClick={(e) => { e.stopPropagation(); onToggleFavorite(e, id); }}
+                            className="absolute top-2 right-2 h-8 w-8 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center flex-shrink-0 transition-all hover:scale-110 active:scale-90 z-10"
+                            title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                        >
+                            <Heart className={`h-3.5 w-3.5 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400 hover:text-red-400'}`} />
+                        </button>
 
-                        {/* Header */}
-                        <p className="text-sm font-display font-bold text-gray-900 mb-0.5">VIP Number</p>
+                        <p className="text-xs font-display font-bold text-gray-900 mb-0.5">VIP Number</p>
                         <CarrierBadge small />
 
-                        {/* Large phone number */}
-                        <div className="bg-gray-50 border border-gray-200 rounded-xl px-5 py-2 mb-3 mt-3">
-                            <p className="font-mono font-black text-gray-900 text-xl tracking-wider text-center">
+                        {/* Phone number */}
+                        <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-1.5 mb-2 mt-2">
+                            <p className="font-mono font-black text-gray-900 text-lg tracking-wider text-center">
                                 {phoneNumber}
                             </p>
                         </div>
 
-                        {/* Action buttons */}
-                        <div className="w-full space-y-2 mb-3">
+                        {/* Action buttons — horizontal */}
+                        <div className="w-full flex gap-2 mb-2">
                             {telUrl && (
                                 <a
                                     href={telUrl}
                                     onClick={e => e.stopPropagation()}
-                                    className="w-full flex items-center justify-center gap-2.5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white py-2.5 rounded-full font-bold text-sm transition-all shadow-sm hover:shadow-md"
+                                    className="flex-1 flex items-center justify-center gap-1.5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white py-2 rounded-full font-bold text-xs transition-all shadow-sm hover:shadow-md"
                                 >
-                                    <Phone className="h-4 w-4" /> Call Now
+                                    <Phone className="h-3.5 w-3.5" /> Call
                                 </a>
                             )}
 
@@ -222,9 +219,9 @@ function MobileNumberCard({
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     onClick={e => e.stopPropagation()}
-                                    className="w-full flex items-center justify-center gap-2.5 bg-gradient-to-r from-[#25D366] to-[#20BD5A] hover:from-[#1da851] hover:to-[#189E49] text-white py-2.5 rounded-full font-bold text-sm transition-all shadow-sm hover:shadow-md"
+                                    className="flex-1 flex items-center justify-center gap-1.5 bg-gradient-to-r from-[#25D366] to-[#20BD5A] hover:from-[#1da851] hover:to-[#189E49] text-white py-2 rounded-full font-bold text-xs transition-all shadow-sm hover:shadow-md"
                                 >
-                                    <MessageCircle className="h-4 w-4" /> WhatsApp
+                                    <MessageCircle className="h-3.5 w-3.5" /> WhatsApp
                                 </a>
                             )}
                         </div>
@@ -233,14 +230,10 @@ function MobileNumberCard({
                         <Link
                             to={detailUrl}
                             onClick={e => e.stopPropagation()}
-                            className="text-xs font-bold text-gray-500 hover:text-primary transition-colors uppercase tracking-wider"
+                            className="text-[10px] font-bold text-gray-500 hover:text-primary transition-colors uppercase tracking-wider"
                         >
                             VIEW DETAILS →
                         </Link>
-
-                        {phoneDigits && (
-                            <p className="text-[10px] text-gray-400 font-mono tracking-wide mt-1">+{phoneDigits}</p>
-                        )}
                     </div>
                 </div>
             </div>

@@ -180,11 +180,11 @@ export default function Navbar() {
 
             {/* Right Side */}
             <div className="flex items-center gap-2">
-              {/* Dashboard Icon (logged in only) */}
+              {/* Dashboard Icon (logged in, desktop only) */}
               {user && (
                 <Link
                   to="/dashboard"
-                  className="flex h-10 w-10 rounded-full bg-gray-100 border border-gray-200 items-center justify-center text-gray-500 hover:text-foreground hover:bg-gray-200 transition-all duration-300"
+                  className="hidden lg:flex h-10 w-10 rounded-full bg-gray-100 border border-gray-200 items-center justify-center text-gray-500 hover:text-foreground hover:bg-gray-200 transition-all duration-300"
                   title="Dashboard"
                 >
                   <LayoutDashboard className="h-4 w-4" />
