@@ -180,7 +180,7 @@ export default function Navbar() {
 
             {/* Right Side */}
             <div className="flex items-center gap-2">
-            {/* Dashboard Icon (logged in, desktop only) */}
+              {/* Dashboard Icon (logged in, desktop only) */}
               {user && (
                 <Link
                   to="/dashboard"
@@ -375,16 +375,6 @@ export default function Navbar() {
               {t('contactUs')}
             </Link>
 
-            {/* List Your Number CTA */}
-            <Link
-              to={user ? '/dashboard' : '/login'}
-              onClick={closeMenu}
-              className="flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl bg-gray-900 text-white font-bold hover:bg-gray-800 transition-all shadow-sm my-2"
-            >
-              <PlusCircle className="h-5 w-5" />
-              List Your Number
-            </Link>
-
             {user && (
               <Link
                 to="/dashboard"
@@ -394,6 +384,16 @@ export default function Navbar() {
                 {t('dashboard')}
               </Link>
             )}
+
+            {/* List Your Number CTA */}
+            <Link
+              to={user ? '/dashboard' : '/login'}
+              onClick={closeMenu}
+              className="flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl bg-gray-900 text-white font-bold hover:bg-gray-800 transition-all shadow-sm my-2"
+            >
+              <PlusCircle className="h-5 w-5" />
+              List Your Number
+            </Link>
           </div>
 
           {/* Bottom Actions */}
