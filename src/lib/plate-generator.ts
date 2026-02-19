@@ -36,12 +36,12 @@ interface EmirateConfig {
 const CONFIGS: Record<string, EmirateConfig> = {
   ajman: {
     hasCode: true,
-    fontHeightRatio: 0.18,
-    letterSpacingRatio: 0.015,
+    fontHeightRatio: 0.22,
+    letterSpacingRatio: 0.001,
     verticalCenter: true,
     components: [
-      { type: 'code', xRatio: 0.09, align: 'center', emboss: true, fontSizeRatio: 0.17 },
-      { type: 'number', xRatio: 0.43, align: 'center', emboss: true },
+      { type: 'code', xRatio: 0.10, yRatio: 0.77, align: 'center', emboss: true, fontSizeRatio: 0.19 },
+      { type: 'number', xRatio: 0.42, yRatio: 0.81, align: 'center', emboss: true },
     ],
   },
   abudhabi: {
@@ -52,8 +52,8 @@ const CONFIGS: Record<string, EmirateConfig> = {
     baselineRatio: 0.50,
     verticalCenter: true,
     components: [
-      { type: 'code', xRatio: 0.14, align: 'center', fontSizeRatio: 0.12, letterSpacingRatio: 0.0001, baselineOffsetRatio: -0.23, emboss: true },
-      { type: 'number', xRatio: 0.70, align: 'center', emboss: true, letterSpacingRatio: 0.0001, baselineOffsetRatio: -0.03 },
+      { type: 'code', xRatio: 0.09, yRatio: 0.46, align: 'center', fontSizeRatio: 0.12, letterSpacingRatio: 0.0001, baselineOffsetRatio: -0.23, emboss: true },
+      { type: 'number', xRatio: 0.70, yRatio: 0.78, align: 'center', fontSizeRatio: 0.24, emboss: true, letterSpacingRatio: 0.0001, baselineOffsetRatio: -0.03 },
     ],
   },
   dubai: {
@@ -87,8 +87,8 @@ const CONFIGS: Record<string, EmirateConfig> = {
     baselineRatio: 0.70,
     verticalCenter: false,
     components: [
-      { type: 'code', xRatio: 0.155, align: 'center', emboss: true },
-      { type: 'number', xRatio: 0.735, align: 'center', emboss: true },
+      { type: 'code', xRatio: 0.165, align: 'center', emboss: true },
+      { type: 'number', xRatio: 0.760, yRatio: 0.74, fontSizeRatio: 0.18, letterSpacingRatio: 0.0001, align: 'center', emboss: true },
     ],
   },
   rak: {
