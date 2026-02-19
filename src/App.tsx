@@ -53,7 +53,7 @@ export default function App() {
                   <Route path="/plate/:plateId" element={<PlateDetailPage />} />
                   <Route path="/request" element={<RequestPage />} />
                   <Route path="/contact" element={<ContactPage />} />
-                  <Route path="/visualizer" element={<VisualizerPage />} />
+                  <Route path="/visualizer" element={<ProtectedRoute adminOnly><VisualizerPage /></ProtectedRoute>} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/signup" element={<SignupPage />} />
                   <Route path="/forgot-password" element={<ForgotPasswordPage />} />

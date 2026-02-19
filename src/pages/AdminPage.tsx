@@ -2,7 +2,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
-import { Loader2, Users, FileText, BarChart3, Upload, Trash2, Eye, EyeOff, Search, X, ChevronDown, ChevronUp, Smartphone } from 'lucide-react';
+import { Loader2, Users, FileText, BarChart3, Upload, Trash2, Eye, EyeOff, Search, X, ChevronDown, ChevronUp, Smartphone, Wrench } from 'lucide-react';
+import PlateGeneratorSection from '@/components/PlateGenerator';
 
 interface UserProfile {
   id: string;
@@ -39,7 +40,7 @@ interface AdminMobileNumber {
 
 export default function AdminPage() {
   const { t } = useLanguage();
-  const [tab, setTab] = useState<'analytics' | 'users' | 'listings' | 'bulk'>('analytics');
+  const [tab, setTab] = useState<'analytics' | 'users' | 'listings' | 'bulk' | 'visualizer'>('analytics');
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [listings, setListings] = useState<AdminListing[]>([]);
   const [mobileNumbers, setMobileNumbers] = useState<AdminMobileNumber[]>([]);
@@ -224,6 +225,7 @@ export default function AdminPage() {
           {tabBtn('users', <Users className="h-4 w-4" />, t('allUsers'))}
           {tabBtn('listings', <FileText className="h-4 w-4" />, t('allListingsAdmin'))}
           {tabBtn('bulk', <Upload className="h-4 w-4" />, t('bulkUpload'))}
+          {tabBtn('visualizer', <Wrench className="h-4 w-4" />, 'Plate Visualizer')}
         </div>
 
         {/* Analytics */}
@@ -514,6 +516,13 @@ export default function AdminPage() {
                 </button>
               </div>
             )}
+          </div>
+        )}
+
+        {/* ── Plate Visualizer ── */}
+        {tab === 'visualizer' && (
+          <div className="bg-card border border-border rounded-2xl p-6">
+            <PlateGeneratorSection />
           </div>
         )}
       </div>
