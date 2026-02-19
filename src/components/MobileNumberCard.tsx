@@ -1,6 +1,7 @@
-import { memo, useState } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Phone, MessageCircle, Heart } from 'lucide-react';
+import { AedLogo } from '@/components/PlateCard';
 
 interface MobileNumberCardProps {
     id: string;
@@ -13,10 +14,20 @@ interface MobileNumberCardProps {
     onToggleFavorite: (e: React.MouseEvent, id: string) => void;
 }
 
+/** Detect touch device to disable flip */
+function useIsTouch() {
+    const [isTouch, setIsTouch] = useState(false);
+    useEffect(() => {
+        setIsTouch(window.matchMedia('(hover: none) and (pointer: coarse)').matches);
+    }, []);
+    return isTouch;
+}
+
 function MobileNumberCard({
     id, phoneNumber, carrier, price, description, contactPhone,
     isFavorite, onToggleFavorite,
 }: MobileNumberCardProps) {
+    const isTouch = useIsTouch();
     const [flipped, setFlipped] = useState(false);
     const navigate = useNavigate();
 
@@ -35,6 +46,65 @@ function MobileNumberCard({
         }
     };
 
+    const CarrierBadge = ({ small = false }: { small?: boolean }) => (
+        <span className={`inline-flex items-center gap-1.5 font-black px-3 py-1.5 rounded-full uppercase tracking-wider border ${carrier === 'etisalat'
+            ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+            : 'bg-blue-50 border-blue-200 text-blue-700'
+            } ${small ? 'text-[9px]' : 'text-[10px]'}`}>
+            <img
+                src={carrier === 'etisalat' ? '/Eand_Logo.svg' : '/du-logo.png'}
+                alt={carrier}
+                className={`object-contain ${small ? 'h-3 w-3' : 'h-4 w-4'}`}
+            />
+            {carrier === 'etisalat' ? 'e&' : 'du'}
+        </span>
+    );
+
+    // ── TOUCH DEVICES: no flip ──
+    if (isTouch) {
+        return (
+            <Link
+                to={detailUrl}
+                className="block h-[240px] bg-white rounded-2xl border border-gray-200 hover:shadow-lg transition-all duration-300 p-4 flex flex-col"
+            >
+                {/* Top: carrier + fav */}
+                <div className="flex justify-between items-center mb-3">
+                    <CarrierBadge />
+                    <button
+                        onClick={(e) => { e.preventDefault(); onToggleFavorite(e, id); }}
+                        className="h-8 w-8 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center"
+                    >
+                        <Heart className={`h-3.5 w-3.5 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
+                    </button>
+                </div>
+                {/* Number */}
+                <p className="text-xl font-black tracking-widest text-gray-900 mb-1 font-mono">
+                    {phoneNumber}
+                </p>
+                {description && (
+                    <p className="text-xs text-gray-400 mb-2 line-clamp-1">{description}</p>
+                )}
+                <div className="mt-auto">
+                    <div className="h-px w-full bg-gray-100 mb-3" />
+                    <div className="flex justify-between items-center">
+                        <p className="text-gray-900 font-mono font-bold text-lg flex items-center gap-1">
+                            {price ? (
+                                <>
+                                    <AedLogo />
+                                    <span>{price.toLocaleString()}</span>
+                                </>
+                            ) : <span className="text-sm text-gray-500">Call for Price</span>}
+                        </p>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-white bg-primary px-2.5 py-1 rounded-full">
+                            View →
+                        </span>
+                    </div>
+                </div>
+            </Link>
+        );
+    }
+
+    // ── DESKTOP: flip card ──
     return (
         <div
             className="perspective-1000 h-[280px] cursor-pointer"
@@ -50,17 +120,7 @@ function MobileNumberCard({
                     <div className="block h-full bg-white rounded-2xl border border-gray-200 hover:shadow-lg transition-all duration-300 group p-6 flex flex-col">
                         {/* Top row: carrier badge + fav */}
                         <div className="flex justify-between items-center mb-5">
-                            <span className={`inline-flex items-center gap-1.5 text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider border ${carrier === 'etisalat'
-                                ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
-                                : 'bg-blue-50 border-blue-200 text-blue-700'
-                                }`}>
-                                <img
-                                    src={carrier === 'etisalat' ? '/Eand_Logo.svg' : '/du-logo.png'}
-                                    alt={carrier}
-                                    className="h-4 w-4 object-contain"
-                                />
-                                {carrier === 'etisalat' ? 'e&' : 'du'}
-                            </span>
+                            <CarrierBadge />
                             <button
                                 onClick={(e) => { e.stopPropagation(); onToggleFavorite(e, id); }}
                                 className="h-8 w-8 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center hover:bg-red-50 hover:border-red-200 transition-all"
@@ -74,17 +134,20 @@ function MobileNumberCard({
                             {phoneNumber}
                         </p>
 
-                        {/* Description */}
                         {description && (
                             <p className="text-xs text-gray-400 mb-3 line-clamp-2">{description}</p>
                         )}
 
                         <div className="mt-auto">
                             <div className="h-px w-full bg-gray-100 mb-4" />
-                            {/* Price + view hint + hover buttons */}
                             <div className="flex justify-between items-center">
-                                <p className="text-gray-900 font-mono font-bold text-xl">
-                                    {price ? `AED ${price.toLocaleString()}` : 'Call for Price'}
+                                <p className="text-gray-900 font-mono font-bold text-xl flex items-center gap-1">
+                                    {price ? (
+                                        <>
+                                            <AedLogo />
+                                            <span>{price.toLocaleString()}</span>
+                                        </>
+                                    ) : 'Call for Price'}
                                 </p>
                                 <div className="flex items-center gap-1.5">
                                     {telUrl && (
@@ -116,7 +179,7 @@ function MobileNumberCard({
                     </div>
                 </div>
 
-                {/* ── BACK SIDE ── contact options */}
+                {/* ── BACK SIDE — same fixed size as front ── */}
                 <div className="absolute inset-0 backface-hidden rotate-y-180">
                     <div className="h-full bg-white rounded-2xl border border-gray-200 flex flex-col items-center px-5 pt-5 pb-4 relative">
                         {/* Heart button — top right */}
@@ -132,13 +195,10 @@ function MobileNumberCard({
 
                         {/* Header */}
                         <p className="text-sm font-display font-bold text-gray-900 mb-0.5">VIP Number</p>
-                        <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full mb-3 ${carrier === 'etisalat' ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-700'}`}>
-                            <img src={carrier === 'etisalat' ? '/Eand_Logo.svg' : '/du-logo.png'} alt={carrier} className="h-3 w-3 object-contain" />
-                            {carrier === 'etisalat' ? 'e&' : 'du'}
-                        </span>
+                        <CarrierBadge small />
 
                         {/* Large phone number */}
-                        <div className="bg-gray-50 border border-gray-200 rounded-xl px-5 py-2 mb-3">
+                        <div className="bg-gray-50 border border-gray-200 rounded-xl px-5 py-2 mb-3 mt-3">
                             <p className="font-mono font-black text-gray-900 text-xl tracking-wider text-center">
                                 {phoneNumber}
                             </p>
@@ -169,7 +229,7 @@ function MobileNumberCard({
                             )}
                         </div>
 
-                        {/* View Details — small text link */}
+                        {/* View Details */}
                         <Link
                             to={detailUrl}
                             onClick={e => e.stopPropagation()}
@@ -178,7 +238,6 @@ function MobileNumberCard({
                             VIEW DETAILS →
                         </Link>
 
-                        {/* Phone number at bottom */}
                         {phoneDigits && (
                             <p className="text-[10px] text-gray-400 font-mono tracking-wide mt-1">+{phoneDigits}</p>
                         )}

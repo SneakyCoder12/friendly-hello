@@ -1,4 +1,4 @@
-import { memo, useState, useEffect } from 'react';
+import { memo, useState, useEffect, useRef } from 'react';
 
 import { Link, useNavigate } from 'react-router-dom';
 import { usePlateImage } from '@/hooks/usePlateGenerator';
@@ -23,7 +23,31 @@ interface PlateCardProps {
   vehicleType?: 'car' | 'bike' | 'classic';
 }
 
+/** Detect if device has touch capability — used to fully disable flip cards */
+function useIsTouch() {
+  const [isTouch, setIsTouch] = useState(false);
+  useEffect(() => {
+    const check = () =>
+      window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+    setIsTouch(check());
+  }, []);
+  return isTouch;
+}
+
+/** AED logo SVG inline — the new Dhs logo with D and two arrows */
+export function AedLogo({ className = 'aed-logo' }: { className?: string }) {
+  return (
+    <img
+      className={className}
+      style={{ height: '0.75em', width: 'auto', display: 'inline-block', verticalAlign: 'middle' }}
+      alt="AED"
+      src="data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDEwMDAgODcwIiB3aWR0aD0iMTAwMCIgaGVpZ2h0PSI4NzAiPgoJPHRpdGxlPkxheWVyIGNvcHk8L3RpdGxlPgoJPHN0eWxlPgoJCS5zMCB7IGZpbGw6IGN1cnJlbnRDb2xvciB9IAoJPC9zdHlsZT4KCTxwYXRoIGlkPSJMYXllciBjb3B5IiBjbGFzcz0iczAiIGQ9Im04OC4zIDFjMC40IDAuNiAyLjYgMy4zIDQuNyA1LjkgMTUuMyAxOC4yIDI2LjggNDcuOCAzMyA4NS4xIDQuMSAyNC41IDQuMyAzMi4yIDQuMyAxMjUuNnY4N2gtNDEuOGMtMzguMiAwLTQyLjYtMC4yLTUwLjEtMS43LTExLjgtMi41LTI0LTkuMi0zMi4yLTE3LjgtNi41LTYuOS02LjMtNy4zLTUuOSAxMy42IDAuNSAxNy4zIDAuNyAxOS4yIDMuMiAyOC42IDQgMTQuOSA5LjUgMjYgMTcuOCAzNS45IDExLjMgMTMuNiAyMi44IDIxLjIgMzkuMiAyNi4zIDMuNSAxIDEwLjkgMS40IDM3LjEgMS42bDMyLjcgMC41djQzLjMgNDMuNGwtNDYuMS0wLjMtNDYuMy0wLjMtOC0zLjJjLTkuNS0zLjgtMTMuOC02LjYtMjMuMS0xNC45bC02LjgtNi4xIDAuNCAxOS4xYzAuNSAxNy43IDAuNiAxOS43IDMuMSAyOC43IDguNyAzMS44IDI5LjcgNTQuNSA1Ny40IDYxLjkgNi45IDEuOSA5LjYgMiAzOC41IDIuNGwzMC45IDAuNHY4OS42YzAgNTQuMS0wLjMgOTQtMC44IDEwMC44LTAuNSA2LjItMi4xIDE3LjgtMy41IDI1LjktNi41IDM3LjMtMTguMiA2NS40LTM1IDgzLjZsLTMuNCAzLjdoMTY5LjFjMTAxLjEgMCAxNzYuNy0wLjQgMTg3LjgtMC45IDE5LjUtMSA2My01LjMgNzIuOC03LjQgMy4xLTAuNiA4LjktMS41IDEyLjctMi4xIDguMS0xLjIgMjEuNS00IDQwLjgtOC45IDI3LjItNi44IDUyLTE1LjMgNzYuMy0yNi4xIDcuNi0zLjQgMjkuNC0xNC41IDM1LjItMTggMy4xLTEuOCA2LjgtNCA4LjItNC43IDMuOS0yLjEgMTAuNC02LjMgMTkuOS0xMy4xIDQuNy0zLjQgOS40LTYuNyAxMC40LTcuNCA0LjItMi44IDE4LjctMTQuOSAyNS4zLTIxIDI1LjEtMjMuMSA0Ni4xLTQ4LjggNjIuNC03Ni4zIDIuMy00IDUuMy05IDYuNi0xMS4xIDMuMy01LjYgMTYuOS0zMy42IDE4LjItMzcuOCAwLjYtMS45IDEuNC0zLjkgMS44LTQuMyAyLjYtMy40IDE3LjYtNTAuNiAxOS40LTYwLjkgMC42LTMuMyAwLjktMy44IDMuNC00LjMgMS42LTAuMyAyNC45LTAuMyA1MS44LTAuMSA1My44IDAuNCA1My44IDAuNCA2NS43IDUuOSA2LjcgMy4xIDguNyA0LjUgMTYuMSAxMS4yIDkuNyA4LjcgOC44IDEwLjEgOC4yLTExLjctMC40LTEyLjgtMC45LTIwLjctMS44LTIzLjktMy40LTEyLjMtNC4yLTE0LjktNy4yLTIxLjEtOS44LTIxLjQtMjYuMi0zNi43LTQ3LjItNDRsLTguMi0zLTMzLjQtMC40LTMzLjMtMC41IDAuNC0xMS43YzAuNC0xNS40IDAuNC00NS45LTAuMS02MS42bC0wLjQtMTIuNiA0NC42LTAuMmMzOC4yLTAuMiA0NS4zIDAgNDkuNSAxLjEgMTIuNiAzLjUgMjEuMSA4LjMgMzEuNSAxNy44bDUuOCA1LjR2LTE0LjhjMC0xNy42LTAuOS0yNS40LTQuNS0zNy03LjEtMjMuNS0yMS4xLTQxLTQxLjEtNTEuOC0xMy03LTEzLjgtNy4yLTU4LjUtNy41LTI2LjItMC4yLTM5LjktMC42LTQwLjYtMS4yLTAuNi0wLjYtMS4xLTEuNi0xLjEtMi40IDAtMC44LTEuNS03LjEtMy41LTEzLjktMjMuNC04Mi43LTY3LjEtMTQ4LjQtMTMxLTE5Ny4xLTguNy02LjctMzAtMjAuOC0zOC42LTI1LjYtMy4zLTEuOS02LjktMy45LTcuOC00LjUtNC4yLTIuMy0yOC4zLTE0LjEtMzQuMy0xNi42LTMuNi0xLjYtOC4zLTMuNi0xMC40LTQuNC0zNS4zLTE1LjMtOTQuNS0yOS44LTEzOS43LTM0LjMtNy40LTAuNy0xNy4yLTEuOC0yMS43LTIuMi0yMC40LTIuMy00OC43LTIuNi0yMDkuNC0yLjYtMTM1LjggMC0xNjkuOSAwLjMtMTY5LjQgMXptMzMwLjcgNDMuM2MzMy44IDIgNTQuNiA0LjYgNzguOSAxMC41IDc0LjIgMTcuNiAxMjYuNCA1NC44IDE2NC4zIDExNyAzLjUgNS44IDE4LjMgMzYgMjAuNSA0Mi4xIDEwLjUgMjguMyAxNS42IDQ1LjEgMjAuMSA2Ny4zIDEuMSA1LjQgMi42IDEyLjYgMy4zIDE2IDAuNyAzLjMgMSA2LjQgMC43IDYuNy0wLjUgMC40LTEwMC45IDAuNi0yMjMuMyAwLjVsLTIyMi41LTAuMi0wLjMtMTI4LjVjLTAuMS03MC42IDAtMTI5LjMgMC4zLTEzMC40bDAuNC0xLjloNzEuMWMzOSAwIDc4IDAuNCA4Ni41IDAuOXptMjk3LjUgMzUwLjNjMC43IDQuMyAwLjcgNzcuMyAwIDgwLjlsLTAuNiAyLjctMjI3LjUtMC4yLTIyNy40LTAuMy0wLjItNDIuNGMtMC4yLTIzLjMgMC00Mi43IDAuMi00My4xIDAuMy0wLjUgOTcuMi0wLjggMjI3LjctMC44aDIyNy4yem0tMTAuMiAxNzEuN2MwLjUgMS41LTEuOSAxMy44LTYuOCAzMy44LTUuNiAyMi41LTEzLjIgNDUuMi0yMC45IDYyLTMuOCA4LjYtMTMuMyAyNy4yLTE1LjYgMzAuNy0xLjEgMS42LTQuMyA2LjctNy4xIDExLjItMTggMjguMi00My43IDUzLjktNzMgNzIuOS0xMC43IDYuOC0zMi43IDE4LjQtMzguNiAyMC4yLTEuMiAwLjMtMi41IDAuOS0zIDEuMy0wLjcgMC42LTkuOCA0LTIwLjQgNy44LTE5LjUgNi45LTU2LjYgMTQuNC04Ni40IDE3LjUtMTkuMyAxLjktMjIuNCAyLTk2LjcgMmgtNzYuOXYtMTI5LjctMTI5LjhsMjIwLjktMC40YzEyMS41LTAuMiAyMjEuNi0wLjUgMjIyLjQtMC43IDAuOS0wLjEgMS44IDAuNSAyLjEgMS4yeiIvPgo8L3N2Zz4="
+    />
+  );
+}
+
 function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerPhone, plateNumber, listingId, status, plateStyle = 'private', vehicleType }: PlateCardProps) {
+  const isTouch = useIsTouch();
   // Resolve display type for icons — always reflect stored data, no defaults
   const displayType: 'car' | 'bike' | 'classic' = vehicleType ?? (plateStyle === 'bike' ? 'bike' : plateStyle === 'classic' ? 'classic' : 'car');
   const isSold = status === 'sold';
@@ -94,8 +118,76 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
     );
   }
 
+  // ── TOUCH DEVICES: simple card, no flip ──
+  if (isTouch) {
+    return (
+      <Link
+        to={plateUrl}
+        className={`block h-[240px] bg-card rounded-2xl border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300 overflow-hidden relative ${isSold ? 'opacity-80' : ''}`}
+      >
+        {isSold && (
+          <div className="sold-ribbon"><span>SOLD</span></div>
+        )}
+        <div className="flex flex-col items-center justify-center h-full relative">
+          {/* Vehicle type badge */}
+          <div className="absolute top-2 left-2 z-10 flex items-center gap-1 px-2 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider border bg-card/90 backdrop-blur-sm shadow-sm border-border/60 text-muted-foreground">
+            {displayType === 'bike' ? (
+              <><Bike className="h-3 w-3" /> Bike</>
+            ) : displayType === 'classic' ? (
+              <><span className="text-[9px] font-serif italic">C</span> Classic</>
+            ) : (
+              <><Car className="h-3 w-3" /> Car</>
+            )}
+          </div>
+          {/* Favorite button */}
+          {listingId && (
+            <button
+              onClick={toggleFavorite}
+              className="absolute top-2 right-2 z-10 h-7 w-7 rounded-full bg-white/80 border border-border/40 shadow-sm flex items-center justify-center transition-all active:scale-90"
+            >
+              <Heart className={`h-3.5 w-3.5 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
+            </button>
+          )}
+          {/* Plate image */}
+          <div className="w-[90%] mx-auto h-[90px] flex items-center justify-center">
+            {dataUrl ? (
+              <img
+                src={dataUrl}
+                alt={`${emirate} ${code} ${number}`}
+                className="w-full h-full object-contain object-center"
+                style={{ imageRendering: '-webkit-optimize-contrast' } as React.CSSProperties}
+              />
+            ) : (
+              <div className="animate-pulse bg-muted rounded w-full h-full" />
+            )}
+          </div>
+          {/* Price + View button */}
+          <div className="mt-2 p-2.5 w-full border-t border-border/50">
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-sm font-bold text-foreground font-mono tracking-tight flex items-center gap-1">
+                  {price ? (
+                    <>
+                      <AedLogo />
+                      <span className="text-foreground">{price.replace(/^AED\s*/, '')}</span>
+                    </>
+                  ) : (
+                    <span className="text-muted-foreground text-xs">Contact</span>
+                  )}
+                </p>
+              </div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-white bg-primary px-2.5 py-1 rounded-full">
+                View →
+              </span>
+            </div>
+          </div>
+        </div>
+      </Link>
+    );
+  }
+
+  // ── DESKTOP: flip card ──
   const handleCardClick = () => {
-    // On mobile, first tap flips; second tap navigates
     if (!flipped) {
       setFlipped(true);
     } else {
@@ -123,8 +215,8 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
               </div>
             )}
             <div className="flex flex-col items-center justify-center h-full relative">
-              {/* Vehicle type badge — top-left (hidden on mobile for cleaner look) */}
-              <div className="absolute top-2 sm:top-3 left-2 sm:left-3 z-10 hidden sm:flex items-center gap-1 px-2 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider border
+              {/* Vehicle type badge — top-left */}
+              <div className="absolute top-2 sm:top-3 left-2 sm:left-3 z-10 flex items-center gap-1 px-2 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider border
                             bg-card/90 backdrop-blur-sm shadow-sm border-border/60 text-muted-foreground">
                 {displayType === 'bike' ? (
                   <><Bike className="h-3 w-3" /> Bike</>
@@ -134,18 +226,8 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
                   <><Car className="h-3 w-3" /> Car</>
                 )}
               </div>
-              {/* Mobile-only heart button — subtle, top-right */}
-              {listingId && (
-                <button
-                  onClick={toggleFavorite}
-                  className="sm:hidden absolute top-2 right-2 z-10 h-7 w-7 rounded-full bg-white/80 border border-border/40 shadow-sm flex items-center justify-center transition-all active:scale-90"
-                  title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
-                >
-                  <Heart className={`h-3.5 w-3.5 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
-                </button>
-              )}
 
-              {/* Plate image — smaller on mobile */}
+              {/* Plate image */}
               <div className="w-[90%] mx-auto h-[90px] sm:h-[120px] flex items-center justify-center">
                 {dataUrl ? (
                   <img
@@ -158,15 +240,21 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
                   <div className="animate-pulse bg-muted rounded w-full h-full" />
                 )}
               </div>
-              {/* Price section — compact on mobile */}
+              {/* Price section */}
               <div className="mt-2 sm:mt-4 p-2.5 sm:p-4 w-full border-t border-border/50">
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="hidden sm:block text-[10px] text-muted-foreground uppercase tracking-wider font-bold mb-1">Price</p>
-                    <p className="text-sm sm:text-xl font-bold text-foreground font-mono tracking-tight">{price || 'Contact'}</p>
+                    <p className="text-sm sm:text-xl font-bold text-foreground font-mono tracking-tight flex items-center gap-1">
+                      {price ? (
+                        <>
+                          <AedLogo />
+                          <span>{price.replace(/^AED\s*/, '')}</span>
+                        </>
+                      ) : 'Contact'}
+                    </p>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    {/* Small hover action buttons */}
                     {telUrl && (
                       <a
                         href={telUrl}
@@ -192,13 +280,12 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
                     <p className={`text-[10px] text-muted-foreground font-bold uppercase tracking-wider group-hover:text-primary transition-colors ${(telUrl || whatsappUrl) ? 'hidden group-hover:hidden sm:group-hover:block' : ''}`}>View →</p>
                   </div>
                 </div>
-
               </div>
             </div>
           </Link>
         </div>
 
-        {/* BACK SIDE — contact options */}
+        {/* BACK SIDE — contact options (same fixed size as front) */}
         <div className="absolute inset-0 backface-hidden rotate-y-180">
           <div className={`h-full bg-card rounded-2xl border border-border flex flex-col items-center px-5 pt-6 pb-4 relative ${isSold ? 'opacity-80' : ''}`}>
             {/* SOLD Ribbon */}
@@ -231,7 +318,7 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
               </p>
             </div>
 
-            {/* Action buttons — only show if phone number exists */}
+            {/* Action buttons */}
             <div className="w-full space-y-2 mb-3">
               {telUrl && (
                 <a
@@ -256,7 +343,7 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
               )}
             </div>
 
-            {/* View Details — small text link instead of button */}
+            {/* View Details */}
             <Link
               to={plateUrl}
               onClick={e => e.stopPropagation()}

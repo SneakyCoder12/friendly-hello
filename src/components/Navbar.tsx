@@ -175,7 +175,6 @@ export default function Navbar() {
                 </div>
               </div>
 
-              <Link className={navLinkClass} to="/visualizer">{t('generator')}</Link>
               <Link className={navLinkClass} to="/contact">{t('contactUs')}</Link>
             </div>
 
@@ -367,13 +366,6 @@ export default function Navbar() {
             </div>
 
             {/* Other Links */}
-            <Link
-              to="/visualizer"
-              onClick={closeMenu}
-              className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 transition-all"
-            >
-              {t('generator')}
-            </Link>
             <Link
               to="/contact"
               onClick={closeMenu}
