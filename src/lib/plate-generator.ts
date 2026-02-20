@@ -3,6 +3,8 @@
    Canvas-based rendering for Flat Plates
 */
 
+import { loadPlateFonts } from './plateFontLoader';
+
 const OUTPUT_WIDTH = 3840;
 
 const FONT_PRIMARY = 'PlateFont';
@@ -366,23 +368,15 @@ export async function generatePlate({
     baselineY = H * (config.baselineRatio || 0.5);
   }
 
-  // Load Fonts
+  // Load all plate fonts before rendering (centralized, fail-safe)
+  await loadPlateFonts();
+
+  // Derive the specific font name for this emirate config
   const targetWeight = config.fontWeight || 'bold';
-  const fontFileURL = config.fontFile || FONT_FILE;
   const fontNameId = config.fontFile ? `PlateFont_${emId}` : FONT_PRIMARY;
-
-  // Load Font
-  const font = new FontFace(fontNameId, `url("${fontFileURL}")`, { weight: targetWeight });
-  await font.load();
-  document.fonts.add(font);
-
-  // Load Arabic font if needed
   let arabicFontNameId = '';
   if (config.arabicFontFile) {
     arabicFontNameId = `ArabicFont_${emId}`;
-    const arabicFont = new FontFace(arabicFontNameId, `url("${config.arabicFontFile}")`, { weight: 'bold' });
-    await arabicFont.load();
-    document.fonts.add(arabicFont);
   }
 
   ctx.textBaseline = 'alphabetic';
