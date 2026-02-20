@@ -392,6 +392,15 @@ export async function generatePlate({
     const isArabic = comp.type === 'arabic_number' && arabicFontNameId;
     const activeFontName = isArabic ? arabicFontNameId : fontNameId;
 
+    // Verify the font is actually loaded — fail hard if not (no silent fallback)
+    const fontCheckStr = `${targetWeight} 12px "${activeFontName}"`;
+    if (!document.fonts.check(fontCheckStr)) {
+      throw new Error(
+        `[PlateGenerator] Font not loaded: "${activeFontName}". ` +
+        `Ensure loadPlateFonts() was awaited before generatePlate(). Aborting.`
+      );
+    }
+
     const compFontSize = comp.fontSizeRatio ? W * comp.fontSizeRatio : globalFontHeight;
     const compSpacing = comp.letterSpacingRatio ? W * comp.letterSpacingRatio : W * config.letterSpacingRatio;
 
@@ -403,7 +412,8 @@ export async function generatePlate({
       compY = baselineY + H * comp.baselineOffsetRatio;
     }
 
-    ctx.font = `${targetWeight} ${Math.round(compFontSize)}px "${activeFontName}", sans-serif`;
+    // NO fallback font — only the custom plate font is allowed
+    ctx.font = `${targetWeight} ${Math.round(compFontSize)}px "${activeFontName}"`;
 
     // Calculate alignment
     const width = ctx.measureText(text).width + (text.length - 1) * compSpacing;
