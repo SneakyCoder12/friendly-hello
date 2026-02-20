@@ -15,12 +15,12 @@
  *   PlateFont_sharjah_classic → DIN-1451.ttf
  *   PlateFont_sharjah_bike    → DIN-1451.ttf
  *   PlateFont_ajman_bike      → DIN-1451.ttf
- *   PlateFont_dubai           → Rough Motion.otf
- *   PlateFont_dubai_bike      → Rough Motion.otf
- *   PlateFont_dubai_classic   → Rough Motion.otf
- *   PlateFont_rak_bike        → Rough Motion.otf
- *   PlateFont_umm_al_quwain_bike → Rough Motion.otf
- *   PlateFont_fujairah_bike   → Rough Motion.otf
+ *   PlateFont_dubai           → RoughMotion.otf
+ *   PlateFont_dubai_bike      → RoughMotion.otf
+ *   PlateFont_dubai_classic   → RoughMotion.otf
+ *   PlateFont_rak_bike        → RoughMotion.otf
+ *   PlateFont_umm_al_quwain_bike → RoughMotion.otf
+ *   PlateFont_fujairah_bike   → RoughMotion.otf
  *   ArabicFont_abudhabi       → Amiri-Bold.ttf
  */
 
@@ -75,38 +75,7 @@ export function loadPlateFonts(): Promise<void> {
   if (fontsLoaded) return fontsLoaded;
 
   fontsLoaded = (async () => {
-    // 1. Verify all font files are reachable (deduplicated by URL)
-    const seen = new Set<string>();
-    const fetchChecks: Promise<void>[] = [];
-
-    for (const def of PLATE_FONTS) {
-      if (seen.has(def.url)) continue;
-      seen.add(def.url);
-
-      fetchChecks.push(
-        (async () => {
-          const encodedUrl = def.url.replace(/ /g, '%20');
-          let response: Response;
-          try {
-            response = await fetch(encodedUrl);
-          } catch (e) {
-            const msg = `[PlateFontLoader] Network error fetching font: ${def.url} — ${e}`;
-            console.error(msg);
-            throw new Error(msg);
-          }
-          if (!response.ok) {
-            const msg = `[PlateFontLoader] Font file not found (${response.status}): ${def.url}`;
-            console.error(msg);
-            throw new Error(msg);
-          }
-        })()
-      );
-    }
-
-    // Fail fast — abort everything if any font file is missing
-    await Promise.all(fetchChecks);
-
-    // 2. Register every font name via FontFace API so canvas can use them
+    // 1. Register every font name via FontFace API so canvas can use them
     const faceLoads = PLATE_FONTS.map(async (def) => {
       const encodedUrl = def.url.replace(/ /g, '%20');
       const weight = def.weight ?? 'bold';
@@ -114,34 +83,27 @@ export function loadPlateFonts(): Promise<void> {
       // Skip if this exact font name is already registered
       if (document.fonts.check(`${weight} 12px "${def.name}"`)) return;
 
-      const face = new FontFace(def.name, `url("${encodedUrl}")`, { weight });
       try {
+        const face = new FontFace(def.name, `url("${encodedUrl}")`, { weight });
         await face.load();
+        document.fonts.add(face);
       } catch (e) {
-        const msg = `[PlateFontLoader] FontFace.load() failed for "${def.name}" (${def.url}): ${e}`;
-        console.error(msg);
-        throw new Error(msg);
+        console.warn(`[PlateFontLoader] Failed to load "${def.name}" (${def.url}): ${e}`);
+        // Continue — plate-generator.ts will use fallback font
       }
-      document.fonts.add(face);
     });
 
-    // Fail fast if any FontFace fails to load
     await Promise.all(faceLoads);
 
-    // 3. Wait for the browser to fully process all registered fonts
+    // 2. Wait for the browser to fully process all registered fonts
     await document.fonts.ready;
 
-    // 4. Final verification — confirm every font name is actually available to canvas
-    for (const def of PLATE_FONTS) {
+    // 3. Log results
+    const loaded = PLATE_FONTS.filter(def => {
       const weight = def.weight ?? 'bold';
-      if (!document.fonts.check(`${weight} 12px "${def.name}"`)) {
-        const msg = `[PlateFontLoader] Font "${def.name}" still not available after load. Aborting.`;
-        console.error(msg);
-        throw new Error(msg);
-      }
-    }
-
-    console.log('[PlateFontLoader] All plate fonts loaded and verified.');
+      return document.fonts.check(`${weight} 12px "${def.name}"`);
+    });
+    console.log(`[PlateFontLoader] ${loaded.length}/${PLATE_FONTS.length} plate fonts loaded.`);
   })();
 
   return fontsLoaded;
