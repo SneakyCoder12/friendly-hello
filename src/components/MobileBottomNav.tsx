@@ -1,9 +1,9 @@
-import { Home, Gavel, Sparkles, User } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { Home, Store, Sparkles, User } from 'lucide-react';
 
 const NAV_ITEMS = [
     { label: 'Home', icon: Home, path: '/' },
-    { label: 'Auctions', icon: Gavel, path: '/marketplace' },
+    { label: 'Marketplace', icon: Store, path: '/marketplace' },
     { label: 'Features', icon: Sparkles, path: '/features' },
     { label: 'Account', icon: User, path: '/dashboard' },
 ];
@@ -21,8 +21,8 @@ export default function MobileBottomNav() {
                             key={path}
                             to={path}
                             className={`flex flex-col items-center justify-center gap-0.5 min-w-[56px] py-1 rounded-xl transition-colors duration-200 ${isActive
-                                    ? 'text-primary'
-                                    : 'text-muted-foreground'
+                                ? 'text-primary'
+                                : 'text-muted-foreground'
                                 }`}
                         >
                             <Icon className={`h-5 w-5 transition-transform duration-200 ${isActive ? 'scale-110' : ''}`} strokeWidth={isActive ? 2.5 : 2} />

@@ -364,7 +364,7 @@ export default function MarketplacePage() {
         />
         {/* Panel — full screen overlay */}
         <div
-          className={`sm:hidden fixed inset-0 z-[101] bg-background transition-transform duration-400 ease-[cubic-bezier(0.32,0.72,0,1)] flex flex-col ${filterPanelOpen ? 'translate-y-0' : 'translate-y-full'}`}
+          className={`sm:hidden fixed inset-0 z-[101] bg-background transition-transform duration-400 ease-[cubic-bezier(0.32,0.72,0,1)] flex flex-col pt-20 sm:pt-0 ${filterPanelOpen ? 'translate-y-0' : 'translate-y-full'}`}
         >
           {/* Header */}
           <div className="flex-shrink-0 flex items-center justify-between px-5 py-4 border-b border-border bg-card">
@@ -382,7 +382,7 @@ export default function MarketplacePage() {
           </div>
 
           {/* Scrollable filter content */}
-          <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-5 space-y-5">
+          <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-5 space-y-5 mt-2">
             {/* Search */}
             <div className="relative">
               <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
