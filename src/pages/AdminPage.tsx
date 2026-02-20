@@ -1,9 +1,10 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
-import { Loader2, Users, FileText, BarChart3, Upload, Trash2, Eye, EyeOff, Search, X, ChevronDown, ChevronUp, Smartphone, Wrench } from 'lucide-react';
+import { Loader2, Users, FileText, BarChart3, Upload, Trash2, Eye, EyeOff, Search, X, ChevronDown, ChevronUp, Smartphone, Wrench, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
 import PlateGeneratorSection from '@/components/PlateGenerator';
+import { regenerateAllPlateImages } from '@/lib/plateImageMigration';
 
 interface UserProfile {
   id: string;
@@ -541,11 +542,111 @@ export default function AdminPage() {
 
         {/* ── Plate Visualizer ── */}
         {tab === 'visualizer' && (
-          <div className="bg-card border border-border rounded-2xl p-6">
-            <PlateGeneratorSection />
+          <div className="space-y-6">
+            {/* Plate Image Migration Tool */}
+            <MigrationPanel />
+            <div className="bg-card border border-border rounded-2xl p-6">
+              <PlateGeneratorSection />
+            </div>
           </div>
         )}
       </div>
     </div>
   );
 }
+
+/** Standalone panel so it has its own state cleanly */
+function MigrationPanel() {
+  const [running, setRunning] = useState(false);
+  const [progress, setProgress] = useState<{ done: number; total: number; current: string } | null>(null);
+  const [result, setResult] = useState<{ succeeded: number; failed: number; errors: { id: string; plate_number: string; error: string }[] } | null>(null);
+
+  const run = useCallback(async () => {
+    if (!confirm('This will regenerate ALL plate images and update the database. Proceed?')) return;
+    setRunning(true);
+    setResult(null);
+    setProgress({ done: 0, total: 0, current: 'Starting…' });
+    try {
+      const res = await regenerateAllPlateImages((done, total, current) => {
+        setProgress({ done, total, current });
+      });
+      setResult(res);
+      if (res.failed === 0) {
+        toast.success(`Migration complete — ${res.succeeded}/${res.total} plates regenerated.`);
+      } else {
+        toast.error(`Migration done with errors — ${res.failed} failed. See details below.`);
+      }
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      toast.error('Migration failed: ' + msg);
+    } finally {
+      setRunning(false);
+    }
+  }, []);
+
+  return (
+    <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h3 className="font-display font-bold text-foreground text-lg">Regenerate All Plate Images</h3>
+          <p className="text-sm text-muted-foreground mt-1">
+            Re-renders every listing's plate image using the correct custom fonts and uploads
+            versioned WebP files to Supabase Storage. Run this after any font fix.
+          </p>
+        </div>
+        <button
+          onClick={run}
+          disabled={running}
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-sm hover:opacity-90 disabled:opacity-50 transition"
+        >
+          {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+          {running ? 'Running…' : 'Run Migration'}
+        </button>
+      </div>
+
+      {/* Progress */}
+      {running && progress && (
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm text-muted-foreground">
+            <span>{progress.current}</span>
+            <span>{progress.done} / {progress.total}</span>
+          </div>
+          {progress.total > 0 && (
+            <div className="w-full bg-border rounded-full h-2">
+              <div
+                className="bg-primary h-2 rounded-full transition-all"
+                style={{ width: `${Math.round((progress.done / progress.total) * 100)}%` }}
+              />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Results */}
+      {result && !running && (
+        <div className="space-y-3">
+          <div className="flex gap-4 text-sm font-bold">
+            <span className="flex items-center gap-1 text-primary">
+              <CheckCircle className="h-4 w-4" /> {result.succeeded} succeeded
+            </span>
+            {result.failed > 0 && (
+              <span className="flex items-center gap-1 text-destructive">
+                <AlertCircle className="h-4 w-4" /> {result.failed} failed
+              </span>
+            )}
+          </div>
+          {result.errors.length > 0 && (
+            <div className="bg-surface border border-border rounded-xl p-3 max-h-48 overflow-y-auto space-y-1">
+              {result.errors.map((e) => (
+                <div key={e.id} className="text-xs text-destructive font-mono">
+                  [{e.plate_number}] {e.error}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
