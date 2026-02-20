@@ -23,6 +23,7 @@ interface ListingDetail {
     plate_number: string;
     emirate: string;
     plate_style: string | null;
+    plate_image_url: string | null;
     price: number | null;
     description: string | null;
     contact_phone: string | null;
@@ -96,7 +97,9 @@ export default function PlateDetailPage() {
     const emirateKey = listing ? (EMIRATE_KEY_MAP[listing.emirate] || listing.emirate.toLowerCase().replace(/\s+/g, '_')) : '';
     const emirateDisplay = listing?.emirate || '';
 
-    const dataUrl = usePlateImage(emirateKey, code, number, plateStyle);
+    // Use CDN image if available, fallback to canvas generation for pre-migration listings
+    const canvasFallback = usePlateImage(listing?.plate_image_url ? '' : emirateKey, listing?.plate_image_url ? '' : code, listing?.plate_image_url ? '' : number, plateStyle);
+    const dataUrl = listing?.plate_image_url || canvasFallback;
 
     // Contact info — prefer listing contact_phone, fall back to seller phone_number
     const phone = listing?.contact_phone || seller?.phone_number || '';

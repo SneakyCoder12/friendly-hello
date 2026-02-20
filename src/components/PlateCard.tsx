@@ -7,6 +7,25 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+/** Convert internal emirate keys to display names */
+const EMIRATE_DISPLAY_NAMES: Record<string, string> = {
+  abudhabi: 'Abu Dhabi',
+  dubai: 'Dubai',
+  sharjah: 'Sharjah',
+  ajman: 'Ajman',
+  umm_al_quwain: 'Umm Al Quwain',
+  rak: 'Ras Al Khaimah',
+  fujairah: 'Fujairah',
+};
+
+function formatEmirateName(key: string): string {
+  if (EMIRATE_DISPLAY_NAMES[key]) return EMIRATE_DISPLAY_NAMES[key];
+  // Fallback: replace underscores with spaces, capitalize each word
+  return key
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
+
 interface PlateCardProps {
   emirate: string;
   code: string;
@@ -21,6 +40,8 @@ interface PlateCardProps {
   plateStyle?: 'private' | 'bike' | 'classic';
   /** Explicit vehicle type for icon display; derived from plateStyle if omitted */
   vehicleType?: 'car' | 'bike' | 'classic';
+  /** CDN URL for pre-generated plate image — skips canvas generation when set */
+  plateImageUrl?: string | null;
 }
 
 /** Detect if device has touch capability — used to fully disable flip cards */
@@ -46,12 +67,13 @@ export function AedLogo({ className = 'aed-logo' }: { className?: string }) {
   );
 }
 
-function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerPhone, plateNumber, listingId, status, plateStyle = 'private', vehicleType }: PlateCardProps) {
+function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerPhone, plateNumber, listingId, status, plateStyle = 'private', vehicleType, plateImageUrl }: PlateCardProps) {
   const isTouch = useIsTouch();
-  // Resolve display type for icons — always reflect stored data, no defaults
   const displayType: 'car' | 'bike' | 'classic' = vehicleType ?? (plateStyle === 'bike' ? 'bike' : plateStyle === 'classic' ? 'classic' : 'car');
   const isSold = status === 'sold';
-  const dataUrl = usePlateImage(emirate, code, number, plateStyle);
+  // Use CDN image if available, fallback to canvas generation for pre-migration listings
+  const canvasFallback = usePlateImage(plateImageUrl ? '' : emirate, plateImageUrl ? '' : code, plateImageUrl ? '' : number, plateStyle);
+  const plateImg = plateImageUrl || canvasFallback;
   const [flipped, setFlipped] = useState(false);
   const { user } = useAuth();
   const [isFavorite, setIsFavorite] = useState(false);
@@ -106,8 +128,8 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
     return (
       <div className="h-[240px] sm:h-[260px] bg-card/50 rounded-2xl border border-border/50 flex flex-col items-center justify-center opacity-60">
         <div className="w-[90%] mx-auto h-[120px] flex items-center justify-center">
-          {dataUrl ? (
-            <img src={dataUrl} alt="Coming Soon" className="w-full h-full object-contain object-center opacity-40" />
+          {plateImg ? (
+            <img src={plateImg} alt="Coming Soon" className="w-full h-full object-contain object-center opacity-40" />
           ) : (
             <div className="animate-pulse bg-muted rounded w-full h-full" />
           )}
@@ -153,9 +175,9 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
           )}
           {/* Plate image */}
           <div className="w-[90%] mx-auto h-[90px] flex items-center justify-center">
-            {dataUrl ? (
+            {plateImg ? (
               <img
-                src={dataUrl}
+                src={plateImg}
                 alt={`${emirate} ${code} ${number}`}
                 className="w-full h-full object-contain object-center"
                 style={{ imageRendering: '-webkit-optimize-contrast' } as React.CSSProperties}
@@ -232,9 +254,9 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
 
               {/* Plate image */}
               <div className="w-[90%] mx-auto h-[100px] flex items-center justify-center">
-                {dataUrl ? (
+                {plateImg ? (
                   <img
-                    src={dataUrl}
+                    src={plateImg}
                     alt={`${emirate} ${code} ${number}`}
                     className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-300"
                     style={{ imageRendering: '-webkit-optimize-contrast' } as React.CSSProperties}
@@ -288,8 +310,8 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
                 <Heart className={`h-3.5 w-3.5 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400 hover:text-red-400'}`} />
               </button>
             )}
-            <p className="text-sm font-display font-black text-foreground mb-0.5">Premium Plate</p>
-            <p className="text-[10px] text-muted-foreground font-medium mb-2">{emirate}</p>
+            <p className="text-sm font-display font-black text-foreground mb-0.5">AL NUAMI</p>
+            <p className="text-[10px] text-muted-foreground font-medium mb-2">{formatEmirateName(emirate)}</p>
 
             {/* Plate number */}
             <div className="bg-surface border border-border rounded-xl px-4 py-1.5 mb-3">

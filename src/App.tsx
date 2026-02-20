@@ -9,6 +9,7 @@ import Footer from '@/components/Footer';
 import AnimatedPage from '@/components/AnimatedPage';
 import ScrollToTop from '@/components/ScrollToTop';
 import MobileBottomNav from '@/components/MobileBottomNav';
+import ScrollToTopButton from '@/components/ScrollToTopButton';
 import { Loader2 } from 'lucide-react';
 
 const HomePage = lazy(() => import('@/pages/HomePage'));
@@ -69,6 +70,7 @@ export default function App() {
             <div className="sm:hidden h-16" />
           </div>
           <MobileBottomNav />
+          <ScrollToTopButton />
           <Toaster position="top-center" richColors />
         </BrowserRouter>
       </AuthProvider>

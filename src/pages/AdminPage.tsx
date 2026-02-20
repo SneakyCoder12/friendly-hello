@@ -79,9 +79,29 @@ export default function AdminPage() {
   useEffect(() => { fetchAll(); }, []);
 
   const deleteListing = async (id: string) => {
-    const { error } = await supabase.from('listings').delete().eq('id', id);
-    if (error) toast.error(error.message);
-    else { toast.success('Listing deleted'); fetchAll(); }
+    try {
+      const session = (await supabase.auth.getSession()).data.session;
+      if (!session) { toast.error('Not authenticated'); return; }
+
+      const response = await fetch('/api/delete-listing', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ listingId: id }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        toast.error(result.error || 'Failed to delete listing');
+      } else {
+        toast.success('Listing deleted');
+        fetchAll();
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to delete listing');
+    }
   };
 
   const toggleListingStatus = async (listing: AdminListing) => {

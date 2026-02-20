@@ -32,6 +32,7 @@ interface ListingWithSeller {
   plate_number: string;
   emirate: string;
   plate_style: string | null;
+  plate_image_url: string | null;
   price: number | null;
   description: string | null;
   status: string;
@@ -57,6 +58,15 @@ export default function MarketplacePage() {
   const [total, setTotal] = useState(0);
   const [filterPanelOpen, setFilterPanelOpen] = useState(false);
 
+  // Lock body scroll when mobile filter panel is open
+  useEffect(() => {
+    if (filterPanelOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [filterPanelOpen]);
   useEffect(() => {
     const paramEmirate = searchParams.get('emirate');
     if (paramEmirate) {
@@ -131,11 +141,10 @@ export default function MarketplacePage() {
   const Chip = ({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) => (
     <button
       onClick={onClick}
-      className={`whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
-        active
-          ? 'bg-primary text-primary-foreground border-primary shadow-sm'
-          : 'bg-card text-foreground border-border hover:border-primary/50 hover:bg-surface'
-      }`}
+      className={`whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${active
+        ? 'bg-primary text-primary-foreground border-primary shadow-sm'
+        : 'bg-card text-foreground border-border hover:border-primary/50 hover:bg-surface'
+        }`}
     >
       {label}
     </button>
@@ -274,104 +283,113 @@ export default function MarketplacePage() {
           )}
         </div>
 
-        {/* ── MOBILE SLIDE-UP FILTER PANEL ── */}
-        {filterPanelOpen && (
-          <>
-            <div
-              className="sm:hidden fixed inset-0 z-[60] bg-black/50"
+        {/* ── MOBILE FULL-SCREEN FILTER OVERLAY ── */}
+        {/* Backdrop */}
+        <div
+          className={`sm:hidden fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${filterPanelOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+          onClick={() => setFilterPanelOpen(false)}
+        />
+        {/* Panel — full screen overlay */}
+        <div
+          className={`sm:hidden fixed inset-0 z-[101] bg-background transition-transform duration-400 ease-[cubic-bezier(0.32,0.72,0,1)] flex flex-col ${filterPanelOpen ? 'translate-y-0' : 'translate-y-full'}`}
+        >
+          {/* Header */}
+          <div className="flex-shrink-0 flex items-center justify-between px-5 py-4 border-b border-border bg-card">
+            <div>
+              <h3 className="font-display font-bold text-lg text-foreground">Filters</h3>
+              <p className="text-xs text-muted-foreground">{total} plates found</p>
+            </div>
+            <button
               onClick={() => setFilterPanelOpen(false)}
-            />
-            <div className="sm:hidden fixed inset-x-0 bottom-0 z-[61] bg-card rounded-t-3xl shadow-2xl"
-              style={{ maxHeight: 'calc(100dvh - 80px)', overflowY: 'auto' }}
+              className="h-11 w-11 rounded-full bg-surface border-2 border-border flex items-center justify-center text-foreground hover:bg-gray-200 transition-all active:scale-95"
+              aria-label="Close filters"
             >
-              <div className="sticky top-0 bg-card px-4 pt-4 pb-3 border-b border-border flex items-center justify-between z-10">
-                <h3 className="font-bold text-lg text-foreground">Filters</h3>
-                <button onClick={() => setFilterPanelOpen(false)} className="p-2 rounded-xl hover:bg-surface transition-colors">
-                  <X className="h-5 w-5 text-foreground" />
-                </button>
-              </div>
+              <X className="h-6 w-6" />
+            </button>
+          </div>
 
-              <div className="p-4 space-y-5 pb-8">
-                {/* Search */}
-                <div className="relative">
-                  <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <input value={search} onChange={e => { setSearch(e.target.value); setPage(0); }}
-                    className="w-full bg-surface border border-border rounded-xl ps-10 pe-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                    placeholder="Search plate number..." />
-                </div>
+          {/* Scrollable filter content */}
+          <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-5 space-y-5">
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <input value={search} onChange={e => { setSearch(e.target.value); setPage(0); }}
+                className="w-full bg-surface border border-border rounded-xl ps-10 pe-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                placeholder="Search plate number..." />
+            </div>
 
-                {/* Emirate */}
-                <div>
-                  <label className="text-xs font-bold text-muted-foreground uppercase mb-2 block">Emirate</label>
-                  <div className="flex flex-wrap gap-2">
-                    <Chip label="All" active={emirateFilter === ''} onClick={() => { setEmirateFilter(''); setPage(0); }} />
-                    {EMIRATES.map(em => (
-                      <Chip key={em} label={em} active={emirateFilter === em} onClick={() => { setEmirateFilter(emirateFilter === em ? '' : em); setPage(0); }} />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Vehicle Type */}
-                <div>
-                  <label className="text-xs font-bold text-muted-foreground uppercase mb-2 block">Vehicle Type</label>
-                  <div className="flex flex-wrap gap-2">
-                    {PLATE_TYPE_CHIPS.map(c => (
-                      <Chip key={c.value} label={c.label} active={vehicleTypeFilter === c.value}
-                        onClick={() => { setVehicleTypeFilter(c.value); setPage(0); }} />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Digit Count */}
-                <div>
-                  <label className="text-xs font-bold text-muted-foreground uppercase mb-2 block">Number of Digits</label>
-                  <div className="flex flex-wrap gap-2">
-                    {DIGIT_COUNT_CHIPS.map(c => (
-                      <Chip key={c.value} label={c.label || 'Any'} active={digitCountFilter === c.value}
-                        onClick={() => { setDigitCountFilter(c.value); setPage(0); }} />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Price Range + Code */}
-                <div>
-                  <label className="text-xs font-bold text-muted-foreground uppercase mb-2 block">Price Range (AED)</label>
-                  <div className="flex gap-2 mb-3">
-                    <input type="number" value={minPrice} onChange={e => { setMinPrice(e.target.value); setPage(0); }}
-                      placeholder="Min" className="flex-1 bg-surface border border-border rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
-                    <input type="number" value={maxPrice} onChange={e => { setMaxPrice(e.target.value); setPage(0); }}
-                      placeholder="Max" className="flex-1 bg-surface border border-border rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
-                  </div>
-                  {availableCodes.length > 0 && (
-                    <>
-                      <label className="text-xs font-bold text-muted-foreground uppercase mb-2 block">Plate Code</label>
-                      <select
-                        value={codeFilter}
-                        onChange={e => { setCodeFilter(e.target.value); setPage(0); }}
-                        className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                      >
-                        <option value="">All Codes</option>
-                        {availableCodes.map(code => (
-                          <option key={code} value={code}>{code}</option>
-                        ))}
-                      </select>
-                    </>
-                  )}
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-2 pt-2">
-                  <button onClick={resetFilters} className="flex-1 py-3 rounded-xl border border-border text-sm font-medium text-foreground hover:bg-surface transition-colors">
-                    Clear All
-                  </button>
-                  <button onClick={() => setFilterPanelOpen(false)} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-medium">
-                    Show {total} Results
-                  </button>
-                </div>
+            {/* Emirate */}
+            <div>
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2.5 block">Emirate</label>
+              <div className="flex flex-wrap gap-2">
+                <Chip label="All" active={emirateFilter === ''} onClick={() => { setEmirateFilter(''); setPage(0); }} />
+                {EMIRATES.map(em => (
+                  <Chip key={em} label={em} active={emirateFilter === em} onClick={() => { setEmirateFilter(emirateFilter === em ? '' : em); setPage(0); }} />
+                ))}
               </div>
             </div>
-          </>
-        )}
+
+            {/* Vehicle Type */}
+            <div>
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2.5 block">Vehicle Type</label>
+              <div className="flex flex-wrap gap-2">
+                {PLATE_TYPE_CHIPS.map(c => (
+                  <Chip key={c.value} label={c.label} active={vehicleTypeFilter === c.value}
+                    onClick={() => { setVehicleTypeFilter(c.value); setPage(0); }} />
+                ))}
+              </div>
+            </div>
+
+            {/* Digit Count */}
+            <div>
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2.5 block">Number of Digits</label>
+              <div className="flex flex-wrap gap-2">
+                {DIGIT_COUNT_CHIPS.map(c => (
+                  <Chip key={c.value} label={c.label || 'Any'} active={digitCountFilter === c.value}
+                    onClick={() => { setDigitCountFilter(c.value); setPage(0); }} />
+                ))}
+              </div>
+            </div>
+
+            {/* Price Range */}
+            <div>
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2.5 block">Price Range (AED)</label>
+              <div className="flex gap-2">
+                <input type="number" value={minPrice} onChange={e => { setMinPrice(e.target.value); setPage(0); }}
+                  placeholder="Min" className="flex-1 bg-surface border border-border rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                <input type="number" value={maxPrice} onChange={e => { setMaxPrice(e.target.value); setPage(0); }}
+                  placeholder="Max" className="flex-1 bg-surface border border-border rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              </div>
+            </div>
+
+            {/* Plate Code */}
+            {availableCodes.length > 0 && (
+              <div>
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2.5 block">Plate Code</label>
+                <select
+                  value={codeFilter}
+                  onChange={e => { setCodeFilter(e.target.value); setPage(0); }}
+                  className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                >
+                  <option value="">All Codes</option>
+                  {availableCodes.map(code => (
+                    <option key={code} value={code}>{code}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+
+          {/* Sticky footer buttons */}
+          <div className="flex-shrink-0 px-5 py-4 border-t border-border bg-card flex gap-2">
+            <button onClick={resetFilters} className="flex-1 py-3 rounded-xl border border-border text-sm font-bold text-foreground hover:bg-surface transition-colors">
+              Clear All
+            </button>
+            <button onClick={() => setFilterPanelOpen(false)} className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-bold shadow-sm">
+              Show {total} Results
+            </button>
+          </div>
+        </div>
 
         {/* ── LISTINGS GRID ── */}
         {loading ? (
@@ -403,6 +421,7 @@ export default function MarketplacePage() {
                   status={listing.status}
                   plateStyle={resolvedPlateStyle}
                   vehicleType={rawStyle === 'bike' ? 'bike' : rawStyle === 'classic' ? 'classic' : 'car'}
+                  plateImageUrl={listing.plate_image_url}
                 />
               );
             })}

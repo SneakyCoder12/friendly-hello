@@ -8,6 +8,7 @@ interface SupabaseListing {
   plate_number: string;
   emirate: string;
   plate_style: string | null;
+  plate_image_url: string | null;
   price: number | null;
   contact_phone: string | null;
   status: string;
@@ -51,10 +52,9 @@ export default function PlateListings() {
   }, [isMobile]);
 
   const fetchListings = async () => {
-    console.log('[PlateListings] Fetching active & sold listings...');
     const { data, error } = await supabase
       .from('listings')
-      .select('id, plate_number, emirate, plate_style, price, contact_phone, status')
+      .select('id, plate_number, emirate, plate_style, plate_image_url, price, contact_phone, status')
       .in('status', ['active', 'sold'])
       .order('created_at', { ascending: false })
       .limit(28);
@@ -62,7 +62,6 @@ export default function PlateListings() {
     if (error) {
       console.error('[PlateListings] Query error:', error);
     } else {
-      console.log('[PlateListings] Raw data:', data);
       const grouped: Record<string, SupabaseListing[]> = {};
       ((data || []) as unknown as SupabaseListing[]).forEach((l) => {
         // Skip classic & bike plates — they have their own dedicated sections
@@ -71,7 +70,6 @@ export default function PlateListings() {
         if (!grouped[key]) grouped[key] = [];
         if (grouped[key].length < 4) grouped[key].push(l);
       });
-      console.log('[PlateListings] Grouped:', grouped);
       setListingsByEmirate(grouped);
     }
     setLoading(false);
@@ -86,10 +84,7 @@ export default function PlateListings() {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'listings' },
-        () => {
-          console.log('[PlateListings] Real-time update received, re-fetching...');
-          fetchListings();
-        }
+        () => { fetchListings(); }
       )
       .subscribe();
 

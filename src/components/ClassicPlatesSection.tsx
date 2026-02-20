@@ -9,6 +9,7 @@ interface ClassicListing {
     plate_number: string;
     emirate: string;
     plate_style: string | null;
+    plate_image_url: string | null;
     price: number | null;
     contact_phone: string | null;
     status: string;
@@ -33,7 +34,7 @@ export default function ClassicPlatesSection() {
         const fetchClassicPlates = async () => {
             const { data, error } = await supabase
                 .from('listings')
-                .select('id, plate_number, emirate, plate_style, price, contact_phone, status')
+                .select('id, plate_number, emirate, plate_style, plate_image_url, price, contact_phone, status')
                 .eq('plate_style', 'classic')
                 .in('status', ['active', 'sold'])
                 .order('created_at', { ascending: false })
@@ -115,6 +116,7 @@ export default function ClassicPlatesSection() {
                                         listingId={listing.id}
                                         status={listing.status}
                                         plateStyle="classic"
+                                        plateImageUrl={listing.plate_image_url}
                                     />
                                 </div>
                             );
@@ -147,6 +149,7 @@ export default function ClassicPlatesSection() {
                                     listingId={listing.id}
                                     status={listing.status}
                                     plateStyle="classic"
+                                    plateImageUrl={listing.plate_image_url}
                                 />
                             </div>
                         );

@@ -9,6 +9,7 @@ interface BikeListing {
     plate_number: string;
     emirate: string;
     plate_style: string | null;
+    plate_image_url: string | null;
     price: number | null;
     contact_phone: string | null;
     status: string;
@@ -33,7 +34,7 @@ export default function BikePlatesSection() {
         const fetchBikePlates = async () => {
             const { data, error } = await supabase
                 .from('listings')
-                .select('id, plate_number, emirate, plate_style, price, contact_phone, status')
+                .select('id, plate_number, emirate, plate_style, plate_image_url, price, contact_phone, status')
                 .eq('plate_style', 'bike')
                 .in('status', ['active', 'sold'])
                 .order('created_at', { ascending: false })
@@ -116,6 +117,7 @@ export default function BikePlatesSection() {
                                         listingId={listing.id}
                                         status={listing.status}
                                         plateStyle="bike"
+                                        plateImageUrl={listing.plate_image_url}
                                     />
                                 </div>
                             );
@@ -149,6 +151,7 @@ export default function BikePlatesSection() {
                                     listingId={listing.id}
                                     status={listing.status}
                                     plateStyle="bike"
+                                    plateImageUrl={listing.plate_image_url}
                                 />
                             </div>
                         );

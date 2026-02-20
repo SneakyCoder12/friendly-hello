@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { Loader2, Plus, Pencil, Trash2, Eye, EyeOff, CheckCircle, Search, X, Shield, Smartphone, Heart, BarChart3, TrendingUp, Hash, Car, Bike, ChevronRight, LayoutDashboard, ListFilter, Phone as PhoneIcon } from 'lucide-react';
 import PhoneInput from '@/components/PhoneInput';
 import MiniPlatePreview from '@/components/MiniPlatePreview';
+import { generateAndUploadPlateImage, deletePlateImage } from '@/lib/plateImageService';
 
 const EMIRATES = ['Abu Dhabi', 'Dubai', 'Sharjah', 'Ajman', 'Umm Al Quwain', 'Ras Al Khaimah', 'Fujairah'];
 
@@ -15,12 +16,25 @@ interface Listing {
   plate_number: string;
   emirate: string;
   plate_style: string | null;
+  plate_image_url: string | null;
+  plate_image_path: string | null;
   price: number | null;
   description: string | null;
   status: string;
   created_at: string;
   vehicle_type: string;
 }
+
+/** Map display emirate names → internal keys for plate template lookup */
+const EMIRATE_TO_KEY: Record<string, string> = {
+  'Abu Dhabi': 'abudhabi',
+  'Dubai': 'dubai',
+  'Sharjah': 'sharjah',
+  'Ajman': 'ajman',
+  'Umm Al Quwain': 'umm_al_quwain',
+  'Ras Al Khaimah': 'rak',
+  'Fujairah': 'fujairah',
+};
 
 interface BulkRow {
   plate_number: string;
@@ -169,33 +183,73 @@ export default function DashboardPage() {
     if (!valid.length) { toast.error('Add at least one plate number'); return; }
 
     setSaving(true);
-    const payload = valid.map(r => {
-      // Classic plates have no code — just store the number
-      const isClassic = r.vehicle_type === 'classic';
-      const isBike = r.vehicle_type === 'bike';
-      const fullPlateNumber = isClassic
-        ? r.plate_number.trim()
-        : (r.plate_style.trim() ? `${r.plate_style.trim()} ${r.plate_number.trim()}` : r.plate_number.trim());
-      return {
-        plate_number: fullPlateNumber,
-        emirate: r.emirate,
-        plate_style: isBike ? 'bike' : isClassic ? 'classic' : (r.plate_style || null),
-        price: r.price ? Number(r.price) : null,
-        description: r.description || null,
-        contact_email: r.contact_email || null,
-        contact_phone: r.contact_phone || null,
-        user_id: user.id,
-        status: 'active' as const,
-      };
-    });
+    try {
+      // Build payload rows first (without image URLs)
+      const payloadRows = valid.map(r => {
+        const isClassic = r.vehicle_type === 'classic';
+        const isBike = r.vehicle_type === 'bike';
+        const fullPlateNumber = isClassic
+          ? r.plate_number.trim()
+          : (r.plate_style.trim() ? `${r.plate_style.trim()} ${r.plate_number.trim()}` : r.plate_number.trim());
+        return {
+          plate_number: fullPlateNumber,
+          emirate: r.emirate,
+          plate_style: isBike ? 'bike' : isClassic ? 'classic' : (r.plate_style || null),
+          price: r.price ? Number(r.price) : null,
+          description: r.description || null,
+          contact_email: r.contact_email || null,
+          contact_phone: r.contact_phone || null,
+          user_id: user.id,
+          status: 'active' as const,
+        };
+      });
 
-    const { error } = await supabase.from('listings').insert(payload);
-    if (error) toast.error(error.message);
-    else {
-      toast.success(`${payload.length} listings created successfully!`);
+      // Insert listings first to get IDs
+      const { data: inserted, error } = await supabase.from('listings').insert(payloadRows).select('id, plate_number, emirate, plate_style');
+      if (error) { toast.error(error.message); setSaving(false); return; }
+
+      // Generate and upload plate images for each new listing
+      if (inserted && inserted.length > 0) {
+        const imageResults = await Promise.allSettled(
+          inserted.map(async (listing) => {
+            const parts = listing.plate_number.split(' ');
+            const isClassic = listing.plate_style === 'classic';
+            const isBike = listing.plate_style === 'bike';
+            const plateCode = isClassic ? '' : (parts.length > 1 ? parts[0] : '');
+            const plateNumber = isClassic ? listing.plate_number : (parts.length > 1 ? parts.slice(1).join(' ') : parts[0]);
+            const emirateKey = EMIRATE_TO_KEY[listing.emirate] || listing.emirate.toLowerCase().replace(/\s+/g, '_');
+            const plateStyle: 'private' | 'bike' | 'classic' = isBike ? 'bike' : isClassic ? 'classic' : 'private';
+
+            const result = await generateAndUploadPlateImage({
+              listingId: listing.id,
+              emirate: emirateKey,
+              plateCode,
+              plateNumber,
+              plateStyle,
+            });
+
+            // Update the listing with the image URL and path
+            await supabase.from('listings').update({
+              plate_image_url: result.url,
+              plate_image_path: result.path,
+            }).eq('id', listing.id);
+
+            return result;
+          })
+        );
+
+        const failed = imageResults.filter(r => r.status === 'rejected');
+        if (failed.length > 0) {
+          console.warn(`${failed.length} plate image(s) failed to generate`);
+        }
+      }
+
+      toast.success(`${payloadRows.length} listings created successfully!`);
       setShowForm(false);
       setRows([]);
       fetchListings();
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to create listings');
     }
     setSaving(false);
   };
@@ -223,29 +277,75 @@ export default function DashboardPage() {
     if (!user || !editId) return;
     if (!editForm.plate_number.trim()) { toast.error('Number is required'); return; }
     setSaving(true);
-    const isClassic = editForm.vehicle_type === 'classic';
-    const isBike = editForm.vehicle_type === 'bike';
-    // Classic plates: just number, no code prefix
-    const fullPlateNumber = isClassic
-      ? editForm.plate_number.trim()
-      : (editForm.plate_code.trim() ? `${editForm.plate_code.trim()} ${editForm.plate_number.trim()}` : editForm.plate_number.trim());
-    const { error } = await supabase.from('listings').update({
-      plate_number: fullPlateNumber,
-      emirate: editForm.emirate,
-      plate_style: isBike ? 'bike' : isClassic ? 'classic' : (editForm.plate_code.trim() || null),
-      price: editForm.price ? Number(editForm.price) : null,
-      description: editForm.description || null,
-    }).eq('id', editId);
-    if (error) toast.error(error.message);
-    else { toast.success('Listing updated'); setEditId(null); fetchListings(); }
+    try {
+      const isClassic = editForm.vehicle_type === 'classic';
+      const isBike = editForm.vehicle_type === 'bike';
+      const fullPlateNumber = isClassic
+        ? editForm.plate_number.trim()
+        : (editForm.plate_code.trim() ? `${editForm.plate_code.trim()} ${editForm.plate_number.trim()}` : editForm.plate_number.trim());
+
+      const plateCode = isClassic ? '' : editForm.plate_code.trim();
+      const plateNumber = editForm.plate_number.trim();
+      const emirateKey = EMIRATE_TO_KEY[editForm.emirate] || editForm.emirate.toLowerCase().replace(/\s+/g, '_');
+      const plateStyle: 'private' | 'bike' | 'classic' = isBike ? 'bike' : isClassic ? 'classic' : 'private';
+
+      // Delete old image if it exists
+      const oldListing = listings.find(l => l.id === editId);
+      if (oldListing?.plate_image_path) {
+        await deletePlateImage(oldListing.plate_image_path);
+      }
+
+      // Generate new plate image
+      const imgResult = await generateAndUploadPlateImage({
+        listingId: editId,
+        emirate: emirateKey,
+        plateCode,
+        plateNumber,
+        plateStyle,
+      });
+
+      const { error } = await supabase.from('listings').update({
+        plate_number: fullPlateNumber,
+        emirate: editForm.emirate,
+        plate_style: isBike ? 'bike' : isClassic ? 'classic' : (editForm.plate_code.trim() || null),
+        price: editForm.price ? Number(editForm.price) : null,
+        description: editForm.description || null,
+        plate_image_url: imgResult.url,
+        plate_image_path: imgResult.path,
+      }).eq('id', editId);
+      if (error) toast.error(error.message);
+      else { toast.success('Listing updated'); setEditId(null); fetchListings(); }
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to update listing');
+    }
     setSaving(false);
   };
 
   const handleDelete = async () => {
     if (!deleteId) return;
-    const { error } = await supabase.from('listings').delete().eq('id', deleteId);
-    if (error) toast.error(error.message);
-    else { toast.success('Listing deleted'); fetchListings(); }
+    try {
+      const session = (await supabase.auth.getSession()).data.session;
+      if (!session) { toast.error('Please log in again'); return; }
+
+      const response = await fetch('/api/delete-listing', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ listingId: deleteId }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        toast.error(result.error || 'Failed to delete listing');
+      } else {
+        toast.success('Listing deleted');
+        fetchListings();
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to delete listing');
+    }
     setDeleteId(null);
   };
 
@@ -1004,6 +1104,7 @@ export default function DashboardPage() {
                                     number={pNum}
                                     vehicleType={(listing.vehicle_type as 'car' | 'bike' | 'classic') || 'car'}
                                     className="w-full h-full"
+                                    plateImageUrl={listing.plate_image_url}
                                   />
                                 </div>
                                 <div className="min-w-0">

@@ -7,6 +7,7 @@ interface SupabaseListing {
   plate_number: string;
   emirate: string;
   plate_style: string | null;
+  plate_image_url: string | null;
   price: number | null;
   contact_phone?: string | null;
   status: string;
@@ -90,6 +91,7 @@ export default function EmirateSection({ section, listings, loading }: Props) {
                     listingId={listing.id}
                     status={listing.status}
                     plateStyle={listing.plate_style === 'bike' ? 'bike' : 'private'}
+                    plateImageUrl={listing.plate_image_url}
                   />
                 </div>
               );
@@ -130,6 +132,7 @@ export default function EmirateSection({ section, listings, loading }: Props) {
                   listingId={listing.id}
                   status={listing.status}
                   plateStyle={listing.plate_style === 'bike' ? 'bike' : 'private'}
+                  plateImageUrl={listing.plate_image_url}
                 />
               </div>
             );

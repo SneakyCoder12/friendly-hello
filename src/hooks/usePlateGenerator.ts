@@ -2,8 +2,36 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { generatePlate, exportPNG, type GeneratePlateOptions } from '@/lib/plate-generator';
 import { PLATE_TEMPLATES } from '@/data/listings';
 
-// Shared image cache across all hook instances
+// Per-image cache (loaded on demand, not all at once)
 const imageCache: Record<string, HTMLImageElement> = {};
+const imageLoadPromises: Record<string, Promise<HTMLImageElement | null>> = {};
+
+// Cache for rendered plate data URLs to avoid re-rendering
+const plateDataUrlCache: Record<string, string> = {};
+
+function loadSingleImage(key: string): Promise<HTMLImageElement | null> {
+    if (imageCache[key]) return Promise.resolve(imageCache[key]);
+    if (key in imageLoadPromises) return imageLoadPromises[key];
+
+    const src = PLATE_TEMPLATES[key];
+    if (!src) return Promise.resolve(null);
+
+    imageLoadPromises[key] = new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            imageCache[key] = img;
+            resolve(img);
+        };
+        img.onerror = () => {
+            console.warn('Failed to load:', src);
+            resolve(null);
+        };
+        img.src = src;
+    });
+    return imageLoadPromises[key];
+}
+
+// Keep loadAllTemplateImages for the interactive generator which needs all images
 let imagesLoadedPromise: Promise<Record<string, HTMLImageElement>> | null = null;
 
 function loadAllTemplateImages(): Promise<Record<string, HTMLImageElement>> {
@@ -36,22 +64,27 @@ function loadAllTemplateImages(): Promise<Record<string, HTMLImageElement>> {
 
 /** Hook for rendering a single plate to a data URL (for cards) */
 export function usePlateImage(emirate: string, code: string, number: string, plateStyle: 'private' | 'bike' | 'classic' = 'private') {
-    const [dataUrl, setDataUrl] = useState<string | null>(null);
-    const mountedRef = useRef(true);
+    const cacheKey = `${emirate}_${code}_${number}_${plateStyle}`;
+    const [dataUrl, setDataUrl] = useState<string | null>(plateDataUrlCache[cacheKey] || null);
 
     useEffect(() => {
-        mountedRef.current = true;
         let cancelled = false;
 
+        // If already cached, use it immediately
+        if (plateDataUrlCache[cacheKey]) {
+            setDataUrl(plateDataUrlCache[cacheKey]);
+            return;
+        }
+
         (async () => {
-            const images = await loadAllTemplateImages();
-            // Select image key based on style
+            // Load only the specific template image needed
             let imgKey = emirate;
             if (plateStyle === 'bike') imgKey = `${emirate}_bike`;
             if (plateStyle === 'classic') imgKey = `${emirate}_classic`;
 
-
-            const img = images[imgKey] || images[emirate];
+            // Try specific key first, fallback to base emirate
+            let img = await loadSingleImage(imgKey);
+            if (!img && imgKey !== emirate) img = await loadSingleImage(emirate);
             if (!img || cancelled) return;
 
             try {
@@ -63,18 +96,17 @@ export function usePlateImage(emirate: string, code: string, number: string, pla
                     plateStyle,
                 });
                 if (!cancelled) {
-                    setDataUrl(canvas.toDataURL('image/png'));
+                    const url = canvas.toDataURL('image/png');
+                    plateDataUrlCache[cacheKey] = url;
+                    setDataUrl(url);
                 }
             } catch (e) {
                 console.error('Plate render failed:', e);
             }
         })();
 
-        return () => {
-            cancelled = true;
-            mountedRef.current = false;
-        };
-    }, [emirate, code, number, plateStyle]);
+        return () => { cancelled = true; };
+    }, [emirate, code, number, plateStyle, cacheKey]);
 
     return dataUrl;
 }

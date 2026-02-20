@@ -7,6 +7,7 @@ interface FeaturedListing {
     plate_number: string;
     emirate: string;
     plate_style: string | null;
+    plate_image_url: string | null;
     price: number | null;
     contact_phone: string | null;
     status: string;
@@ -33,7 +34,7 @@ export default function FeaturedNumbersStrip() {
         (async () => {
             const { data } = await supabase
                 .from('listings')
-                .select('id, plate_number, emirate, plate_style, price, contact_phone, status')
+                .select('id, plate_number, emirate, plate_style, plate_image_url, price, contact_phone, status')
                 .eq('status', 'active')
                 .order('price', { ascending: false })
                 .limit(6);
@@ -69,6 +70,7 @@ export default function FeaturedNumbersStrip() {
                                 listingId={listing.id}
                                 status={listing.status}
                                 plateStyle={listing.plate_style === 'bike' ? 'bike' : 'private'}
+                                plateImageUrl={listing.plate_image_url}
                             />
                         </div>
                     );
