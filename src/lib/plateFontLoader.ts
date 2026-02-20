@@ -36,33 +36,33 @@ interface FontDef {
 const PLATE_FONTS: FontDef[] = [
   // ── GL Nummernschild ──────────────────────────────────────────────────────
   // Registered under every configKey that uses this file so document.fonts.check() succeeds
-  { name: 'PlateFont',                    url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
-  { name: 'PlateFont_ajman',             url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
-  { name: 'PlateFont_ajman_classic',     url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
-  { name: 'PlateFont_abudhabi',          url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
-  { name: 'PlateFont_abudhabi_bike',     url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
-  { name: 'PlateFont_abudhabi_classic',  url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
-  { name: 'PlateFont_rak_classic',       url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
-  { name: 'PlateFont_fujairah',          url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
-  { name: 'PlateFont_sharjah',           url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
+  { name: 'PlateFont', url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
+  { name: 'PlateFont_ajman', url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
+  { name: 'PlateFont_ajman_classic', url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
+  { name: 'PlateFont_abudhabi', url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
+  { name: 'PlateFont_abudhabi_bike', url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
+  { name: 'PlateFont_abudhabi_classic', url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
+  { name: 'PlateFont_rak_classic', url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
+  { name: 'PlateFont_fujairah', url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
+  { name: 'PlateFont_sharjah', url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
 
   // ── DIN-1451 ──────────────────────────────────────────────────────────────
-  { name: 'PlateFont_rak',               url: '/fonts/DIN-1451.ttf', weight: 'bold' },
-  { name: 'PlateFont_umm_al_quwain',     url: '/fonts/DIN-1451.ttf', weight: 'bold' },
-  { name: 'PlateFont_sharjah_classic',   url: '/fonts/DIN-1451.ttf', weight: 'bold' },
-  { name: 'PlateFont_sharjah_bike',      url: '/fonts/DIN-1451.ttf', weight: 'bold' },
-  { name: 'PlateFont_ajman_bike',        url: '/fonts/DIN-1451.ttf', weight: 'bold' },
+  { name: 'PlateFont_rak', url: '/fonts/DIN-1451.ttf', weight: 'bold' },
+  { name: 'PlateFont_umm_al_quwain', url: '/fonts/DIN-1451.ttf', weight: 'bold' },
+  { name: 'PlateFont_sharjah_classic', url: '/fonts/DIN-1451.ttf', weight: 'bold' },
+  { name: 'PlateFont_sharjah_bike', url: '/fonts/DIN-1451.ttf', weight: 'bold' },
+  { name: 'PlateFont_ajman_bike', url: '/fonts/DIN-1451.ttf', weight: 'bold' },
 
   // ── Rough Motion ──────────────────────────────────────────────────────────
-  { name: 'PlateFont_dubai',             url: '/fonts/Rough Motion.otf', weight: 'bold' },
-  { name: 'PlateFont_dubai_bike',        url: '/fonts/Rough Motion.otf', weight: 'bold' },
-  { name: 'PlateFont_dubai_classic',     url: '/fonts/Rough Motion.otf', weight: 'bold' },
-  { name: 'PlateFont_rak_bike',          url: '/fonts/Rough Motion.otf', weight: 'bold' },
-  { name: 'PlateFont_umm_al_quwain_bike',url: '/fonts/Rough Motion.otf', weight: 'bold' },
-  { name: 'PlateFont_fujairah_bike',     url: '/fonts/Rough Motion.otf', weight: 'bold' },
+  { name: 'PlateFont_dubai', url: '/fonts/Rough Motion.otf', weight: 'bold' },
+  { name: 'PlateFont_dubai_bike', url: '/fonts/Rough Motion.otf', weight: 'bold' },
+  { name: 'PlateFont_dubai_classic', url: '/fonts/Rough Motion.otf', weight: 'bold' },
+  { name: 'PlateFont_rak_bike', url: '/fonts/Rough Motion.otf', weight: 'bold' },
+  { name: 'PlateFont_umm_al_quwain_bike', url: '/fonts/Rough Motion.otf', weight: 'bold' },
+  { name: 'PlateFont_fujairah_bike', url: '/fonts/Rough Motion.otf', weight: 'bold' },
 
   // ── Arabic ────────────────────────────────────────────────────────────────
-  { name: 'ArabicFont_abudhabi',         url: '/fonts/Amiri-Bold.ttf',   weight: 'bold' },
+  { name: 'ArabicFont_abudhabi', url: '/fonts/Amiri-Bold.ttf', weight: 'bold' },
 ];
 
 let fontsLoaded: Promise<void> | null = null;
@@ -80,8 +80,13 @@ export function loadPlateFonts(): Promise<void> {
       const encodedUrl = def.url.replace(/ /g, '%20');
       const weight = def.weight ?? 'bold';
 
-      // Skip if this exact font name is already registered
-      if (document.fonts.check(`${weight} 12px "${def.name}"`)) return;
+      // Never rely on document.fonts.check() — it can return true for system
+      // fallback fonts, causing the real custom font to be skipped entirely.
+      // Instead, check if we already added a FontFace with this exact name.
+      const alreadyRegistered = Array.from(document.fonts).some(
+        (f) => f.family === def.name || f.family === `"${def.name}"`
+      );
+      if (alreadyRegistered) return;
 
       try {
         const face = new FontFace(def.name, `url("${encodedUrl}")`, { weight });
