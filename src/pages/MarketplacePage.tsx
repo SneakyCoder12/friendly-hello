@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Search, ChevronLeft, ChevronRight, Loader2, X, Sparkles, Settings } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Loader2, X, Sparkles, Settings, ChevronDown } from 'lucide-react';
 import PlateCard from '@/components/PlateCard';
 
 const EMIRATES = ['Abu Dhabi', 'Dubai', 'Sharjah', 'Ajman', 'Umm Al Quwain', 'Ras Al Khaimah', 'Fujairah'];
@@ -39,6 +39,78 @@ interface ListingWithSeller {
   created_at: string;
   user_id: string;
   contact_phone: string | null;
+}
+
+/** Searchable combobox for plate codes */
+function CodeCombobox({
+  codes, value, onChange, className = '',
+}: { codes: string[]; value: string; onChange: (v: string) => void; className?: string }) {
+  const [query, setQuery] = useState('');
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const filtered = query.trim()
+    ? codes.filter(c => c.toLowerCase().includes(query.toLowerCase()))
+    : codes;
+
+  // Close on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const select = (code: string) => { onChange(code); setQuery(''); setOpen(false); };
+  const clear = () => { onChange(''); setQuery(''); setOpen(false); };
+
+  return (
+    <div ref={ref} className={`relative ${className}`}>
+      <div
+        className={`flex items-center gap-1.5 bg-surface border rounded-xl px-3 py-2.5 text-sm cursor-pointer transition-all focus-within:ring-2 focus-within:ring-primary/30 ${open ? 'border-primary/50' : 'border-border'}`}
+        onClick={() => setOpen(o => !o)}
+      >
+        <Search className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+        <input
+          value={open ? query : (value || '')}
+          onChange={e => { setQuery(e.target.value); setOpen(true); }}
+          onClick={e => { e.stopPropagation(); setOpen(true); }}
+          placeholder={value || 'All Codes'}
+          className="flex-1 bg-transparent outline-none text-foreground placeholder:text-muted-foreground min-w-0 w-20"
+        />
+        {value ? (
+          <button onClick={e => { e.stopPropagation(); clear(); }} className="text-muted-foreground hover:text-foreground">
+            <X className="h-3.5 w-3.5" />
+          </button>
+        ) : (
+          <ChevronDown className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${open ? 'rotate-180' : ''}`} />
+        )}
+      </div>
+
+      {open && filtered.length > 0 && (
+        <div className="absolute top-full left-0 right-0 mt-1 z-50 bg-card border border-border rounded-xl shadow-lg overflow-hidden">
+          <div className="max-h-52 overflow-y-auto">
+            <button
+              className="w-full text-left px-4 py-2.5 text-sm text-muted-foreground hover:bg-surface transition-colors"
+              onClick={() => clear()}
+            >
+              All Codes
+            </button>
+            {filtered.map(code => (
+              <button
+                key={code}
+                className={`w-full text-left px-4 py-2.5 text-sm transition-colors hover:bg-surface ${value === code ? 'bg-primary/10 text-primary font-bold' : 'text-foreground'}`}
+                onClick={() => select(code)}
+              >
+                {code}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function MarketplacePage() {
@@ -237,11 +309,12 @@ export default function MarketplacePage() {
               {EMIRATES.map(em => <option key={em} value={em}>{em}</option>)}
             </select>
             {availableCodes.length > 0 && (
-              <select value={codeFilter} onChange={e => { setCodeFilter(e.target.value); setPage(0); }}
-                className="bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 min-w-[120px]">
-                <option value="">All Codes</option>
-                {availableCodes.map(code => <option key={code} value={code}>{code}</option>)}
-              </select>
+              <CodeCombobox
+                codes={availableCodes}
+                value={codeFilter}
+                onChange={v => { setCodeFilter(v); setPage(0); }}
+                className="min-w-[150px]"
+              />
             )}
             <div className="flex gap-2 items-center">
               <input type="number" value={minPrice} onChange={e => { setMinPrice(e.target.value); setPage(0); }}
@@ -366,16 +439,12 @@ export default function MarketplacePage() {
             {availableCodes.length > 0 && (
               <div>
                 <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2.5 block">Plate Code</label>
-                <select
+                <CodeCombobox
+                  codes={availableCodes}
                   value={codeFilter}
-                  onChange={e => { setCodeFilter(e.target.value); setPage(0); }}
-                  className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                >
-                  <option value="">All Codes</option>
-                  {availableCodes.map(code => (
-                    <option key={code} value={code}>{code}</option>
-                  ))}
-                </select>
+                  onChange={v => { setCodeFilter(v); setPage(0); }}
+                  className="w-full"
+                />
               </div>
             )}
           </div>
