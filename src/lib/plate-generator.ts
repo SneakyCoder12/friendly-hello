@@ -371,9 +371,18 @@ export async function generatePlate({
   // Load all plate fonts before rendering (centralized, fail-safe)
   await loadPlateFonts();
 
-  // Derive the specific font name for this emirate config
+  // Derive the specific font name for this emirate+style config.
+  // MUST match the exact registered name in plateFontLoader.ts.
+  // Priority: PlateFont_<configKey> → PlateFont_<emId> → PlateFont (default)
   const targetWeight = config.fontWeight || 'bold';
-  const fontNameId = config.fontFile ? `PlateFont_${emId}` : FONT_PRIMARY;
+  const fontNameForKey   = `PlateFont_${configKey}`; // e.g. PlateFont_abudhabi_bike
+  const fontNameForEmid  = `PlateFont_${emId}`;      // e.g. PlateFont_abudhabi
+  const fontNameId = config.fontFile
+    ? (document.fonts.check(`${targetWeight} 12px "${fontNameForKey}"`)
+        ? fontNameForKey
+        : fontNameForEmid)
+    : FONT_PRIMARY;
+
   let arabicFontNameId = '';
   if (config.arabicFontFile) {
     arabicFontNameId = `ArabicFont_${emId}`;
@@ -392,12 +401,12 @@ export async function generatePlate({
     const isArabic = comp.type === 'arabic_number' && arabicFontNameId;
     const activeFontName = isArabic ? arabicFontNameId : fontNameId;
 
-    // Verify the font is actually loaded — fail hard if not (no silent fallback)
-    const fontCheckStr = `${targetWeight} 12px "${activeFontName}"`;
-    if (!document.fonts.check(fontCheckStr)) {
+    // Verify the resolved font is actually available — fail hard, no silent fallback
+    if (!document.fonts.check(`${targetWeight} 12px "${activeFontName}"`)) {
       throw new Error(
-        `[PlateGenerator] Font not loaded: "${activeFontName}". ` +
-        `Ensure loadPlateFonts() was awaited before generatePlate(). Aborting.`
+        `[PlateGenerator] Font "${activeFontName}" not available in document.fonts. ` +
+        `configKey="${configKey}", emId="${emId}". ` +
+        `Ensure loadPlateFonts() was fully awaited before calling generatePlate().`
       );
     }
 

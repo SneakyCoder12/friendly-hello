@@ -30,36 +30,39 @@ interface FontDef {
   weight?: string;
 }
 
-// Each entry maps the exact font name used in ctx.font → the font file URL
+// Each entry maps the exact font name used in ctx.font → the font file URL.
+// IMPORTANT: Names here must match the logic in plate-generator.ts that resolves
+//   fontNameId via `PlateFont_${configKey}` (e.g. PlateFont_abudhabi_bike).
 const PLATE_FONTS: FontDef[] = [
-  // GL Nummernschild (default / abu dhabi / classic variants)
-  { name: 'PlateFont',                  url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
-  { name: 'PlateFont_abudhabi',         url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
-  { name: 'PlateFont_abudhabi_bike',    url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
-  { name: 'PlateFont_abudhabi_classic', url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
-  { name: 'PlateFont_ajman',            url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
-  { name: 'PlateFont_ajman_classic',    url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
-  { name: 'PlateFont_rak_classic',      url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
-  { name: 'PlateFont_fujairah',         url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
-  { name: 'PlateFont_sharjah',          url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
+  // ── GL Nummernschild ──────────────────────────────────────────────────────
+  // Registered under every configKey that uses this file so document.fonts.check() succeeds
+  { name: 'PlateFont',                    url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
+  { name: 'PlateFont_ajman',             url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
+  { name: 'PlateFont_ajman_classic',     url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
+  { name: 'PlateFont_abudhabi',          url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
+  { name: 'PlateFont_abudhabi_bike',     url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
+  { name: 'PlateFont_abudhabi_classic',  url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
+  { name: 'PlateFont_rak_classic',       url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
+  { name: 'PlateFont_fujairah',          url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
+  { name: 'PlateFont_sharjah',           url: '/fonts/GL-Nummernschild-Mtl.ttf', weight: 'bold' },
 
-  // DIN 1451 (rak / umm_al_quwain / some bike plates)
-  { name: 'PlateFont_rak',              url: '/fonts/DIN-1451.ttf',             weight: 'bold' },
-  { name: 'PlateFont_umm_al_quwain',   url: '/fonts/DIN-1451.ttf',             weight: 'bold' },
-  { name: 'PlateFont_sharjah_classic', url: '/fonts/DIN-1451.ttf',             weight: 'bold' },
-  { name: 'PlateFont_sharjah_bike',    url: '/fonts/DIN-1451.ttf',             weight: 'bold' },
-  { name: 'PlateFont_ajman_bike',      url: '/fonts/DIN-1451.ttf',             weight: 'bold' },
+  // ── DIN-1451 ──────────────────────────────────────────────────────────────
+  { name: 'PlateFont_rak',               url: '/fonts/DIN-1451.ttf', weight: 'bold' },
+  { name: 'PlateFont_umm_al_quwain',     url: '/fonts/DIN-1451.ttf', weight: 'bold' },
+  { name: 'PlateFont_sharjah_classic',   url: '/fonts/DIN-1451.ttf', weight: 'bold' },
+  { name: 'PlateFont_sharjah_bike',      url: '/fonts/DIN-1451.ttf', weight: 'bold' },
+  { name: 'PlateFont_ajman_bike',        url: '/fonts/DIN-1451.ttf', weight: 'bold' },
 
-  // Rough Motion (dubai + bike variants that use it)
-  { name: 'PlateFont_dubai',           url: '/fonts/Rough Motion.otf',          weight: 'bold' },
-  { name: 'PlateFont_dubai_bike',      url: '/fonts/Rough Motion.otf',          weight: 'bold' },
-  { name: 'PlateFont_dubai_classic',   url: '/fonts/Rough Motion.otf',          weight: 'bold' },
-  { name: 'PlateFont_rak_bike',        url: '/fonts/Rough Motion.otf',          weight: 'bold' },
-  { name: 'PlateFont_umm_al_quwain_bike', url: '/fonts/Rough Motion.otf',       weight: 'bold' },
-  { name: 'PlateFont_fujairah_bike',   url: '/fonts/Rough Motion.otf',          weight: 'bold' },
+  // ── Rough Motion ──────────────────────────────────────────────────────────
+  { name: 'PlateFont_dubai',             url: '/fonts/Rough Motion.otf', weight: 'bold' },
+  { name: 'PlateFont_dubai_bike',        url: '/fonts/Rough Motion.otf', weight: 'bold' },
+  { name: 'PlateFont_dubai_classic',     url: '/fonts/Rough Motion.otf', weight: 'bold' },
+  { name: 'PlateFont_rak_bike',          url: '/fonts/Rough Motion.otf', weight: 'bold' },
+  { name: 'PlateFont_umm_al_quwain_bike',url: '/fonts/Rough Motion.otf', weight: 'bold' },
+  { name: 'PlateFont_fujairah_bike',     url: '/fonts/Rough Motion.otf', weight: 'bold' },
 
-  // Arabic (Abu Dhabi classic)
-  { name: 'ArabicFont_abudhabi',       url: '/fonts/Amiri-Bold.ttf',            weight: 'bold' },
+  // ── Arabic ────────────────────────────────────────────────────────────────
+  { name: 'ArabicFont_abudhabi',         url: '/fonts/Amiri-Bold.ttf',   weight: 'bold' },
 ];
 
 let fontsLoaded: Promise<void> | null = null;
