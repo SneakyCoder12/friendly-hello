@@ -144,14 +144,14 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
   // ── TOUCH DEVICES: simple card, no flip ──
   if (isTouch) {
     return (
-      <Link
-        to={plateUrl}
-        className={`block h-[240px] bg-card rounded-2xl border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300 overflow-hidden relative ${isSold ? 'opacity-80' : ''}`}
-      >
-        {isSold && (
-          <div className="sold-ribbon"><span>SOLD</span></div>
-        )}
-        <div className="flex flex-col items-center justify-center h-full relative">
+        <Link
+          to={plateUrl}
+          className={`block min-h-[260px] bg-card rounded-2xl border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300 overflow-hidden relative ${isSold ? 'opacity-80' : ''}`}
+        >
+          {isSold && (
+            <div className="sold-ribbon"><span>SOLD</span></div>
+          )}
+          <div className="flex flex-col items-center justify-center h-full relative">
           {/* Vehicle type badge */}
           <div className="absolute top-2 left-2 z-10 flex items-center gap-1 px-2 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider border bg-card/90 backdrop-blur-sm shadow-sm border-border/60 text-muted-foreground">
             {displayType === 'bike' ? (
@@ -189,21 +189,19 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
             )}
           </div>
           {/* Price + View button */}
-          <div className="mt-2 p-2.5 w-full border-t border-border/50">
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="text-sm font-bold text-foreground font-mono tracking-tight flex items-center gap-1">
-                  {price ? (
-                    <>
-                      <AedLogo />
-                      <span className="text-foreground">{price.replace(/^AED\s*/, '')}</span>
-                    </>
-                  ) : (
-                    <span className="text-muted-foreground text-xs">Contact for price</span>
-                  )}
-                </p>
-              </div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-white bg-primary px-2.5 py-1 rounded-full">
+          <div className="mt-auto p-2.5 w-full border-t border-border/50">
+            <div className="flex flex-col gap-2">
+              <p className="text-sm font-bold text-foreground font-mono tracking-tight flex items-center gap-1">
+                {price ? (
+                  <>
+                    <AedLogo />
+                    <span className="text-foreground">{price.replace(/^AED\s*/, '')}</span>
+                  </>
+                ) : (
+                  <span className="text-muted-foreground text-xs">Contact for price</span>
+                )}
+              </p>
+              <span className="self-start text-[10px] font-bold uppercase tracking-wider text-white bg-primary px-2.5 py-1 rounded-full">
                 View →
               </span>
             </div>
@@ -269,28 +267,18 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
               </div>
               {/* Price section */}
               <div className="mt-2 p-2.5 w-full border-t border-border/50">
-                <div className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0">
-                  <div className="w-full flex justify-center sm:justify-start">
-                    <p className="text-sm font-bold text-foreground font-mono tracking-tight flex items-center gap-1">
-                      {price ? (
-                        <>
-                          <AedLogo />
-                          <span>{price.replace(/^AED\s*/, '')}</span>
-                        </>
-                      ) : <span className="text-muted-foreground text-xs">{t('contactForPrice')}</span>}
-                    </p>
-                  </div>
-                  <div className="flex items-center justify-center w-full sm:w-auto">
-                    {isTouch ? (
-                      <p className="w-full text-center text-[10px] text-white bg-[hsl(40,86%,44%)] px-4 py-1.5 rounded-full font-bold uppercase tracking-wider shadow-sm">
-                        {t('viewDetailsBtn')}
-                      </p>
-                    ) : (
-                      <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider group-hover:text-primary transition-colors">
-                        {t('hoverToViewBtn')}
-                      </p>
-                    )}
-                  </div>
+                <div className="flex justify-between items-center">
+                  <p className="text-sm font-bold text-foreground font-mono tracking-tight flex items-center gap-1">
+                    {price ? (
+                      <>
+                        <AedLogo />
+                        <span>{price.replace(/^AED\s*/, '')}</span>
+                      </>
+                    ) : <span className="text-muted-foreground text-xs">{t('contactForPrice')}</span>}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider group-hover:text-primary transition-colors">
+                    {t('hoverToViewBtn')}
+                  </p>
                 </div>
               </div>
             </div>

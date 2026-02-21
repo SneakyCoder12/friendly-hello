@@ -65,37 +65,37 @@ function MobileNumberCard({
         return (
             <Link
                 to={detailUrl}
-                className="block h-[240px] bg-white rounded-2xl border border-gray-200 hover:shadow-lg transition-all duration-300 p-4 flex flex-col"
+                className="block min-h-[260px] bg-card rounded-2xl border border-border hover:shadow-lg transition-all duration-300 p-4 flex flex-col"
             >
                 {/* Top: carrier + fav */}
                 <div className="flex justify-between items-center mb-3">
                     <CarrierBadge />
                     <button
-                        onClick={(e) => { e.preventDefault(); onToggleFavorite(e, id); }}
-                        className="h-8 w-8 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center"
+                         onClick={(e) => { e.preventDefault(); onToggleFavorite(e, id); }}
+                        className="h-8 w-8 rounded-full bg-surface border border-border flex items-center justify-center"
                     >
-                        <Heart className={`h-3.5 w-3.5 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
+                        <Heart className={`h-3.5 w-3.5 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
                     </button>
                 </div>
                 {/* Number */}
-                <p className="text-xl font-black tracking-widest text-gray-900 mb-1 font-mono">
+                <p className="text-xl font-black tracking-widest text-foreground mb-1 font-mono">
                     {phoneNumber}
                 </p>
                 {description && (
-                    <p className="text-xs text-gray-400 mb-2 line-clamp-1">{description}</p>
+                    <p className="text-xs text-muted-foreground mb-2 line-clamp-1">{description}</p>
                 )}
                 <div className="mt-auto">
-                    <div className="h-px w-full bg-gray-100 mb-3" />
-                    <div className="flex justify-between items-center">
-                        <p className="text-gray-900 font-mono font-bold text-lg flex items-center gap-1">
+                    <div className="h-px w-full bg-border mb-3" />
+                    <div className="flex flex-col gap-2">
+                        <p className="text-foreground font-mono font-bold text-lg flex items-center gap-1">
                             {price ? (
                                 <>
                                     <AedLogo />
                                     <span>{price.toLocaleString()}</span>
                                 </>
-                            ) : <span className="text-sm text-gray-500">Contact for price</span>}
+                            ) : <span className="text-sm text-muted-foreground">Contact for price</span>}
                         </p>
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-white bg-primary px-2.5 py-1 rounded-full">
+                        <span className="self-start text-[10px] font-bold uppercase tracking-wider text-white bg-primary px-2.5 py-1 rounded-full">
                             View →
                         </span>
                     </div>
@@ -117,31 +117,31 @@ function MobileNumberCard({
             >
                 {/* ── FRONT SIDE ── */}
                 <div className="absolute inset-0 backface-hidden">
-                    <div className="block h-full bg-white rounded-2xl border border-gray-200 hover:shadow-lg transition-all duration-300 group p-6 flex flex-col">
+                    <div className="block h-full bg-card rounded-2xl border border-border hover:shadow-lg transition-all duration-300 group p-6 flex flex-col">
                         {/* Top row: carrier badge + fav */}
                         <div className="flex justify-between items-center mb-5">
                             <CarrierBadge />
                             <button
                                 onClick={(e) => { e.stopPropagation(); onToggleFavorite(e, id); }}
-                                className="h-8 w-8 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center hover:bg-red-50 hover:border-red-200 transition-all"
+                                className="h-8 w-8 rounded-full bg-surface border border-border flex items-center justify-center hover:bg-red-50 hover:border-red-200 transition-all"
                             >
-                                <Heart className={`h-3.5 w-3.5 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
+                                <Heart className={`h-3.5 w-3.5 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
                             </button>
                         </div>
 
                         {/* Number */}
-                        <p className="text-2xl font-black tracking-widest text-gray-900 mb-2 font-mono group-hover:text-gray-700 transition-colors">
+                        <p className="text-2xl font-black tracking-widest text-foreground mb-2 font-mono group-hover:text-foreground/70 transition-colors">
                             {phoneNumber}
                         </p>
 
                         {description && (
-                            <p className="text-xs text-gray-400 mb-3 line-clamp-2">{description}</p>
+                            <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{description}</p>
                         )}
 
                         <div className="mt-auto">
-                            <div className="h-px w-full bg-gray-100 mb-4" />
+                            <div className="h-px w-full bg-border mb-4" />
                             <div className="flex justify-between items-center">
-                                <p className="text-gray-900 font-mono font-bold text-xl flex items-center gap-1">
+                                <p className="text-foreground font-mono font-bold text-xl flex items-center gap-1">
                                     {price ? (
                                         <>
                                             <AedLogo />
@@ -172,7 +172,7 @@ function MobileNumberCard({
                                             <MessageCircle className="h-3.5 w-3.5" />
                                         </a>
                                     )}
-                                    <p className={`text-[10px] text-gray-400 font-bold uppercase tracking-wider group-hover:text-primary transition-colors ${(telUrl || whatsappUrl) ? 'hidden group-hover:hidden sm:group-hover:block' : ''}`}>View →</p>
+                                    <p className={`text-[10px] text-muted-foreground font-bold uppercase tracking-wider group-hover:text-primary transition-colors ${(telUrl || whatsappUrl) ? 'hidden group-hover:hidden sm:group-hover:block' : ''}`}>View →</p>
                                 </div>
                             </div>
                         </div>
@@ -181,22 +181,22 @@ function MobileNumberCard({
 
                 {/* ── BACK SIDE — same fixed size as front ── */}
                 <div className="absolute inset-0 backface-hidden rotate-y-180">
-                    <div className="h-full bg-white rounded-2xl border border-gray-200 flex flex-col items-center justify-center px-4 py-3 relative">
+                    <div className="h-full bg-card rounded-2xl border border-border flex flex-col items-center justify-center px-4 py-3 relative">
                         {/* Heart button — top right */}
                         <button
                             onClick={(e) => { e.stopPropagation(); onToggleFavorite(e, id); }}
-                            className="absolute top-2 right-2 h-8 w-8 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center flex-shrink-0 transition-all hover:scale-110 active:scale-90 z-10"
+                            className="absolute top-2 right-2 h-8 w-8 rounded-full bg-card border border-border shadow-sm flex items-center justify-center flex-shrink-0 transition-all hover:scale-110 active:scale-90 z-10"
                             title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                         >
-                            <Heart className={`h-3.5 w-3.5 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400 hover:text-red-400'}`} />
+                            <Heart className={`h-3.5 w-3.5 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-muted-foreground hover:text-red-400'}`} />
                         </button>
 
-                        <p className="text-xs font-display font-bold text-gray-900 mb-0.5">VIP Number</p>
+                        <p className="text-xs font-display font-bold text-foreground mb-0.5">VIP Number</p>
                         <CarrierBadge small />
 
                         {/* Phone number */}
-                        <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-1.5 mb-2 mt-2">
-                            <p className="font-mono font-black text-gray-900 text-lg tracking-wider text-center">
+                        <div className="bg-surface border border-border rounded-xl px-4 py-1.5 mb-2 mt-2">
+                            <p className="font-mono font-black text-foreground text-lg tracking-wider text-center">
                                 {phoneNumber}
                             </p>
                         </div>
@@ -230,7 +230,7 @@ function MobileNumberCard({
                         <Link
                             to={detailUrl}
                             onClick={e => e.stopPropagation()}
-                            className="text-[10px] font-bold text-gray-500 hover:text-primary transition-colors uppercase tracking-wider"
+                            className="text-[10px] font-bold text-muted-foreground hover:text-primary transition-colors uppercase tracking-wider"
                         >
                             VIEW DETAILS →
                         </Link>
