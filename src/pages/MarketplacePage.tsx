@@ -471,7 +471,7 @@ export default function MarketplacePage() {
         ) : listings.length === 0 ? (
           <div className="text-center py-20 text-muted-foreground">{t('noResults')}</div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6 mb-8">
             {listings.map(listing => {
               const parts = listing.plate_number.split(' ');
               const code = parts.length > 1 ? parts[0] : '';

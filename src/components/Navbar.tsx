@@ -80,13 +80,13 @@ export default function Navbar() {
               <img
                 src="/Logo.png"
                 alt="Alnuami Groups"
-                className={`h-10 sm:h-14 lg:h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105 self-center`}
+                className={`h-9 sm:h-14 lg:h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105 self-center`}
               />
-              <div className={`ml-2 sm:ml-1 leading-none transition-colors duration-300`}>
-                <h1 className={`font-display font-black text-xl sm:text-2xl lg:text-3xl tracking-tighter transition-colors duration-300 group-hover:text-gray-700 text-gray-900`}>
+              <div className={`ml-1.5 sm:ml-1 leading-none transition-colors duration-300`}>
+                <h1 className={`font-display font-black text-[17px] sm:text-2xl lg:text-3xl tracking-tighter transition-colors duration-300 group-hover:text-gray-700 text-gray-900`}>
                   ALNUAMI
                 </h1>
-                <p className={`text-[7px] sm:text-[8px] lg:text-[9px] font-bold uppercase tracking-[0.3em] -mt-0.5 text-gray-400`} style={{ paddingLeft: '64.5%' }}>Groups</p>
+                <p className={`text-[6px] sm:text-[8px] lg:text-[9px] font-bold uppercase tracking-[0.3em] -mt-0.5 sm:-mt-0.5 text-gray-400`} style={{ paddingLeft: '64.5%' }}>Groups</p>
               </div>
             </Link>
 
@@ -215,7 +215,7 @@ export default function Navbar() {
             </div>
 
             {/* Right Side */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               {/* Dashboard Icon (logged in, desktop only) */}
               {user && (
                 <Link
@@ -233,7 +233,7 @@ export default function Navbar() {
               {/* Language toggle — shown on all screen sizes */}
               <button
                 onClick={toggleLang}
-                className={`h-10 w-10 rounded-full border flex items-center justify-center transition-all duration-300 ${isDarkMode
+                className={`h-9 w-9 sm:h-10 sm:w-10 rounded-full border flex items-center justify-center transition-all duration-300 ${isDarkMode
                   ? 'bg-white/10 border-white/30 text-white hover:bg-white/20'
                   : 'bg-gray-100 border-gray-200 text-gray-500 hover:text-foreground hover:bg-gray-200'
                   }`}
@@ -268,12 +268,12 @@ export default function Navbar() {
               {/* Hamburger Button */}
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
-                className={`lg:hidden h-10 w-10 rounded-full border flex items-center justify-center transition-all duration-300 relative z-[60] ${isDarkMode
+                className={`lg:hidden h-9 w-9 sm:h-10 sm:w-10 rounded-full border flex items-center justify-center transition-all duration-300 relative z-[60] ml-0.5 ${isDarkMode
                   ? 'bg-white/10 border-white/30 text-white hover:bg-white/20'
                   : 'bg-gray-100 border-gray-200 text-foreground hover:bg-gray-200'
                   }`}
               >
-                {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                {menuOpen ? <X className="h-4 w-4 sm:h-5 sm:w-5" /> : <Menu className="h-4 w-4 sm:h-5 sm:w-5" />}
               </button>
             </div>
           </div>

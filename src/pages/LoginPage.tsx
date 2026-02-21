@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
 import { Loader2, Lock, Eye, EyeOff, UserCircle } from 'lucide-react';
-import { isPhoneNumber, formatPhoneAsEmail } from '@/utils/phoneAuth';
+import { isPhoneNumber, normalizePhone } from '@/utils/phoneAuth';
 
 export default function LoginPage() {
   const { t } = useLanguage();
@@ -19,17 +19,52 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
 
-    const isPhone = isPhoneNumber(email);
-    const loginIdentifier = isPhone ? formatPhoneAsEmail(email) : email;
+    try {
+      const isPhone = isPhoneNumber(email);
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email: loginIdentifier,
-      password
-    });
+      if (isPhone) {
+        // Run it through the fallback custom API to handle both phone-registered AND email-registered users
+        // typing their profile phone number to log in securely.
+        const normalizedPhone = email.replace(/\D/g, ''); // Extract digits to send to backend for normalization sync
 
-    if (error) toast.error(error.message);
-    else { toast.success(t('success')); navigate('/dashboard'); }
-    setLoading(false);
+        const response = await fetch('/api/login-fallback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: email, normalizedPhone, password })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Invalid login credentials');
+        }
+
+        // Successfully found and authenticated! Establish the session on the client side.
+        const { session } = result;
+        const { error: sessionErr } = await supabase.auth.setSession({
+          access_token: session.access_token,
+          refresh_token: session.refresh_token
+        });
+
+        if (sessionErr) throw new Error(sessionErr.message);
+
+      } else {
+        // Standard Email Login Flow
+        const { error } = await supabase.auth.signInWithPassword({
+          email: email,
+          password
+        });
+        if (error) throw new Error(error.message);
+      }
+
+      toast.success(t('success'));
+      navigate('/dashboard');
+
+    } catch (err: any) {
+      toast.error(err.message || 'Login failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

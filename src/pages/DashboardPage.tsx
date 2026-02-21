@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -61,6 +61,7 @@ const emptyRow = (prev?: BulkRow, email?: string, phone?: string): BulkRow => ({
 export default function DashboardPage() {
   const { user, profile, isAdmin, refreshProfile } = useAuth();
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -88,6 +89,11 @@ export default function DashboardPage() {
 
   // Delete
   const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  // Soft Deleting Account
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deletingAccount, setDeletingAccount] = useState(false);
 
   // Mobile Numbers
   interface MobileNumber {
@@ -162,10 +168,48 @@ export default function DashboardPage() {
     setLoading(false);
   };
 
+  const handleAccountDelete = async () => {
+    if (!user) return;
+    if (deleteConfirmText !== 'DELETE') {
+      toast.error('Please type DELETE to confirm');
+      return;
+    }
+
+    setDeletingAccount(true);
+    try {
+      const session = (await supabase.auth.getSession()).data.session;
+      if (!session) throw new Error('Please log in again');
+
+      const response = await fetch('/api/soft-delete-account', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        }
+      });
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Failed to delete account');
+
+      toast.success('Your account and all listings have been permanently hidden and suspended.');
+      await supabase.auth.signOut();
+      navigate('/');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to delete account');
+      setDeletingAccount(false);
+    }
+  };
+
   useEffect(() => { fetchListings(); }, [user]);
 
   // Bulk form
   const initBulkForm = () => {
+    if (!profile?.plate_call_number || !profile?.whatsapp_number) {
+      toast.error('You must add your Call Number and WhatsApp Number in your Profile before listing plates.');
+      setActiveSection('profile');
+      setEditingProfile(true);
+      return;
+    }
     setRows([emptyRow(undefined, user?.email || '', profile?.phone_number || '')]);
     setShowForm(true);
   };
@@ -426,6 +470,12 @@ export default function DashboardPage() {
   };
 
   const initMobileForm = () => {
+    if (!profile?.plate_call_number || !profile?.whatsapp_number) {
+      toast.error('You must add your Call Number and WhatsApp Number in your Profile before listing mobile numbers.');
+      setActiveSection('profile');
+      setEditingProfile(true);
+      return;
+    }
     setMobileForm({
       phone_number: '',
       carrier: 'du',
@@ -731,6 +781,59 @@ export default function DashboardPage() {
                       className="flex items-center gap-1.5 text-primary text-xs sm:text-sm font-bold bg-primary/5 hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-all active:scale-95 flex-shrink-0">
                       <Pencil className="h-3 w-3" /> Edit
                     </button>
+                  </div>
+                )}
+
+                {/* Account Deletion Section */}
+                <div className="mt-8 pt-6 border-t border-red-500/20">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <h4 className="text-sm font-bold text-red-600 mb-1">Delete Account</h4>
+                      <p className="text-xs text-muted-foreground">Permanently hide your profile, mobile numbers, and plate listings.</p>
+                    </div>
+                    <button onClick={() => setShowDeleteModal(true)} disabled={deletingAccount}
+                      className="flex-shrink-0 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 px-4 py-2 rounded-xl text-xs font-bold transition-all border border-red-100 disabled:opacity-50">
+                      Delete Account
+                    </button>
+                  </div>
+                </div>
+
+                {/* Account Deletion Modal */}
+                {showDeleteModal && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+                    <div className="bg-card glass-card border flex flex-col items-center justify-center border-border/60 rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl relative text-center">
+                      <div className="h-16 w-16 bg-red-100 rounded-full flex items-center justify-center mb-5 border-4 border-white shadow-sm mx-auto">
+                        <Trash2 className="h-7 w-7 text-red-600" />
+                      </div>
+                      <h3 className="text-xl font-display font-black text-foreground mb-2">Delete Account?</h3>
+                      <p className="text-sm text-muted-foreground mb-6">
+                        This action is irreversible. All your listings will be hidden immediately and you will lose access to your account.
+                      </p>
+
+                      <div className="w-full text-left mb-6">
+                        <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-2 text-center">
+                          Type <span className="text-red-500">DELETE</span> to confirm
+                        </label>
+                        <input
+                          type="text"
+                          value={deleteConfirmText}
+                          onChange={(e) => setDeleteConfirmText(e.target.value.toUpperCase())}
+                          placeholder="DELETE"
+                          className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-sm text-center font-black focus:outline-none focus:ring-2 focus:ring-red-500/30 transition-all font-mono"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-2 w-full">
+                        <button onClick={handleAccountDelete} disabled={deletingAccount || deleteConfirmText !== 'DELETE'}
+                          className="w-full bg-red-600 text-white hover:bg-red-700 py-3 rounded-xl text-sm font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+                          {deletingAccount ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Yes, Delete My Account'}
+                        </button>
+                        <button onClick={() => { setShowDeleteModal(false); setDeleteConfirmText(''); }} disabled={deletingAccount}
+                          className="w-full bg-surface hover:bg-surface-accent py-3 rounded-xl text-sm font-bold border border-border transition-all text-foreground mt-2 disabled:opacity-50">
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>

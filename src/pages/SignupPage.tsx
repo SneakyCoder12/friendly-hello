@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
 import { Loader2, Mail, Lock, User, Eye, EyeOff, Smartphone } from 'lucide-react';
-import { COUNTRY_CODES, isPhoneNumber, formatPhoneAsEmail } from '@/utils/phoneAuth';
+import { COUNTRY_CODES, isPhoneNumber, formatPhoneAsEmail, normalizePhone } from '@/utils/phoneAuth';
 
 export default function SignupPage() {
   const { t } = useLanguage();
@@ -44,8 +44,10 @@ export default function SignupPage() {
         setLoading(false);
         return;
       }
-      signupPhonePlain = `${form.phoneCode}${form.phoneNumber}`;
-      signupEmail = formatPhoneAsEmail(signupPhonePlain);
+      const rawPhone = `${form.phoneCode}${form.phoneNumber}`;
+      const normalized = normalizePhone(rawPhone);
+      signupPhonePlain = `+${normalized}`; // Keep standard international prefix
+      signupEmail = formatPhoneAsEmail(normalized);
     } else if (!form.email.includes('@')) {
       toast.error('Please enter a valid email address');
       setLoading(false);

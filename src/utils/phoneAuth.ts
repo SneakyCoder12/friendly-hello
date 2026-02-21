@@ -12,13 +12,34 @@ export const COUNTRY_CODES = [
 ];
 
 /**
+ * Strictly normalizes phone numbers (especially UAE variations) into a pure baseline.
+ * Handles inputs like '0501234567', '501234567', '9710501234567'.
+ */
+export function normalizePhone(phone: string): string {
+    let cleaned = phone.replace(/\D/g, '');
+
+    // Fix UAE specific variations to ensure consistency across the DB
+    if (cleaned.startsWith('97105')) {
+        // User typed +971 050 ... -> Strip the extra 0
+        cleaned = '971' + cleaned.substring(4);
+    } else if (cleaned.startsWith('05')) {
+        // User typed 050 ... (local format) -> Convert to 97150
+        cleaned = '971' + cleaned.substring(1);
+    } else if (cleaned.startsWith('5') && (cleaned.length === 9 || cleaned.length === 8)) {
+        // User typed 50 ... -> Prepend 971
+        cleaned = '971' + cleaned;
+    }
+
+    return cleaned;
+}
+
+/**
  * Converts a string comprising of an international dialing code + phone number 
  * into a safe, pseudo email address for Supabase standard auth.
  * E.g., "+971501234567" -> "971501234567@phone-user.alnuami.com"
  */
 export function formatPhoneAsEmail(phone: string): string {
-    // Strip everything except numeric digits
-    const cleaned = phone.replace(/\D/g, '');
+    const cleaned = normalizePhone(phone);
     return `${cleaned}@phone-user.alnuami.com`;
 }
 
