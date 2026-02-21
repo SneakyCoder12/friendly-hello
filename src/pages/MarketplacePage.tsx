@@ -2,8 +2,9 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Search, ChevronLeft, ChevronRight, Loader2, X, Sparkles, Settings, ChevronDown } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Loader2, X, Sparkles, SlidersHorizontal, ChevronDown, Settings } from 'lucide-react';
 import PlateCard from '@/components/PlateCard';
+import ListWithUsBanner from '@/components/ListWithUsBanner';
 
 const EMIRATES = ['Abu Dhabi', 'Dubai', 'Sharjah', 'Ajman', 'Umm Al Quwain', 'Ras Al Khaimah', 'Fujairah'];
 const EMIRATE_KEY_MAP: Record<string, string> = {
@@ -226,11 +227,11 @@ export default function MarketplacePage() {
   );
 
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
+    <div className="bg-background overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8 pt-24">
 
         {/* ─── Premium Plate Banner ─── */}
-        <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden mb-8 sm:mb-10 border border-border/60 shadow-sm bg-gradient-to-br from-surface via-card to-surface">
+        <div className="hidden md:block relative rounded-2xl sm:rounded-3xl overflow-hidden mb-8 sm:mb-10 border border-border/60 shadow-sm bg-gradient-to-br from-surface via-card to-surface">
           <div className="absolute inset-0 opacity-[0.06]"
             style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 200'%3E%3Cpath d='M0,200 L0,180 L30,180 L30,120 L35,120 L35,100 L40,100 L40,120 L45,120 L45,180 L80,180 L80,140 L85,140 L85,60 L87,55 L89,60 L89,140 L95,140 L95,180 L130,180 L130,150 L140,150 L140,130 L150,130 L150,150 L160,150 L160,180 L200,180 L200,160 L210,160 L210,40 L213,10 L216,40 L216,160 L220,160 L220,180 L260,180 L260,150 L280,150 L280,130 L290,130 L290,170 L310,170 L310,140 L325,140 L325,170 L340,170 L340,180 L380,180 L380,160 L400,160 L400,120 L405,120 L405,80 L410,75 L415,80 L415,120 L420,120 L420,160 L440,160 L440,180 L500,180 L500,140 L520,140 L520,110 L540,110 L540,140 L560,140 L560,180 L600,180 L600,155 L620,155 L620,130 L630,130 L630,155 L650,155 L650,180 L700,180 L700,160 L730,160 L730,140 L750,140 L750,160 L780,160 L780,180 L800,180 L800,200 Z' fill='%23000' opacity='0.5'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right bottom', backgroundSize: '70% auto' }} />
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 via-white to-red-500 opacity-30" />
@@ -281,14 +282,15 @@ export default function MarketplacePage() {
                 <X className="h-3 w-3" /> Clear
               </button>
             )}
-            {/* Mobile gear */}
+            {/* Mobile filter button */}
             <button
               onClick={() => setFilterPanelOpen(true)}
-              className="sm:hidden relative flex items-center justify-center w-10 h-10 rounded-xl bg-card border border-border shadow-sm"
+              className="sm:hidden relative flex items-center justify-center gap-2 px-4 h-10 rounded-xl bg-card border border-border shadow-sm hover:bg-surface transition-colors"
             >
-              <Settings className="h-5 w-5 text-muted-foreground" />
+              <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-bold text-foreground">Filters</span>
               {activeFilterCount > 0 && (
-                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-primary-foreground text-[9px] font-black flex items-center justify-center">
+                <span className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-primary text-primary-foreground text-[10px] font-black flex items-center justify-center shadow-md">
                   {activeFilterCount}
                 </span>
               )}
@@ -513,6 +515,10 @@ export default function MarketplacePage() {
             </button>
           </div>
         )}
+
+        <div className="mt-8 sm:mt-12">
+          <ListWithUsBanner />
+        </div>
       </div>
     </div>
   );

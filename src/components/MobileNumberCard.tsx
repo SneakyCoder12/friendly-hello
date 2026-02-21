@@ -16,10 +16,30 @@ interface MobileNumberCardProps {
 
 /** Detect touch device to disable flip */
 function useIsTouch() {
-    const [isTouch, setIsTouch] = useState(false);
+    const [isTouch, setIsTouch] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+        }
+        return false;
+    });
+
     useEffect(() => {
-        setIsTouch(window.matchMedia('(hover: none) and (pointer: coarse)').matches);
+        const mediaQuery = window.matchMedia('(hover: none) and (pointer: coarse)');
+        setIsTouch(mediaQuery.matches);
+
+        const handler = (event: MediaQueryListEvent) => {
+            setIsTouch(event.matches);
+        };
+
+        if (mediaQuery.addEventListener) {
+            mediaQuery.addEventListener('change', handler);
+            return () => mediaQuery.removeEventListener('change', handler);
+        } else {
+            mediaQuery.addListener(handler);
+            return () => mediaQuery.removeListener(handler);
+        }
     }, []);
+
     return isTouch;
 }
 
@@ -71,7 +91,7 @@ function MobileNumberCard({
                 <div className="flex justify-between items-center mb-3">
                     <CarrierBadge />
                     <button
-                         onClick={(e) => { e.preventDefault(); onToggleFavorite(e, id); }}
+                        onClick={(e) => { e.preventDefault(); onToggleFavorite(e, id); }}
                         className="h-8 w-8 rounded-full bg-surface border border-border flex items-center justify-center"
                     >
                         <Heart className={`h-3.5 w-3.5 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
@@ -95,9 +115,11 @@ function MobileNumberCard({
                                 </>
                             ) : <span className="text-sm text-muted-foreground">Contact for price</span>}
                         </p>
-                        <span className="self-start text-[10px] font-bold uppercase tracking-wider text-white bg-primary px-2.5 py-1 rounded-full">
-                            View →
-                        </span>
+                        <div className="flex justify-end w-full">
+                            <span className="shrink-0 whitespace-nowrap text-[10px] font-bold uppercase tracking-wider text-white bg-primary px-3 py-1.5 rounded-full shadow-sm">
+                                VIEW DETAILS →
+                            </span>
+                        </div>
                     </div>
                 </div>
             </Link>

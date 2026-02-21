@@ -31,6 +31,7 @@ export default function Footer() {
               <li><Link className="hover:text-[hsl(40,86%,44%)] transition-colors" to="/marketplace?emirate=Ras+Al+Khaimah">{t('rakPlates') || 'Ras Al Khaimah Plates'}</Link></li>
               <li><Link className="hover:text-[hsl(40,86%,44%)] transition-colors" to="/marketplace?emirate=Fujairah">{t('fujariahPlates') || 'Fujairah Plates'}</Link></li>
               <li><Link className="hover:text-[hsl(40,86%,44%)] transition-colors" to="/marketplace?emirate=Umm+Al+Quwain">{t('uaqPlates') || 'Umm Al Quwain Plates'}</Link></li>
+              <li className="pt-2"><Link className="hover:text-[hsl(40,86%,44%)] transition-colors text-white font-bold" to="/mobile-numbers">VIP Mobile Numbers</Link></li>
             </ul>
           </div>
           <div>
@@ -38,8 +39,8 @@ export default function Footer() {
             <ul className="space-y-4 text-sm text-gray-400 font-medium">
               <li><Link className="hover:text-[hsl(40,86%,44%)] transition-colors" to="/contact">{t('contactUs')}</Link></li>
               <li><Link className="hover:text-[hsl(40,86%,44%)] transition-colors" to="/request">{t('submitRequest') || 'Submit Request'}</Link></li>
-              <li><a className="hover:text-[hsl(40,86%,44%)] transition-colors" href="#">{t('terms')}</a></li>
-              <li><a className="hover:text-[hsl(40,86%,44%)] transition-colors" href="#">{t('privacy')}</a></li>
+              <li><Link className="hover:text-[hsl(40,86%,44%)] transition-colors" to="/terms">{t('terms')}</Link></li>
+              <li><Link className="hover:text-[hsl(40,86%,44%)] transition-colors" to="/privacy">{t('privacy')}</Link></li>
             </ul>
           </div>
         </div>

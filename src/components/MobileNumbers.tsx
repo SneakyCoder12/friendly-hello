@@ -62,10 +62,10 @@ export default function MobileNumbers() {
             <p className="text-[10px] sm:text-sm font-bold uppercase tracking-[0.2em] mt-0.5 sm:mt-1 text-muted-foreground">Exclusive Platinum &amp; Diamond</p>
           </div>
         </div>
-        <a className="group flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-bold text-muted-foreground hover:text-primary transition-colors whitespace-nowrap" href="#">
+        <Link className="group flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-bold text-muted-foreground hover:text-primary transition-colors whitespace-nowrap" to="/mobile-numbers">
           VIEW ALL
           <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 transform group-hover:translate-x-1 transition-transform" />
-        </a>
+        </Link>
       </div>
 
       {/* Mobile: horizontal scroll | Desktop: grid */}

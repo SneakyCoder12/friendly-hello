@@ -27,6 +27,8 @@ const AdminPage = lazy(() => import('@/pages/AdminPage'));
 const MobileNumbersPage = lazy(() => import('@/pages/MobileNumbersPage'));
 const MobileNumberDetailPage = lazy(() => import('@/pages/MobileNumberDetailPage'));
 const FeaturesPage = lazy(() => import('@/pages/FeaturesPage'));
+const TermsPage = lazy(() => import('@/pages/TermsPage'));
+const PrivacyPolicyPage = lazy(() => import('@/pages/PrivacyPolicyPage'));
 
 function Loading() {
   return (
@@ -62,12 +64,14 @@ export default function App() {
                   <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
                   <Route path="/dashboard/admin" element={<ProtectedRoute adminOnly><AdminPage /></ProtectedRoute>} />
                   <Route path="/features" element={<FeaturesPage />} />
+                  <Route path="/terms" element={<TermsPage />} />
+                  <Route path="/privacy" element={<PrivacyPolicyPage />} />
                 </Routes>
               </AnimatedPage>
             </Suspense>
             <Footer />
-            {/* Mobile bottom spacer to prevent content hiding behind fixed nav */}
-            <div className="sm:hidden h-16" />
+            {/* Mobile bottom spacer for the fixed bottom nav */}
+            <div className="sm:hidden h-20 bg-background w-full" />
           </div>
           <MobileBottomNav />
           <ScrollToTopButton />

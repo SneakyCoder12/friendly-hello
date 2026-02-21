@@ -47,12 +47,30 @@ interface PlateCardProps {
 
 /** Detect if device has touch capability — used to fully disable flip cards */
 function useIsTouch() {
-  const [isTouch, setIsTouch] = useState(false);
+  const [isTouch, setIsTouch] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+    }
+    return false;
+  });
+
   useEffect(() => {
-    const check = () =>
-      window.matchMedia('(hover: none) and (pointer: coarse)').matches;
-    setIsTouch(check());
+    const mediaQuery = window.matchMedia('(hover: none) and (pointer: coarse)');
+    setIsTouch(mediaQuery.matches);
+
+    const handler = (event: MediaQueryListEvent) => {
+      setIsTouch(event.matches);
+    };
+
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handler);
+      return () => mediaQuery.removeEventListener('change', handler);
+    } else {
+      mediaQuery.addListener(handler);
+      return () => mediaQuery.removeListener(handler);
+    }
   }, []);
+
   return isTouch;
 }
 
@@ -144,14 +162,14 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
   // ── TOUCH DEVICES: simple card, no flip ──
   if (isTouch) {
     return (
-        <Link
-          to={plateUrl}
-          className={`block min-h-[260px] bg-card rounded-2xl border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300 overflow-hidden relative ${isSold ? 'opacity-80' : ''}`}
-        >
-          {isSold && (
-            <div className="sold-ribbon"><span>SOLD</span></div>
-          )}
-          <div className="flex flex-col items-center justify-center h-full relative">
+      <Link
+        to={plateUrl}
+        className={`block min-h-[260px] bg-card rounded-2xl border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300 overflow-hidden relative ${isSold ? 'opacity-80' : ''}`}
+      >
+        {isSold && (
+          <div className="sold-ribbon"><span>SOLD</span></div>
+        )}
+        <div className="flex flex-col items-center justify-center h-full relative">
           {/* Vehicle type badge */}
           <div className="absolute top-2 left-2 z-10 flex items-center gap-1 px-2 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider border bg-card/90 backdrop-blur-sm shadow-sm border-border/60 text-muted-foreground">
             {displayType === 'bike' ? (
@@ -198,12 +216,14 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
                     <span className="text-foreground">{price.replace(/^AED\s*/, '')}</span>
                   </>
                 ) : (
-                  <span className="text-muted-foreground text-xs">Contact for price</span>
+                  <span className="text-muted-foreground text-xs">{t('contactForPrice') || 'Contact for price'}</span>
                 )}
               </p>
-              <span className="self-start text-[10px] font-bold uppercase tracking-wider text-white bg-primary px-2.5 py-1 rounded-full">
-                View →
-              </span>
+              <div className="flex justify-end w-full">
+                <span className="shrink-0 whitespace-nowrap text-[10px] font-bold uppercase tracking-wider text-white bg-primary px-3 py-1.5 rounded-full shadow-sm text-center">
+                  {t('viewDetailsBtn') || 'View'}
+                </span>
+              </div>
             </div>
           </div>
         </div>
