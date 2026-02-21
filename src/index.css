@@ -243,11 +243,11 @@ input[type="number"] {
 /* ── Mobile-Only Styles (max-width: 768px) ── */
 @media (max-width: 768px) {
 
-  /* Plate card sizing in horizontal carousel: fluid 2-per-row */
+  /* Horizontal carousel cards - fixed width for consistent native feel */
   .mobile-plate-card {
-    width: calc((100vw - 36px) / 2);
-    min-width: min(calc((100vw - 36px) / 2), 200px);
-    max-width: calc((100vw - 36px) / 2);
+    width: 240px;
+    min-width: 240px;
+    max-width: 240px;
   }
 
   /* Ensure PlateCard inside mobile carousel adapts */
@@ -291,11 +291,11 @@ input[type="number"] {
   }
 }
 
-/* Ultra-small screens: single column cards */
+/* Ultra-small screens: slightly smaller carousel cards */
 @media (max-width: 359px) {
   .mobile-plate-card {
-    width: calc(100vw - 24px);
-    min-width: calc(100vw - 24px);
-    max-width: calc(100vw - 24px);
+    width: 220px;
+    min-width: 220px;
+    max-width: 220px;
   }
 }
