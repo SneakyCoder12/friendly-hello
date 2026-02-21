@@ -115,6 +115,8 @@ export default function MobileNumberDetailPage() {
     const carrierDisplay = listing?.carrier === 'etisalat' ? 'Etisalat (e&)' : 'Du';
     const carrierLogo = listing?.carrier === 'etisalat' ? '/Eand_Logo.svg' : '/du-logo.webp';
 
+    const isSold = (listing as any)?.status === 'sold';
+
     const handleShare = () => {
         if (navigator.share) {
             navigator.share({ title: `${listing?.phone_number} — VIP Number`, url: window.location.href });
@@ -174,7 +176,12 @@ export default function MobileNumberDetailPage() {
                     <div className="lg:col-span-3">
 
                         {/* Main Number Card */}
-                        <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-10 flex flex-col items-center justify-center border border-gray-200 relative">
+                        <div className={`bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-10 flex flex-col items-center justify-center border border-gray-200 relative overflow-hidden ${isSold ? 'opacity-80' : ''}`}>
+                            {isSold && (
+                                <div className="sold-ribbon">
+                                    <span>SOLD</span>
+                                </div>
+                            )}
                             {/* Carrier Logo */}
                             <div className="absolute top-5 left-5 flex items-center gap-2">
                                 <img src={carrierLogo} alt={carrierDisplay} className="h-6 w-6 object-contain" />
@@ -239,7 +246,11 @@ export default function MobileNumberDetailPage() {
                         <div className="bg-white rounded-2xl border border-gray-200 p-6">
                             <p className="text-[10px] text-gray-300 uppercase tracking-widest font-bold mb-2">Price</p>
                             <p className="text-4xl font-black text-gray-900 font-mono tracking-tight">
-                                {listing.price ? `AED ${listing.price.toLocaleString()}` : 'Contact Seller'}
+                                {isSold ? (
+                                    <span className="text-red-500 font-extrabold tracking-widest uppercase">SOLD</span>
+                                ) : listing.price ? (
+                                    `AED ${listing.price.toLocaleString()}`
+                                ) : 'Contact Seller'}
                             </p>
 
                             <button
@@ -266,20 +277,28 @@ export default function MobileNumberDetailPage() {
                             </div>
 
                             <div className="space-y-3">
-                                {telUrl && (
-                                    <a href={telUrl}
-                                        className="flex items-center justify-center gap-2 w-full bg-gray-900 text-white py-3.5 rounded-xl font-bold text-sm hover:bg-gray-800 transition-all shadow-sm">
-                                        <Phone className="h-4 w-4" /> Call Seller
-                                    </a>
-                                )}
-                                {whatsappUrl && (
-                                    <a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
-                                        className="flex items-center justify-center gap-2 w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold text-sm hover:bg-emerald-700 transition-all shadow-sm">
-                                        <MessageCircle className="h-4 w-4" /> WhatsApp
-                                    </a>
-                                )}
-                                {!telUrl && !whatsappUrl && (
-                                    <p className="text-sm text-gray-500 text-center py-2">No contact info available</p>
+                                {isSold ? (
+                                    <p className="text-sm text-red-500 font-bold text-center py-4 bg-red-50 rounded-xl border border-red-100 uppercase tracking-widest">
+                                        This Number Is SOLD
+                                    </p>
+                                ) : (
+                                    <>
+                                        {telUrl && (
+                                            <a href={telUrl}
+                                                className="flex items-center justify-center gap-2 w-full bg-gray-900 text-white py-3.5 rounded-xl font-bold text-sm hover:bg-gray-800 transition-all shadow-sm">
+                                                <Phone className="h-4 w-4" /> Call Seller
+                                            </a>
+                                        )}
+                                        {whatsappUrl && (
+                                            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
+                                                className="flex items-center justify-center gap-2 w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold text-sm hover:bg-emerald-700 transition-all shadow-sm">
+                                                <MessageCircle className="h-4 w-4" /> WhatsApp
+                                            </a>
+                                        )}
+                                        {!telUrl && !whatsappUrl && (
+                                            <p className="text-sm text-gray-500 text-center py-2">No contact info available</p>
+                                        )}
+                                    </>
                                 )}
                             </div>
                         </div>

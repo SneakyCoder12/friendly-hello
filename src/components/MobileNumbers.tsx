@@ -106,7 +106,13 @@ export default function MobileNumbers() {
                 </p>
                 <div className="h-px w-full bg-border my-3 sm:my-4" />
                 <p className="text-foreground font-mono font-bold text-base sm:text-xl">
-                  {item.price ? `AED ${item.price.toLocaleString()}` : 'Contact for Price'}
+                  {isSold ? (
+                    <span className="text-red-500 font-extrabold tracking-widest uppercase">SOLD</span>
+                  ) : item.price ? (
+                    `AED ${item.price.toLocaleString()}`
+                  ) : (
+                    'Contact for Price'
+                  )}
                 </p>
                 <div className="absolute inset-0 border-2 border-primary/0 group-hover:border-primary/5 rounded-xl transition-all pointer-events-none" />
               </Link>

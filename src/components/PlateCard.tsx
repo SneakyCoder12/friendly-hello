@@ -213,7 +213,9 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
         <div className="p-2 w-full border-t border-border/50 bg-background/50">
           <div className="flex flex-col gap-1 items-center justify-center">
             <p className="text-[11px] font-bold text-foreground font-mono tracking-tight flex items-center gap-1">
-              {price ? (
+              {isSold ? (
+                <span className="text-red-500 font-extrabold tracking-widest uppercase">SOLD</span>
+              ) : price ? (
                 <>
                   <AedLogo />
                   <span className="text-foreground">{price.replace(/^AED\s*/, '')}</span>
@@ -291,7 +293,9 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
               <div className="mt-2 p-2.5 w-full border-t border-border/50">
                 <div className="flex flex-wrap justify-between items-center gap-x-2 gap-y-1.5 min-h-[24px]">
                   <p className="text-[11px] font-bold text-foreground font-mono tracking-tight flex items-center gap-1 shrink-0">
-                    {price ? (
+                    {isSold ? (
+                      <span className="text-red-500 font-extrabold tracking-widest uppercase">SOLD</span>
+                    ) : price ? (
                       <>
                         <AedLogo />
                         <span>{price.replace(/^AED\s*/, '')}</span>

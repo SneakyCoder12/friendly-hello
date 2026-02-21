@@ -30,6 +30,7 @@ interface ListingDetail {
     contact_email: string | null;
     created_at: string;
     user_id: string;
+    status?: string;
 }
 
 interface SellerProfile {
@@ -164,6 +165,8 @@ export default function PlateDetailPage() {
     const sellerName = seller?.full_name || seller?.email || 'Seller';
     const memberYear = seller?.created_at ? new Date(seller.created_at).getFullYear().toString() : '';
 
+    const isSold = listing?.status === 'sold';
+
     const handleShare = () => {
         if (navigator.share) {
             navigator.share({
@@ -262,7 +265,12 @@ export default function PlateDetailPage() {
 
                     {/* Left: Plate Image (3 cols) */}
                     <div className="lg:col-span-3">
-                        <div className="bg-surface rounded-2xl p-8 flex items-center justify-center border border-border">
+                        <div className={`bg-surface rounded-2xl p-8 flex items-center justify-center border border-border relative overflow-hidden ${isSold ? 'opacity-80' : ''}`}>
+                            {isSold && (
+                                <div className="sold-ribbon">
+                                    <span>SOLD</span>
+                                </div>
+                            )}
                             {dataUrl ? (
                                 <img
                                     src={dataUrl}
@@ -434,7 +442,11 @@ export default function PlateDetailPage() {
                         <div className="bg-card rounded-2xl border border-border p-6">
                             <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-2">{t('price')}</p>
                             <p className="text-4xl font-black text-foreground font-mono tracking-tight">
-                                {listing.price ? `AED ${listing.price.toLocaleString()}` : t('contactSeller')}
+                                {isSold ? (
+                                    <span className="text-red-500 font-extrabold tracking-widest uppercase">SOLD</span>
+                                ) : listing.price ? (
+                                    `AED ${listing.price.toLocaleString()}`
+                                ) : t('contactSeller')}
                             </p>
 
                             <button
@@ -467,26 +479,28 @@ export default function PlateDetailPage() {
                             </div>
 
                             <div className="space-y-3">
-                                {telUrl && (
-                                    <a
-                                        href={telUrl}
-                                        className="flex items-center justify-center gap-2 w-full bg-foreground text-background py-3.5 rounded-xl font-bold text-sm hover:opacity-90 transition-all shadow-sm"
-                                    >
-                                        <Phone className="h-4 w-4" /> {t('callNow')}
-                                    </a>
-                                )}
-                                {whatsappUrl && (
-                                    <a
-                                        href={whatsappUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center justify-center gap-2 w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold text-sm hover:bg-emerald-700 transition-all shadow-sm"
-                                    >
-                                        <MessageCircle className="h-4 w-4" /> {t('whatsapp')}
-                                    </a>
-                                )}
-                                {!telUrl && !whatsappUrl && (
-                                    <p className="text-sm text-muted-foreground text-center py-2">{t('noContactInfo')}</p>
+                                {isSold ? (
+                                    <p className="text-sm text-red-500 font-bold text-center py-4 bg-red-50 rounded-xl border border-red-100 uppercase tracking-widest">
+                                        This Plate Is SOLD
+                                    </p>
+                                ) : (
+                                    <>
+                                        {telUrl && (
+                                            <a href={telUrl}
+                                                className="flex items-center justify-center gap-2 w-full bg-foreground text-background py-3.5 rounded-xl font-bold text-sm hover:opacity-90 transition-all shadow-sm">
+                                                <Phone className="h-4 w-4" /> {t('callSeller') || 'Call Seller'}
+                                            </a>
+                                        )}
+                                        {whatsappUrl && (
+                                            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
+                                                className="flex items-center justify-center gap-2 w-full bg-[#25D366] text-white py-3.5 rounded-xl font-bold text-sm hover:bg-[#1da851] transition-all shadow-sm">
+                                                <MessageCircle className="h-4 w-4" /> {t('whatsapp') || 'WhatsApp'}
+                                            </a>
+                                        )}
+                                        {!telUrl && !whatsappUrl && (
+                                            <p className="text-sm text-muted-foreground text-center py-2">{t('noContactInfo') || 'No contact info available'}</p>
+                                        )}
+                                    </>
                                 )}
                             </div>
                         </div>

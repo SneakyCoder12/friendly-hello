@@ -217,6 +217,7 @@ export default function MobileNumbersPage() {
                                 price={item.price}
                                 description={item.description}
                                 contactPhone={item.contact_phone}
+                                status={item.status}
                                 isFavorite={favoriteIds.has(item.id)}
                                 onToggleFavorite={toggleFavorite}
                             />

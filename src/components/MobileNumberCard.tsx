@@ -10,6 +10,7 @@ interface MobileNumberCardProps {
     price: number | null;
     description: string | null;
     contactPhone: string | null;
+    status?: string;
     isFavorite: boolean;
     onToggleFavorite: (e: React.MouseEvent, id: string) => void;
 }
@@ -44,10 +45,11 @@ function useIsTouch() {
 }
 
 function MobileNumberCard({
-    id, phoneNumber, carrier, price, description, contactPhone,
+    id, phoneNumber, carrier, price, description, contactPhone, status,
     isFavorite, onToggleFavorite,
 }: MobileNumberCardProps) {
     const isTouch = useIsTouch();
+    const isSold = status === 'sold';
     const [flipped, setFlipped] = useState(false);
     const navigate = useNavigate();
 
@@ -85,15 +87,20 @@ function MobileNumberCard({
         return (
             <Link
                 to={detailUrl}
-                className="block min-h-[260px] bg-card rounded-2xl border border-border hover:shadow-lg transition-all duration-300 p-4 flex flex-col"
+                className={`block min-h-[260px] bg-card rounded-2xl border border-border hover:shadow-lg transition-all duration-300 p-4 flex flex-col relative overflow-hidden ${isSold ? 'opacity-80' : ''}`}
             >
+                {isSold && (
+                    <div className="sold-ribbon">
+                        <span>SOLD</span>
+                    </div>
+                )}
                 {/* Top: carrier + fav */}
                 <div className="flex justify-between items-center mb-3">
                     <CarrierBadge />
                     <button
                         onClick={(e) => { e.preventDefault(); onToggleFavorite(e, id); }}
                         aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
-                                className="h-8 w-8 rounded-full bg-surface border border-border flex items-center justify-center"
+                        className="h-8 w-8 rounded-full bg-surface border border-border flex items-center justify-center hover:bg-red-50 transition-all"
                     >
                         <Heart className={`h-3.5 w-3.5 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
                     </button>
@@ -109,7 +116,9 @@ function MobileNumberCard({
                     <div className="h-px w-full bg-border mb-3" />
                     <div className="flex flex-col gap-2">
                         <p className="text-foreground font-mono font-bold text-lg flex items-center gap-1">
-                            {price ? (
+                            {isSold ? (
+                                <span className="text-red-500 font-extrabold tracking-widest uppercase text-sm">SOLD</span>
+                            ) : price ? (
                                 <>
                                     <AedLogo />
                                     <span>{price.toLocaleString()}</span>
@@ -140,7 +149,12 @@ function MobileNumberCard({
             >
                 {/* ── FRONT SIDE ── */}
                 <div className="absolute inset-0 backface-hidden">
-                    <div className="block h-full bg-card rounded-2xl border border-border hover:shadow-lg transition-all duration-300 group p-6 flex flex-col">
+                    <div className={`block h-full bg-card rounded-2xl border border-border hover:shadow-lg transition-all duration-300 group p-6 flex flex-col relative overflow-hidden ${isSold ? 'opacity-80' : ''}`}>
+                        {isSold && (
+                            <div className="sold-ribbon">
+                                <span>SOLD</span>
+                            </div>
+                        )}
                         {/* Top row: carrier badge + fav */}
                         <div className="flex justify-between items-center mb-5">
                             <CarrierBadge />
@@ -166,7 +180,9 @@ function MobileNumberCard({
                             <div className="h-px w-full bg-border mb-4" />
                             <div className="flex flex-wrap justify-between items-center gap-x-2 gap-y-2">
                                 <p className="text-foreground font-mono font-bold text-xl flex items-center gap-1 shrink-0">
-                                    {price ? (
+                                    {isSold ? (
+                                        <span className="text-red-500 font-extrabold tracking-widest uppercase text-lg">SOLD</span>
+                                    ) : price ? (
                                         <>
                                             <AedLogo />
                                             <span>{price.toLocaleString()}</span>
@@ -205,15 +221,20 @@ function MobileNumberCard({
 
                 {/* ── BACK SIDE — same fixed size as front ── */}
                 <div className="absolute inset-0 backface-hidden rotate-y-180">
-                    <div className="h-full bg-card rounded-2xl border border-border flex flex-col items-center justify-center px-4 py-3 relative">
+                    <div className={`h-full bg-card flex flex-col items-center justify-center px-4 py-3 relative rounded-2xl border border-border ${isSold ? 'opacity-80' : ''}`}>
+                        {isSold && (
+                            <div className="sold-ribbon">
+                                <span>SOLD</span>
+                            </div>
+                        )}
                         {/* Heart button — top right */}
                         <button
                             onClick={(e) => { e.stopPropagation(); onToggleFavorite(e, id); }}
                             aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
-              className="absolute top-2 right-2 h-8 w-8 rounded-full bg-card border border-border shadow-sm flex items-center justify-center flex-shrink-0 transition-all hover:scale-110 active:scale-90 z-10"
+                            className="absolute top-2 right-2 h-8 w-8 rounded-full bg-white border border-border shadow-sm flex items-center justify-center transition-all hover:scale-110 active:scale-90 z-10"
                             title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                         >
-                            <Heart className={`h-3.5 w-3.5 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-muted-foreground hover:text-red-400'}`} />
+                            <Heart className={`h-3.5 w-3.5 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-300 hover:text-red-400'}`} />
                         </button>
 
                         <p className="text-xs font-display font-bold text-foreground mb-0.5">VIP Number</p>
@@ -237,7 +258,6 @@ function MobileNumberCard({
                                     <Phone className="h-3.5 w-3.5" /> Call
                                 </a>
                             )}
-
                             {whatsappUrl && (
                                 <a
                                     href={whatsappUrl}
