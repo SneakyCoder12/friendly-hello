@@ -13,7 +13,9 @@ interface MobileListing {
 }
 
 function CarrierLogo({ carrier }: { carrier: string }) {
-  if (carrier === 'Etisalat') {
+  const isEtisalat = carrier?.toLowerCase() === 'etisalat';
+
+  if (isEtisalat) {
     return (
       <span className="inline-flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider">
         <img src="/Eand_Logo.svg" alt="Etisalat" className="h-4 w-4 object-contain" />
