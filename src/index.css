@@ -243,11 +243,10 @@ input[type="number"] {
 /* ── Mobile-Only Styles (max-width: 768px) ── */
 @media (max-width: 768px) {
 
-  /* Plate card sizing in horizontal carousel: exactly 2 visible */
+  /* Plate card sizing in horizontal carousel: fluid 2-per-row */
   .mobile-plate-card {
-    /* calc: (viewport - 2*12px container padding - 12px gap) / 2 */
     width: calc((100vw - 36px) / 2);
-    min-width: calc((100vw - 36px) / 2);
+    min-width: min(calc((100vw - 36px) / 2), 200px);
     max-width: calc((100vw - 36px) / 2);
   }
 
@@ -261,18 +260,17 @@ input[type="number"] {
     scroll-snap-align: start;
   }
 
-  /* ── Horizontal scroll carousel — allows both vertical page scroll AND horizontal swipe ── */
+  /* ── Horizontal scroll carousel ── */
   .mobile-scroll-row {
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
-    /* Allow both pan-x and pan-y so vertical page scroll is NOT blocked */
     touch-action: pan-x pan-y;
     scroll-snap-type: x mandatory;
     overscroll-behavior-x: contain;
   }
 
-  /* Bottom nav spacing — prevent content from hiding behind fixed nav */
+  /* Bottom nav spacing */
   .mobile-bottom-spacer {
     padding-bottom: 72px;
   }
@@ -290,5 +288,14 @@ input[type="number"] {
 
   .animate-slide-up {
     animation: slideUp 0.3s ease-out forwards;
+  }
+}
+
+/* Ultra-small screens: single column cards */
+@media (max-width: 359px) {
+  .mobile-plate-card {
+    width: calc(100vw - 24px);
+    min-width: calc(100vw - 24px);
+    max-width: calc(100vw - 24px);
   }
 }
