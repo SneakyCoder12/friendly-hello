@@ -64,7 +64,7 @@ export default function EmirateSection({ section, listings, loading }: Props) {
           />
           <h2 className="text-lg sm:text-4xl font-display font-bold text-foreground tracking-tight">{section.name}</h2>
         </div>
-        <a className="group flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-bold text-muted-foreground hover:text-primary transition-colors whitespace-nowrap" href={`/marketplace?emirate=${encodeURIComponent(section.name)}`}>
+        <a className="-m-2 p-2 group flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-bold text-muted-foreground hover:text-primary transition-colors whitespace-nowrap" href={`/marketplace?emirate=${encodeURIComponent(section.name)}`}>
           View All
           <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 transform group-hover:translate-x-1 transition-transform" />
         </a>

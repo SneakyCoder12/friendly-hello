@@ -73,26 +73,26 @@ export default function ContactPage() {
             <form onSubmit={handleSubmit} className="lg:col-span-2 space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">{t('yourName')} *</label>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-gray-300 mb-2">{t('yourName')} *</label>
                   <input type="text" name="name" value={form.name} onChange={handleChange} required
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-900 font-medium focus:outline-none focus:border-gray-400 focus:bg-white transition-all"
                     placeholder={t('yourName')} />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">{t('yourEmail')} *</label>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-gray-300 mb-2">{t('yourEmail')} *</label>
                   <input type="email" name="email" value={form.email} onChange={handleChange} required
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-900 font-medium focus:outline-none focus:border-gray-400 focus:bg-white transition-all"
                     placeholder="you@example.com" />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">{t('subject')} *</label>
+                <label className="block text-xs font-bold uppercase tracking-widest text-gray-300 mb-2">{t('subject')} *</label>
                 <input type="text" name="subject" value={form.subject} onChange={handleChange} required
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-900 font-medium focus:outline-none focus:border-gray-400 focus:bg-white transition-all"
                   placeholder="What's this about?" />
               </div>
               <div>
-                <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">{t('message')} *</label>
+                <label className="block text-xs font-bold uppercase tracking-widest text-gray-300 mb-2">{t('message')} *</label>
                 <textarea name="message" value={form.message} onChange={handleChange} required rows={6}
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-900 font-medium focus:outline-none focus:border-gray-400 focus:bg-white transition-all resize-none"
                   placeholder="Tell us more..." />
@@ -106,24 +106,24 @@ export default function ContactPage() {
             {/* Company Info */}
             <div className="space-y-8">
               <div>
-                <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">{t('contactTitle')}</h3>
+                <h3 className="text-xs font-bold uppercase tracking-widest text-gray-300 mb-4">{t('contactTitle')}</h3>
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
-                    <Phone className="h-5 w-5 text-gray-400 mt-0.5" />
+                    <Phone className="h-5 w-5 text-gray-300 mt-0.5" />
                     <div>
                       <p className="text-sm font-bold text-gray-900">{t('phoneNumber')}</p>
                       <a href="tel:+971509912129" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">+971 50 991 2129</a>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <Mail className="h-5 w-5 text-gray-400 mt-0.5" />
+                    <Mail className="h-5 w-5 text-gray-300 mt-0.5" />
                     <div>
                       <p className="text-sm font-bold text-gray-900">{t('email')}</p>
-                      <a href="mailto:bo.mohammad125@gmail.com" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">bo.mohammad125@gmail.com</a>
+                      <a href="mailto:alnuamigroups@gmail.com" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">alnuamigroups@gmail.com</a>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <MapPin className="h-5 w-5 text-gray-400 mt-0.5" />
+                    <MapPin className="h-5 w-5 text-gray-300 mt-0.5" />
                     <div>
                       <p className="text-sm font-bold text-gray-900">{t('emirate')}</p>
                       <p className="text-sm text-gray-500">United Arab Emirates</p>

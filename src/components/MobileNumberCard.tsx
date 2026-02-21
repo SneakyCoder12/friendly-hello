@@ -72,7 +72,7 @@ function MobileNumberCard({
             : 'bg-blue-50 border-blue-200 text-blue-700'
             } ${small ? 'text-[9px]' : 'text-[10px]'}`}>
             <img
-                src={carrier === 'etisalat' ? '/Eand_Logo.svg' : '/du-logo.png'}
+                src={carrier === 'etisalat' ? '/Eand_Logo.svg' : '/du-logo.webp'}
                 alt={carrier}
                 className={`object-contain ${small ? 'h-3 w-3' : 'h-4 w-4'}`}
             />
@@ -92,7 +92,8 @@ function MobileNumberCard({
                     <CarrierBadge />
                     <button
                         onClick={(e) => { e.preventDefault(); onToggleFavorite(e, id); }}
-                        className="h-8 w-8 rounded-full bg-surface border border-border flex items-center justify-center"
+                        aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                                className="h-8 w-8 rounded-full bg-surface border border-border flex items-center justify-center"
                     >
                         <Heart className={`h-3.5 w-3.5 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
                     </button>
@@ -145,6 +146,7 @@ function MobileNumberCard({
                             <CarrierBadge />
                             <button
                                 onClick={(e) => { e.stopPropagation(); onToggleFavorite(e, id); }}
+                                aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
                                 className="h-8 w-8 rounded-full bg-surface border border-border flex items-center justify-center hover:bg-red-50 hover:border-red-200 transition-all"
                             >
                                 <Heart className={`h-3.5 w-3.5 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
@@ -162,8 +164,8 @@ function MobileNumberCard({
 
                         <div className="mt-auto">
                             <div className="h-px w-full bg-border mb-4" />
-                            <div className="flex justify-between items-center">
-                                <p className="text-foreground font-mono font-bold text-xl flex items-center gap-1">
+                            <div className="flex flex-wrap justify-between items-center gap-x-2 gap-y-2">
+                                <p className="text-foreground font-mono font-bold text-xl flex items-center gap-1 shrink-0">
                                     {price ? (
                                         <>
                                             <AedLogo />
@@ -207,7 +209,8 @@ function MobileNumberCard({
                         {/* Heart button — top right */}
                         <button
                             onClick={(e) => { e.stopPropagation(); onToggleFavorite(e, id); }}
-                            className="absolute top-2 right-2 h-8 w-8 rounded-full bg-card border border-border shadow-sm flex items-center justify-center flex-shrink-0 transition-all hover:scale-110 active:scale-90 z-10"
+                            aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+              className="absolute top-2 right-2 h-8 w-8 rounded-full bg-card border border-border shadow-sm flex items-center justify-center flex-shrink-0 transition-all hover:scale-110 active:scale-90 z-10"
                             title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                         >
                             <Heart className={`h-3.5 w-3.5 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-muted-foreground hover:text-red-400'}`} />

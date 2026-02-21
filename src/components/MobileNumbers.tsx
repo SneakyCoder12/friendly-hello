@@ -23,7 +23,7 @@ function CarrierLogo({ carrier }: { carrier: string }) {
   }
   return (
     <span className="inline-flex items-center gap-1.5 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider">
-      <img src="/du-logo.png" alt="Du" className="h-4 w-4 object-contain" />
+      <img src="/du-logo.webp" alt="Du" className="h-4 w-4 object-contain" />
       <span className="text-xs font-bold" style={{ color: '#003b71' }}>du</span>
     </span>
   );
@@ -85,9 +85,10 @@ export default function MobileNumbers() {
             const isSold = item.status === 'sold';
             const carrierLower = item.carrier.toLowerCase();
             return (
-              <div
+              <Link
                 key={item.id}
-                className={`min-w-[220px] sm:min-w-0 snap-start relative bg-card backdrop-blur-md border border-border rounded-xl p-6 sm:p-8 hover:bg-surface hover:shadow-xl transition-all cursor-pointer group shadow-sm hover:border-primary/30 overflow-hidden ${isSold ? 'opacity-80' : ''}`}
+                to={`/mobile-number/${item.id}`}
+                className={`block min-w-[220px] sm:min-w-0 snap-start relative bg-card backdrop-blur-md border border-border rounded-xl p-6 sm:p-8 hover:bg-surface hover:shadow-xl transition-all cursor-pointer group shadow-sm hover:border-primary/30 overflow-hidden ${isSold ? 'opacity-80' : ''}`}
               >
                 {isSold && (
                   <div className="sold-ribbon">
@@ -106,7 +107,7 @@ export default function MobileNumbers() {
                   {item.price ? `AED ${item.price.toLocaleString()}` : 'Contact for Price'}
                 </p>
                 <div className="absolute inset-0 border-2 border-primary/0 group-hover:border-primary/5 rounded-xl transition-all pointer-events-none" />
-              </div>
+              </Link>
             );
           })
         )}

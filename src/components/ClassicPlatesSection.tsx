@@ -90,7 +90,7 @@ export default function ClassicPlatesSection() {
                         <h2 className="text-xl sm:text-4xl font-display font-bold text-foreground tracking-tight">{t('classicPlate') || 'Classic Plates'}</h2>
                     </div>
                 </div>
-                <a className="group flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-bold text-muted-foreground hover:text-primary transition-colors whitespace-nowrap" href="/marketplace?vehicleType=classic">
+                <a className="-m-2 p-2 group flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-bold text-muted-foreground hover:text-primary transition-colors whitespace-nowrap" href="/marketplace?vehicleType=classic">
                     {t('viewAll')}
                     <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 transform group-hover:translate-x-1 transition-transform" />
                 </a>

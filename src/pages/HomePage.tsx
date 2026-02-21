@@ -12,6 +12,11 @@ export default function HomePage() {
   return (
     <div className="w-full overflow-x-hidden">
       <Hero />
+      <div className="md:hidden mt-4 mb-2 text-center px-4">
+        <p className="text-[10px] text-muted-foreground/80 max-w-sm mx-auto leading-tight">
+          <span className="font-bold">Notice:</span> We facilitate connections but are not liable for private transactions between buyers and sellers.
+        </p>
+      </div>
       <FeaturedNumbersStrip />
       {/* NoticeBanner hidden on mobile - now shown inside Hero banner */}
       <div className="hidden sm:block">

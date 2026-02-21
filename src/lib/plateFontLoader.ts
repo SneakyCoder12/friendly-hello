@@ -91,7 +91,7 @@ export function loadPlateFonts(): Promise<void> {
       if (alreadyRegistered) return;
 
       try {
-        const face = new FontFace(def.name, `url("${encodedUrl}")`, { weight });
+        const face = new FontFace(def.name, `url("${encodedUrl}")`, { weight, display: 'swap' });
         await face.load();
         document.fonts.add(face);
       } catch (e) {

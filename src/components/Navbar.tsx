@@ -5,13 +5,13 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useState, useEffect } from 'react';
 
 const PLATE_CATEGORIES = [
-  { name: 'Abu Dhabi', plates: 'Abu Dhabi', image: '/abudhabi-plate.png' },
-  { name: 'Dubai', plates: 'Dubai', image: '/dubai-plate.png' },
-  { name: 'Sharjah', plates: 'Sharjah', image: '/sharjah-plate.png' },
-  { name: 'Ajman', plates: 'Ajman', image: '/ajman-plate.png' },
-  { name: 'RAK', plates: 'Ras Al Khaimah', image: '/rak-plate.png' },
-  { name: 'Fujairah', plates: 'Fujairah', image: '/fujariah-plate.png' },
-  { name: 'UAQ', plates: 'Umm Al Quwain', image: '/umm-al-q-plate.png' },
+  { name: 'Abu Dhabi', plates: 'Abu Dhabi', image: '/abudhabi-plate.webp' },
+  { name: 'Dubai', plates: 'Dubai', image: '/dubai-plate.webp' },
+  { name: 'Sharjah', plates: 'Sharjah', image: '/sharjah-plate.webp' },
+  { name: 'Ajman', plates: 'Ajman', image: '/ajman-plate.webp' },
+  { name: 'RAK', plates: 'Ras Al Khaimah', image: '/rak-plate.webp' },
+  { name: 'Fujairah', plates: 'Fujairah', image: '/fujariah-plate.webp' },
+  { name: 'UAQ', plates: 'Umm Al Quwain', image: '/umm-al-q-plate.webp' },
 ];
 
 export default function Navbar() {
@@ -86,7 +86,7 @@ export default function Navbar() {
                 <h1 className={`font-display font-black text-[17px] sm:text-2xl lg:text-3xl tracking-tighter transition-colors duration-300 group-hover:text-gray-700 text-gray-900`}>
                   ALNUAMI
                 </h1>
-                <p className={`text-[6px] sm:text-[8px] lg:text-[9px] font-bold uppercase tracking-[0.3em] -mt-0.5 sm:-mt-0.5 text-gray-400`} style={{ paddingLeft: '64.5%' }}>Groups</p>
+                <p className={`text-[6px] sm:text-[8px] lg:text-[9px] font-bold uppercase tracking-[0.3em] -mt-0.5 sm:-mt-0.5 text-gray-300`} style={{ paddingLeft: '64.5%' }}>Groups</p>
               </div>
             </Link>
 
@@ -117,7 +117,7 @@ export default function Navbar() {
                     <div className="flex gap-10">
                       {/* Plate Numbers */}
                       <div className="flex-1">
-                        <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-5">Plate Numbers</h3>
+                        <h3 className="text-xs font-bold uppercase tracking-widest text-gray-300 mb-5">Plate Numbers</h3>
                         <div className="grid grid-cols-2 gap-3">
                           {PLATE_CATEGORIES.map((cat) => (
                             <Link
@@ -144,7 +144,7 @@ export default function Navbar() {
                       {/* Right Column */}
                       <div className="w-[230px]">
                         {/* Prestigious Numbers */}
-                        <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-5">Prestigious Numbers</h3>
+                        <h3 className="text-xs font-bold uppercase tracking-widest text-gray-300 mb-5">Prestigious Numbers</h3>
                         <div className="space-y-3">
                           <Link
                             to="/mobile-numbers?carrier=etisalat"
@@ -155,7 +155,7 @@ export default function Navbar() {
                             </div>
                             <div>
                               <p className="text-sm font-semibold text-gray-800">Etisalat</p>
-                              <p className="text-[10px] text-gray-400">VIP Numbers</p>
+                              <p className="text-[10px] text-gray-300">VIP Numbers</p>
                             </div>
                           </Link>
                           <Link
@@ -163,11 +163,11 @@ export default function Navbar() {
                             className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors duration-200"
                           >
                             <div className="h-10 w-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center overflow-hidden shadow-sm">
-                              <img src="/du-logo.png" alt="Du" className="h-7 w-7 object-contain" />
+                              <img src="/du-logo.webp" alt="Du" className="h-7 w-7 object-contain" />
                             </div>
                             <div>
                               <p className="text-sm font-semibold text-gray-800">Du</p>
-                              <p className="text-[10px] text-gray-400">VIP Numbers</p>
+                              <p className="text-[10px] text-gray-300">VIP Numbers</p>
                             </div>
                           </Link>
                         </div>
@@ -179,11 +179,11 @@ export default function Navbar() {
                             className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors duration-200 group/req"
                           >
                             <div className="h-10 w-14 rounded-lg bg-white border border-gray-200 flex items-center justify-center overflow-hidden shadow-sm">
-                              <img src="/dubai-plate.png" alt="Plate" className="h-6 w-12 object-contain" />
+                              <img src="/dubai-plate.webp" alt="Plate" className="h-6 w-12 object-contain" />
                             </div>
                             <div>
                               <p className="text-sm font-semibold text-gray-800 group-hover/req:text-gray-900">Request a Plate</p>
-                              <p className="text-[10px] text-gray-400">Can't find it? We'll help</p>
+                              <p className="text-[10px] text-gray-300">Can't find it? We'll help</p>
                             </div>
                           </Link>
                         </div>
@@ -192,7 +192,7 @@ export default function Navbar() {
 
                     {/* Bottom Bar */}
                     <div className="mt-6 pt-5 border-t border-gray-100 flex justify-between items-center">
-                      <p className="text-xs text-gray-400">Browse all categories</p>
+                      <p className="text-xs text-gray-300">Browse all categories</p>
                       <Link to="/marketplace" className="text-xs font-bold text-gray-800 hover:text-gray-600 transition-colors">
                         View All →
                       </Link>
@@ -268,6 +268,7 @@ export default function Navbar() {
               {/* Hamburger Button */}
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
+                aria-label={menuOpen ? "Close menu" : "Open menu"}
                 className={`lg:hidden h-9 w-9 sm:h-10 sm:w-10 rounded-full border flex items-center justify-center transition-all duration-300 relative z-[60] ml-0.5 ${isDarkMode
                   ? 'bg-white/10 border-white/30 text-white hover:bg-white/20'
                   : 'bg-gray-100 border-gray-200 text-foreground hover:bg-gray-200'
@@ -300,11 +301,12 @@ export default function Navbar() {
             <img src="/Logo.png" alt="Alnuami Groups" className="h-16 w-auto object-contain" />
             <div className="-ml-3 leading-none">
               <span className="font-display font-black text-xl tracking-tighter text-gray-900">ALNUAMI</span>
-              <p className="text-[7px] font-bold uppercase tracking-[0.3em] text-gray-400 -mt-0.5" style={{ paddingLeft: '64.5%' }}>Groups</p>
+              <p className="text-[7px] font-bold uppercase tracking-[0.3em] text-gray-300 -mt-0.5" style={{ paddingLeft: '64.5%' }}>Groups</p>
             </div>
           </Link>
           <button
             onClick={closeMenu}
+            aria-label="Close menu"
             className="h-10 w-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-all"
           >
             <X className="h-5 w-5" />
@@ -330,7 +332,7 @@ export default function Navbar() {
                 className="w-full flex items-center justify-between px-4 py-3.5 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 transition-all"
               >
                 <span>{t('marketplace')}</span>
-                <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform duration-300 ${marketplaceOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`h-4 w-4 text-gray-300 transition-transform duration-300 ${marketplaceOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {/* Accordion content */}
@@ -340,7 +342,7 @@ export default function Navbar() {
               >
                 <div className="pl-4 pr-2 pt-2 pb-3 space-y-1">
                   {/* Section: Plate Numbers */}
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-3 pt-2 pb-2">Plate Numbers</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-300 px-3 pt-2 pb-2">Plate Numbers</p>
                   {PLATE_CATEGORIES.map((cat) => (
                     <Link
                       key={cat.plates}
@@ -358,7 +360,7 @@ export default function Navbar() {
                   <div className="h-px bg-gray-100 my-2" />
 
                   {/* Section: VIP Numbers */}
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-3 pt-2 pb-2">VIP Numbers</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-300 px-3 pt-2 pb-2">VIP Numbers</p>
                   <Link
                     to="/mobile-numbers?carrier=etisalat"
                     onClick={closeMenu}
@@ -369,7 +371,7 @@ export default function Navbar() {
                     </div>
                     <div>
                       <span className="text-sm font-medium text-gray-700">Etisalat (e&)</span>
-                      <p className="text-[10px] text-gray-400">VIP Numbers</p>
+                      <p className="text-[10px] text-gray-300">VIP Numbers</p>
                     </div>
                     <ChevronRight className="h-3.5 w-3.5 text-gray-300 ml-auto" />
                   </Link>
@@ -379,11 +381,11 @@ export default function Navbar() {
                     className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 transition-all"
                   >
                     <div className="h-8 w-8 rounded-lg bg-white border border-gray-100 flex items-center justify-center shadow-sm">
-                      <img src="/du-logo.png" alt="Du" className="h-5 w-5 object-contain" />
+                      <img src="/du-logo.webp" alt="Du" className="h-5 w-5 object-contain" />
                     </div>
                     <div>
                       <span className="text-sm font-medium text-gray-700">Du</span>
-                      <p className="text-[10px] text-gray-400">VIP Numbers</p>
+                      <p className="text-[10px] text-gray-300">VIP Numbers</p>
                     </div>
                     <ChevronRight className="h-3.5 w-3.5 text-gray-300 ml-auto" />
                   </Link>
@@ -405,11 +407,11 @@ export default function Navbar() {
                     className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 transition-all"
                   >
                     <div className="h-8 w-14 rounded-lg bg-white border border-gray-200 flex items-center justify-center shadow-sm">
-                      <img src="/dubai-plate.png" alt="Plate" className="h-5 w-10 object-contain" />
+                      <img src="/dubai-plate.webp" alt="Plate" className="h-5 w-10 object-contain" />
                     </div>
                     <div>
                       <span className="text-sm font-medium text-gray-700">Request a Plate</span>
-                      <p className="text-[10px] text-gray-400">Can't find it? We'll help</p>
+                      <p className="text-[10px] text-gray-300">Can't find it? We'll help</p>
                     </div>
                   </Link>
                 </div>

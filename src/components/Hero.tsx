@@ -4,13 +4,13 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const EMIRATES = [
-  { name: 'Abu Dhabi', image: '/abudhabi-plate.png' },
-  { name: 'Dubai', image: '/dubai-plate.png' },
-  { name: 'Sharjah', image: '/sharjah-plate.png' },
-  { name: 'Ajman', image: '/ajman-plate.png' },
-  { name: 'RAK', image: '/rak-plate.png' },
-  { name: 'Fujairah', image: '/fujariah-plate.png' },
-  { name: 'UAQ', image: '/umm-al-q-plate.png' },
+  { name: 'Abu Dhabi', image: '/abudhabi-plate.webp' },
+  { name: 'Dubai', image: '/dubai-plate.webp' },
+  { name: 'Sharjah', image: '/sharjah-plate.webp' },
+  { name: 'Ajman', image: '/ajman-plate.webp' },
+  { name: 'RAK', image: '/rak-plate.webp' },
+  { name: 'Fujairah', image: '/fujariah-plate.webp' },
+  { name: 'UAQ', image: '/umm-al-q-plate.webp' },
 ];
 
 export default function Hero() {
@@ -29,7 +29,7 @@ export default function Hero() {
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: "url('/Background-Main.png')",
+            backgroundImage: "url('/Background-Main.webp')",
           }}
         />
         {/* Overlay for readability */}

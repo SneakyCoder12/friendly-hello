@@ -1330,7 +1330,7 @@ export default function DashboardPage() {
                             className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border text-sm font-bold transition-all ${mobileEditForm.carrier === 'du'
                               ? 'bg-blue-50 border-blue-300 text-blue-700 ring-2 ring-blue-200 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-300'
                               : 'bg-surface border-border text-muted-foreground hover:border-gray-400'}`}>
-                            <img src="/du-logo.png" alt="Du" className="h-5 w-5 object-contain" /> Du
+                            <img src="/du-logo.webp" alt="Du" className="h-5 w-5 object-contain" /> Du
                           </button>
                           <button type="button" onClick={() => setMobileEditForm(f => ({ ...f, carrier: 'etisalat' }))}
                             className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border text-sm font-bold transition-all ${mobileEditForm.carrier === 'etisalat'
@@ -1400,7 +1400,7 @@ export default function DashboardPage() {
                               : 'bg-surface border-border text-muted-foreground hover:border-gray-400'
                               }`}
                           >
-                            <img src="/du-logo.png" alt="Du" className="h-5 w-5 object-contain" />
+                            <img src="/du-logo.webp" alt="Du" className="h-5 w-5 object-contain" />
                             Du
                           </button>
                           <button
@@ -1495,7 +1495,7 @@ export default function DashboardPage() {
                           <div className="flex items-center gap-3 min-w-0">
                             <div className={`h-10 w-10 sm:h-12 sm:w-12 rounded-xl flex items-center justify-center overflow-hidden border-2 flex-shrink-0 transition-transform group-hover:scale-105 ${mn.carrier === 'etisalat' ? 'border-emerald-200 bg-emerald-50' : 'border-blue-200 bg-blue-50'}`}>
                               <img
-                                src={mn.carrier === 'etisalat' ? '/Eand_Logo.svg' : '/du-logo.png'}
+                                src={mn.carrier === 'etisalat' ? '/Eand_Logo.svg' : '/du-logo.webp'}
                                 alt={mn.carrier}
                                 className="h-6 w-6 sm:h-7 sm:w-7 object-contain"
                               />

@@ -6,7 +6,6 @@ const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const PUBLIC_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY;
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-    // Only allow POST
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
@@ -20,18 +19,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ error: 'Missing credentials' });
     }
 
-    // 1. Create admin client for lookup operations
     const adminClient = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
         auth: { persistSession: false },
     });
 
-    // 2. Create standard client for authentication checks
     const authClient = createClient(SUPABASE_URL, PUBLIC_ANON_KEY, {
         auth: { persistSession: false },
     });
 
     try {
-        // First try standard phone pseudo-email login (fastest)
         const pseudoEmail = `${normalizedPhone}@phone-user.alnuami.com`;
         const { data: pseudoData, error: pseudoErr } = await authClient.auth.signInWithPassword({
             email: pseudoEmail,
@@ -42,9 +38,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             return res.status(200).json({ session: pseudoData.session });
         }
 
-        // If that fails, they might have signed up with Email but are using their Profile Phone Number to log in.
-        // Look up the profiles table to see if any user has this phone number registered.
-        // Profile phone numbers are usually stored with a '+' prefix, e.g. "+971555219217"
         const phoneWithPlus = `+${normalizedPhone}`;
 
         const { data: profiles, error: profileErr } = await adminClient
@@ -59,11 +52,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (profiles && profiles.length > 0) {
             const userId = profiles[0].id;
 
-            // Fetch their true identity payload to get the actual registered email
             const { data: userAuth, error: authErr } = await adminClient.auth.admin.getUserById(userId);
 
             if (userAuth?.user?.email) {
-                // Try to authenticate using their true underlying email and the provided password
                 const realEmail = userAuth.user.email;
                 const { data: realData, error: realErr } = await authClient.auth.signInWithPassword({
                     email: realEmail,

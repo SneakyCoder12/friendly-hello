@@ -108,7 +108,7 @@ export default function RequestPage() {
                     {/* Name & Email */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">{t('fullName')} *</label>
+                            <label className="block text-xs font-bold uppercase tracking-widest text-gray-300 mb-2">{t('fullName')} *</label>
                             <input
                                 type="text"
                                 name="name"
@@ -120,7 +120,7 @@ export default function RequestPage() {
                             />
                         </div>
                         <div>
-                            <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">{t('email')} *</label>
+                            <label className="block text-xs font-bold uppercase tracking-widest text-gray-300 mb-2">{t('email')} *</label>
                             <input
                                 type="email"
                                 name="email"
@@ -136,7 +136,7 @@ export default function RequestPage() {
                     {/* Phone & Emirate */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">{t('phoneNumber')} *</label>
+                            <label className="block text-xs font-bold uppercase tracking-widest text-gray-300 mb-2">{t('phoneNumber')} *</label>
                             <input
                                 type="tel"
                                 name="phone"
@@ -148,7 +148,7 @@ export default function RequestPage() {
                             />
                         </div>
                         <div>
-                            <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">{t('preferredEmirate')} *</label>
+                            <label className="block text-xs font-bold uppercase tracking-widest text-gray-300 mb-2">{t('preferredEmirate')} *</label>
                             <select
                                 name="emirate"
                                 value={form.emirate}
@@ -176,7 +176,7 @@ export default function RequestPage() {
 
                     {/* Plate Details */}
                     <div>
-                        <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">{t('preferredNumber')} *</label>
+                        <label className="block text-xs font-bold uppercase tracking-widest text-gray-300 mb-2">{t('preferredNumber')} *</label>
                         <input
                             type="text"
                             name="plateDetails"
@@ -190,7 +190,7 @@ export default function RequestPage() {
 
                     {/* Budget */}
                     <div>
-                        <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">{t('budget')}</label>
+                        <label className="block text-xs font-bold uppercase tracking-widest text-gray-300 mb-2">{t('budget')}</label>
                         <input
                             type="text"
                             name="budget"
@@ -203,7 +203,7 @@ export default function RequestPage() {
 
                     {/* Message */}
                     <div>
-                        <label className="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">{t('additionalNotes')}</label>
+                        <label className="block text-xs font-bold uppercase tracking-widest text-gray-300 mb-2">{t('additionalNotes')}</label>
                         <textarea
                             name="message"
                             value={form.message}
@@ -224,7 +224,7 @@ export default function RequestPage() {
                     </button>
 
                     {/* Disclaimer */}
-                    <p className="text-xs text-center text-gray-400 leading-relaxed">
+                    <p className="text-xs text-center text-gray-300 leading-relaxed">
                         {t('noticeText')}
                     </p>
                 </form>

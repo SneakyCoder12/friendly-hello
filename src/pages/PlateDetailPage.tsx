@@ -315,7 +315,7 @@ export default function PlateDetailPage() {
                                     {/* Car with Plate */}
                                     <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                                         <img
-                                            src="/Preview-Plate.png"
+                                            src="/Preview-Plate.webp"
                                             alt="Car Preview"
                                             className="w-full h-auto"
                                         />
@@ -364,7 +364,7 @@ export default function PlateDetailPage() {
                                     {/* Bike with Plate */}
                                     <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                                         <img
-                                            src="/Preview-Plate-Bike.png"
+                                            src="/Preview-Plate-Bike.webp"
                                             alt="Bike Preview"
                                             className="w-full h-auto"
                                         />

@@ -160,24 +160,24 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
   }
 
   // ── TOUCH DEVICES: simple card, no flip ──
-  if (isTouch) {
-    return (
+  const MobileCard = (
+    <div className="block md:hidden pb-1">
       <Link
         to={plateUrl}
-        className={`block min-h-[260px] bg-card rounded-2xl border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300 overflow-hidden relative ${isSold ? 'opacity-80' : ''}`}
+        className={`flex flex-col h-[180px] sm:h-[200px] bg-card rounded-xl border border-border active:scale-[0.98] transition-all duration-200 overflow-hidden relative ${isSold ? 'opacity-80' : ''}`}
       >
         {isSold && (
           <div className="sold-ribbon"><span>SOLD</span></div>
         )}
-        <div className="flex flex-col items-center justify-center h-full relative">
+        <div className="relative p-2 pb-0 pt-6 flex-1 flex flex-col items-center justify-center">
           {/* Vehicle type badge */}
-          <div className="absolute top-2 left-2 z-10 flex items-center gap-1 px-2 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider border bg-card/90 backdrop-blur-sm shadow-sm border-border/60 text-muted-foreground">
+          <div className="absolute top-1.5 left-1.5 z-10 flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[8px] font-bold uppercase tracking-wider border bg-card/100 shadow-sm border-border/80 text-muted-foreground">
             {displayType === 'bike' ? (
-              <><Bike className="h-3 w-3" /> Bike</>
+              <><Bike className="h-2.5 w-2.5" /> Bike</>
             ) : displayType === 'classic' ? (
-              <><span className="text-[9px] font-serif italic">C</span> Classic</>
+              <><span className="text-[8px] font-serif italic">C</span> Classic</>
             ) : (
-              <><Car className="h-3 w-3" /> Car</>
+              <><Car className="h-2.5 w-2.5" /> Car</>
             )}
           </div>
           {/* Favorite button */}
@@ -188,57 +188,59 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
                 e.stopPropagation();
                 toggleFavorite(e);
               }}
-              className="absolute top-2 right-2 z-10 h-7 w-7 rounded-full bg-white/80 border border-border/40 shadow-sm flex items-center justify-center transition-all active:scale-90"
+              aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+              className="absolute top-1.5 right-1.5 z-10 h-6 w-6 rounded-full bg-white border border-border/60 shadow-sm flex items-center justify-center transition-all active:scale-90"
             >
-              <Heart className={`h-3.5 w-3.5 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
+              <Heart className={`h-3 w-3 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-300'}`} />
             </button>
           )}
           {/* Plate image */}
-          <div className="w-[90%] mx-auto h-[90px] flex items-center justify-center">
+          <div className="w-[95%] mx-auto flex items-center justify-center h-[70px] sm:h-[80px] mb-2">
             {plateImg ? (
               <img
                 src={plateImg}
                 alt={`${emirate} ${code} ${number}`}
-                className="w-full h-full object-contain object-center"
-                style={{ imageRendering: '-webkit-optimize-contrast' } as React.CSSProperties}
+                className="w-full h-full object-contain object-center drop-shadow-md"
+                style={{ imageRendering: '-webkit-optimize-contrast' }}
               />
             ) : (
               <div className="animate-pulse bg-muted rounded w-full h-full" />
             )}
           </div>
-          {/* Price + View button */}
-          <div className="mt-auto p-2.5 w-full border-t border-border/50">
-            <div className="flex flex-col gap-2">
-              <p className="text-sm font-bold text-foreground font-mono tracking-tight flex items-center gap-1">
-                {price ? (
-                  <>
-                    <AedLogo />
-                    <span className="text-foreground">{price.replace(/^AED\s*/, '')}</span>
-                  </>
-                ) : (
-                  <span className="text-muted-foreground text-xs">{t('contactForPrice') || 'Contact for price'}</span>
-                )}
-              </p>
-              <div className="flex justify-end w-full">
-                <span className="shrink-0 whitespace-nowrap text-[10px] font-bold uppercase tracking-wider text-white bg-primary px-3 py-1.5 rounded-full shadow-sm text-center">
-                  {t('viewDetailsBtn') || 'View'}
-                </span>
-              </div>
+        </div>
+
+        {/* Price + View button */}
+        <div className="p-2 w-full border-t border-border/50 bg-background/50">
+          <div className="flex flex-col gap-1 items-center justify-center">
+            <p className="text-[11px] font-bold text-foreground font-mono tracking-tight flex items-center gap-1">
+              {price ? (
+                <>
+                  <AedLogo />
+                  <span className="text-foreground">{price.replace(/^AED\s*/, '')}</span>
+                </>
+              ) : (
+                <span className="text-muted-foreground text-[10px]">{t('contactForPrice') || 'Contact'}</span>
+              )}
+            </p>
+            <div className="w-full mt-0.5">
+              <span className="block w-full whitespace-nowrap text-[9px] font-bold uppercase tracking-wider text-white bg-primary py-1.5 rounded-md shadow-sm text-center">
+                {t('viewDetailsBtn') || 'View Details →'}
+              </span>
             </div>
           </div>
         </div>
       </Link>
-    );
-  }
+    </div>
+  );
 
   // ── DESKTOP: flip card ──
   const handleFrontClick = () => {
     setFlipped(true);
   };
 
-  return (
+  const DesktopCard = (
     <div
-      className="perspective-1000 h-[240px] cursor-pointer"
+      className="hidden md:block perspective-1000 h-[240px] cursor-pointer"
       onMouseEnter={() => setFlipped(true)}
       onMouseLeave={() => setFlipped(false)}
     >
@@ -287,8 +289,8 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
               </div>
               {/* Price section */}
               <div className="mt-2 p-2.5 w-full border-t border-border/50">
-                <div className="flex justify-between items-center">
-                  <p className="text-sm font-bold text-foreground font-mono tracking-tight flex items-center gap-1">
+                <div className="flex flex-wrap justify-between items-center gap-x-2 gap-y-1.5 min-h-[24px]">
+                  <p className="text-[11px] font-bold text-foreground font-mono tracking-tight flex items-center gap-1 shrink-0">
                     {price ? (
                       <>
                         <AedLogo />
@@ -296,7 +298,7 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
                       </>
                     ) : <span className="text-muted-foreground text-xs">{t('contactForPrice')}</span>}
                   </p>
-                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider group-hover:text-primary transition-colors">
+                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider group-hover:text-primary transition-colors shrink-0">
                     {t('hoverToViewBtn')}
                   </p>
                 </div>
@@ -322,10 +324,11 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
                   e.stopPropagation();
                   toggleFavorite(e);
                 }}
+                aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
                 className="absolute top-2 right-2 h-8 w-8 rounded-full bg-white border border-border shadow-sm flex items-center justify-center transition-all hover:scale-110 active:scale-90 z-10"
                 title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
               >
-                <Heart className={`h-3.5 w-3.5 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400 hover:text-red-400'}`} />
+                <Heart className={`h-3.5 w-3.5 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-300 hover:text-red-400'}`} />
               </button>
             )}
             <p className="text-sm font-display font-black text-foreground mb-0.5">AL NUAMI</p>
@@ -375,6 +378,13 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
         </div>
       </div>
     </div>
+  );
+
+  return (
+    <>
+      {MobileCard}
+      {DesktopCard}
+    </>
   );
 }
 

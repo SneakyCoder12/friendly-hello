@@ -439,7 +439,7 @@ export default function AdminPage() {
                   <div key={mn.id} className="bg-card border border-border rounded-xl p-4 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4 flex-1 min-w-0">
                       <div className={`h-9 w-9 rounded-lg flex items-center justify-center overflow-hidden border ${mn.carrier === 'etisalat' ? 'border-emerald-200 bg-emerald-50' : 'border-blue-200 bg-blue-50'}`}>
-                        <img src={mn.carrier === 'etisalat' ? '/Eand_Logo.svg' : '/du-logo.png'} alt={mn.carrier} className="h-5 w-5 object-contain" />
+                        <img src={mn.carrier === 'etisalat' ? '/Eand_Logo.svg' : '/du-logo.webp'} alt={mn.carrier} className="h-5 w-5 object-contain" />
                       </div>
                       <div>
                         <div className="flex items-center gap-3 mb-1 flex-wrap">

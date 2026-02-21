@@ -4,13 +4,13 @@ import { getConfig } from '@/lib/plate-generator';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const EMIRATES_CONFIG = [
-  { value: 'abudhabi', label: 'Abu Dhabi', logo: '/Abu_Dhabi-logo.png' },
-  { value: 'dubai', label: 'Dubai', logo: '/dubai-logo.png' },
-  { value: 'sharjah', label: 'Sharjah', logo: '/SHARJAH-LOGO.png' },
-  { value: 'ajman', label: 'Ajman', logo: '/ajman-logo.png' },
-  { value: 'umm_al_quwain', label: 'Umm Al Quwain', logo: '/ummalquein-logo.png' },
-  { value: 'rak', label: 'Ras Al Khaimah', logo: '/rak-logo.png' },
-  { value: 'fujairah', label: 'Fujairah', logo: '/fujairah-logo.png' },
+  { value: 'abudhabi', label: 'Abu Dhabi', logo: '/Abu_Dhabi-logo.webp' },
+  { value: 'dubai', label: 'Dubai', logo: '/dubai-logo.webp' },
+  { value: 'sharjah', label: 'Sharjah', logo: '/SHARJAH-LOGO.webp' },
+  { value: 'ajman', label: 'Ajman', logo: '/ajman-logo.webp' },
+  { value: 'umm_al_quwain', label: 'Umm Al Quwain', logo: '/ummalquein-logo.webp' },
+  { value: 'rak', label: 'Ras Al Khaimah', logo: '/rak-logo.webp' },
+  { value: 'fujairah', label: 'Fujairah', logo: '/fujairah-logo.webp' },
 ];
 
 export default function PlateGeneratorSection() {

@@ -23,37 +23,30 @@ export default function LoginPage() {
       const isPhone = isPhoneNumber(email);
 
       if (isPhone) {
-        // Try standard phone pseudo-email login first (fastest)
-        const pseudoEmail = `${email.replace(/\D/g, '')}@phone-user.alnuami.com`;
-        const { error: pseudoErr } = await supabase.auth.signInWithPassword({
-          email: pseudoEmail,
-          password
+        // Run it through the fallback custom API to handle both phone-registered AND email-registered users
+        // typing their profile phone number to log in securely.
+        const normalizedPhone = normalizePhone(email); // Formats standard 971...
+
+        const response = await fetch('/api/login-fallback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: email, normalizedPhone, password })
         });
 
-        if (pseudoErr) {
-          // Fallback: If they registered with Gmail but are typing their profile phone number to log in
-          const normalizedPhone = normalizePhone(email);
-          const phoneWithPlus = `+${normalizedPhone}`;
+        const result = await response.json();
 
-          const { data: profiles, error: profileErr } = await supabase
-            .from('profiles')
-            .select('email')
-            .eq('phone_number', phoneWithPlus)
-            .limit(1);
-
-          if (profileErr || !profiles || profiles.length === 0 || !profiles[0].email) {
-            throw new Error('Invalid login credentials');
-          }
-
-          // Found their real email! Log them in with that.
-          const realEmail = profiles[0].email;
-          const { error: realErr } = await supabase.auth.signInWithPassword({
-            email: realEmail,
-            password
-          });
-
-          if (realErr) throw new Error(realErr.message);
+        if (!response.ok) {
+          throw new Error(result.error || 'Invalid login credentials');
         }
+
+        // Successfully found and authenticated! Establish the session on the client side.
+        const { session } = result;
+        const { error: sessionErr } = await supabase.auth.setSession({
+          access_token: session.access_token,
+          refresh_token: session.refresh_token
+        });
+
+        if (sessionErr) throw new Error(sessionErr.message);
 
       } else {
         // Standard Email Login Flow

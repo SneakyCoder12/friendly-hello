@@ -154,7 +154,7 @@ export default function MobileNumbersPage() {
                         {/* Right: Carrier Logos */}
                         <div className="flex gap-5 z-10">
                             <div className="h-24 w-24 rounded-2xl bg-white border border-gray-200 flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow hover:-translate-y-1 transform duration-300">
-                                <img src="/du-logo.png" alt="Du" className="h-12 w-12 object-contain" />
+                                <img src="/du-logo.webp" alt="Du" className="h-12 w-12 object-contain" />
                             </div>
                             <div className="h-24 w-24 rounded-2xl bg-white border border-gray-200 flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow hover:-translate-y-1 transform duration-300">
                                 <img src="/Eand_Logo.svg" alt="Etisalat" className="h-12 w-12 object-contain" />
@@ -166,14 +166,14 @@ export default function MobileNumbersPage() {
                 {/* Header */}
                 <div className="flex items-center justify-between mb-8">
                     <h2 className="text-2xl font-display font-bold text-gray-900">{t('activeListings')}</h2>
-                    <span className="text-sm text-gray-400 font-mono">{total} numbers</span>
+                    <span className="text-sm text-gray-300 font-mono">{total} numbers</span>
                 </div>
 
                 {/* Filters */}
                 <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4 mb-8">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                         <div className="relative">
-                            <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
                             <input value={search} onChange={e => { setSearch(e.target.value); setPage(0); }}
                                 className="w-full bg-white border border-gray-200 rounded-xl ps-10 pe-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-300"
                                 placeholder={t('searchMobileNumber')} />
@@ -200,7 +200,7 @@ export default function MobileNumbersPage() {
 
                 {/* Listings Grid */}
                 {loading ? (
-                    <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-gray-400" /></div>
+                    <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-gray-300" /></div>
                 ) : listings.length === 0 ? (
                     <div className="text-center py-20">
                         <Smartphone className="h-12 w-12 mx-auto text-gray-300 mb-4" />

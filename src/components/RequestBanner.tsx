@@ -51,12 +51,12 @@ export default function RequestBanner() {
               {/* Decorative plates stack — hidden on mobile */}
               <div className="relative w-[200px] h-[70px] hidden md:block">
                 <img
-                  src="/dubai-plate.png"
+                  src="/dubai-plate.webp"
                   alt=""
                   className="absolute top-0 left-0 w-[160px] h-auto object-contain -rotate-3 opacity-60 drop-shadow-md"
                 />
                 <img
-                  src="/abudhabi-plate.png"
+                  src="/abudhabi-plate.webp"
                   alt=""
                   className="absolute top-1 left-8 w-[160px] h-auto object-contain rotate-2 opacity-80 drop-shadow-lg"
                 />

@@ -70,8 +70,6 @@ export default function App() {
               </AnimatedPage>
             </Suspense>
             <Footer />
-            {/* Mobile bottom spacer for the fixed bottom nav */}
-            <div className="sm:hidden h-20 bg-background w-full" />
           </div>
           <MobileBottomNav />
           <ScrollToTopButton />

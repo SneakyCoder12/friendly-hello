@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Search, ChevronLeft, ChevronRight, Loader2, X, Sparkles, SlidersHorizontal, ChevronDown, Settings } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Loader2, X, Sparkles, SlidersHorizontal, ChevronDown, Settings, ArrowRight } from 'lucide-react';
 import PlateCard from '@/components/PlateCard';
 import ListWithUsBanner from '@/components/ListWithUsBanner';
 import { generatePlateSlug } from '@/utils/plateUrl';
@@ -121,8 +121,18 @@ export default function MarketplacePage() {
   const [listings, setListings] = useState<ListingWithSeller[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [emirateFilter, setEmirateFilter] = useState('');
-  const [vehicleTypeFilter, setVehicleTypeFilter] = useState('');
+  const [emirateFilter, setEmirateFilter] = useState(() => {
+    const param = searchParams.get('emirate');
+    if (param) {
+      const match = EMIRATES.find(e => e.toLowerCase() === param.toLowerCase());
+      return match || param;
+    }
+    return '';
+  });
+  const [vehicleTypeFilter, setVehicleTypeFilter] = useState(() => {
+    const param = searchParams.get('vehicleType');
+    return (param === 'bike' || param === 'car' || param === 'classic') ? param : '';
+  });
   const [digitCountFilter, setDigitCountFilter] = useState('');
   const [codeFilter, setCodeFilter] = useState('');
   const [availableCodes, setAvailableCodes] = useState<string[]>([]);
@@ -141,17 +151,7 @@ export default function MarketplacePage() {
     }
     return () => { document.body.style.overflow = ''; };
   }, [filterPanelOpen]);
-  useEffect(() => {
-    const paramEmirate = searchParams.get('emirate');
-    if (paramEmirate) {
-      const match = EMIRATES.find(e => e.toLowerCase() === paramEmirate.toLowerCase());
-      setEmirateFilter(match || paramEmirate);
-    }
-    const paramVehicleType = searchParams.get('vehicleType');
-    if (paramVehicleType === 'bike' || paramVehicleType === 'car' || paramVehicleType === 'classic') {
-      setVehicleTypeFilter(paramVehicleType);
-    }
-  }, [searchParams]);
+  // Removed param extraction effect since it's now handled entirely in the initial state
 
   // Fetch available plate codes for filter dropdown
   useEffect(() => {
@@ -228,56 +228,22 @@ export default function MarketplacePage() {
   );
 
   return (
-    <div className="bg-background overflow-x-hidden">
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-8 pt-24">
-
-        {/* ─── Premium Plate Banner ─── */}
-        <div className="hidden md:block relative rounded-2xl sm:rounded-3xl overflow-hidden mb-8 sm:mb-10 border border-border/60 shadow-sm bg-gradient-to-br from-surface via-card to-surface">
-          <div className="absolute inset-0 opacity-[0.06]"
-            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 200'%3E%3Cpath d='M0,200 L0,180 L30,180 L30,120 L35,120 L35,100 L40,100 L40,120 L45,120 L45,180 L80,180 L80,140 L85,140 L85,60 L87,55 L89,60 L89,140 L95,140 L95,180 L130,180 L130,150 L140,150 L140,130 L150,130 L150,150 L160,150 L160,180 L200,180 L200,160 L210,160 L210,40 L213,10 L216,40 L216,160 L220,160 L220,180 L260,180 L260,150 L280,150 L280,130 L290,130 L290,170 L310,170 L310,140 L325,140 L325,170 L340,170 L340,180 L380,180 L380,160 L400,160 L400,120 L405,120 L405,80 L410,75 L415,80 L415,120 L420,120 L420,160 L440,160 L440,180 L500,180 L500,140 L520,140 L520,110 L540,110 L540,140 L560,140 L560,180 L600,180 L600,155 L620,155 L620,130 L630,130 L630,155 L650,155 L650,180 L700,180 L700,160 L730,160 L730,140 L750,140 L750,160 L780,160 L780,180 L800,180 L800,200 Z' fill='%23000' opacity='0.5'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right bottom', backgroundSize: '70% auto' }} />
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 via-white to-red-500 opacity-30" />
-
-          <div className="relative px-5 sm:px-8 md:px-14 py-8 sm:py-12 md:py-16 flex flex-col md:flex-row items-center gap-6 sm:gap-8">
-            <div className="flex-1 text-center md:text-start z-10">
-              <div className="inline-flex items-center gap-2 mb-4 px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5">
-                <Sparkles className="h-3.5 w-3.5 text-primary" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">{t('premiumCollection')}</span>
-              </div>
-              <h1 className="text-2xl sm:text-3xl md:text-5xl font-display font-black text-foreground tracking-tight mb-3 leading-tight">
-                {t('marketplace')}
-              </h1>
-              <p className="text-muted-foreground text-sm md:text-base leading-relaxed max-w-md">
-                Explore exclusive UAE number plates across all Emirates. Find your dream plate today.
-              </p>
-              <Link to="/mobile-numbers" className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-foreground hover:text-primary transition-colors border border-border rounded-full px-5 py-2.5 bg-card hover:bg-surface shadow-sm">
-                Browse VIP Phone Numbers →
-              </Link>
-            </div>
-
-            <div className="flex-shrink-0 relative w-64 h-48 hidden md:block">
-              <div className="absolute top-4 left-6 bg-card rounded-xl border border-border shadow-lg px-4 py-2.5 transform -rotate-3 hover:rotate-0 transition-transform duration-300 z-20">
-                <img src="/dubai-plate.png" alt="Dubai Plate" className="h-11 w-auto object-contain" />
-              </div>
-              <div className="absolute top-0 right-0 bg-card rounded-lg border border-border shadow-md px-3 py-2 transform rotate-3 hover:rotate-0 transition-transform duration-300 z-10">
-                <img src="/abudhabi-plate.png" alt="Abu Dhabi Plate" className="h-8 w-auto object-contain" />
-              </div>
-              <div className="absolute bottom-4 left-0 bg-card rounded-lg border border-border shadow-md px-3 py-2 transform rotate-2 hover:rotate-0 transition-transform duration-300 z-10">
-                <img src="/sharjah-plate.png" alt="Sharjah Plate" className="h-8 w-auto object-contain" />
-              </div>
-              <div className="absolute bottom-0 right-4 bg-card rounded-lg border border-border shadow-md px-3 py-2 transform -rotate-2 hover:rotate-0 transition-transform duration-300 z-10">
-                <img src="/rak-plate.png" alt="RAK Plate" className="h-8 w-auto object-contain" />
-              </div>
-            </div>
-          </div>
-        </div>
+    <div className="bg-background overflow-x-hidden md:min-h-screen">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8 pt-20 sm:pt-28">
 
         {/* ── HEADER ROW ── */}
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <h2 className="text-2xl font-display font-bold text-foreground">{t('activeListings')}</h2>
-            <span className="text-sm text-muted-foreground font-mono">{total} plates</span>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <h2 className="text-xl sm:text-2xl font-display font-bold text-foreground">{t('activeListings')}</h2>
+            <span className="hidden sm:inline-block text-sm text-muted-foreground font-mono">{total} plates</span>
           </div>
           <div className="flex items-center gap-2">
+            <Link
+              to="/dashboard"
+              className="inline-flex items-center justify-center gap-1 sm:gap-1.5 px-3 sm:px-4 h-10 bg-primary text-primary-foreground font-bold text-[10px] sm:text-sm rounded-xl shadow-sm hover:bg-primary/90 transition-all whitespace-nowrap"
+            >
+              List <span className="hidden sm:inline">Your </span>Number
+            </Link>
             {hasFilters && (
               <button onClick={resetFilters} className="hidden sm:flex items-center gap-1 text-xs text-primary font-bold hover:underline">
                 <X className="h-3 w-3" /> Clear
@@ -471,35 +437,42 @@ export default function MarketplacePage() {
         ) : listings.length === 0 ? (
           <div className="text-center py-20 text-muted-foreground">{t('noResults')}</div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6 mb-8">
-            {listings.map(listing => {
-              const parts = listing.plate_number.split(' ');
-              const code = parts.length > 1 ? parts[0] : '';
-              const number = parts.length > 1 ? parts.slice(1).join(' ') : parts[0];
-              const emirateKey = EMIRATE_KEY_MAP[listing.emirate] || listing.emirate.toLowerCase().replace(/\s+/g, '_');
-              const rawStyle = listing.plate_style;
-              const resolvedPlateStyle: 'private' | 'bike' | 'classic' =
-                rawStyle === 'bike' ? 'bike' : rawStyle === 'classic' ? 'classic' : 'private';
+          <>
+            <div className="sm:hidden mb-4 text-center">
+              <p className="text-[10px] text-muted-foreground/80 max-w-sm mx-auto px-4 leading-tight">
+                <span className="font-bold">Notice:</span> We facilitate connections but are not liable for private transactions between buyers and sellers.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-6 mb-8">
+              {listings.map(listing => {
+                const parts = listing.plate_number.split(' ');
+                const code = parts.length > 1 ? parts[0] : '';
+                const number = parts.length > 1 ? parts.slice(1).join(' ') : parts[0];
+                const emirateKey = EMIRATE_KEY_MAP[listing.emirate] || listing.emirate.toLowerCase().replace(/\s+/g, '_');
+                const rawStyle = listing.plate_style;
+                const resolvedPlateStyle: 'private' | 'bike' | 'classic' =
+                  rawStyle === 'bike' ? 'bike' : rawStyle === 'classic' ? 'classic' : 'private';
 
-              return (
-                <PlateCard
-                  key={listing.id}
-                  emirate={emirateKey}
-                  code={code}
-                  number={number}
-                  price={listing.price ? `AED ${listing.price.toLocaleString()}` : undefined}
-                  plateUrl={`/plate/${generatePlateSlug(listing)}`}
-                  sellerPhone={listing.contact_phone}
-                  plateNumber={listing.plate_number}
-                  listingId={listing.id}
-                  status={listing.status}
-                  plateStyle={resolvedPlateStyle}
-                  vehicleType={rawStyle === 'bike' ? 'bike' : rawStyle === 'classic' ? 'classic' : 'car'}
-                  plateImageUrl={listing.plate_image_url}
-                />
-              );
-            })}
-          </div>
+                return (
+                  <PlateCard
+                    key={listing.id}
+                    emirate={emirateKey}
+                    code={code}
+                    number={number}
+                    price={listing.price ? `AED ${listing.price.toLocaleString()}` : undefined}
+                    plateUrl={`/plate/${generatePlateSlug(listing)}`}
+                    sellerPhone={listing.contact_phone}
+                    plateNumber={listing.plate_number}
+                    listingId={listing.id}
+                    status={listing.status}
+                    plateStyle={resolvedPlateStyle}
+                    vehicleType={rawStyle === 'bike' ? 'bike' : rawStyle === 'classic' ? 'classic' : 'car'}
+                    plateImageUrl={listing.plate_image_url}
+                  />
+                );
+              })}
+            </div>
+          </>
         )}
 
         {/* ── PAGINATION ── */}
@@ -517,8 +490,11 @@ export default function MarketplacePage() {
           </div>
         )}
 
-        <div className="mt-8 sm:mt-12">
-          <ListWithUsBanner />
+        <div className="mt-8 sm:mt-12 flex flex-col items-center justify-center text-center">
+          <Link to="/dashboard" className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 rounded-full bg-primary text-primary-foreground font-bold text-sm sm:text-base hover:bg-primary/90 transition-all shadow-md">
+            List Your Number
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       </div>
     </div>

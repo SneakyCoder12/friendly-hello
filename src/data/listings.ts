@@ -45,25 +45,25 @@ export const LISTINGS: PlateListing[] = [
 ];
 
 export const PLATE_TEMPLATES: Record<string, string> = {
-  abudhabi: '/abudhabi-plate.png',
-  abudhabi_bike: '/AD-B-plate.png',
-  abudhabi_classic: '/AD-C-Plate.png',
-  dubai: '/dubai-plate.png',
-  dubai_bike: '/Dubai-B-plate.png',
-  dubai_classic: '/Dubai-C-Plate.png',
-  ajman: '/ajman-plate.png',
-  ajman_bike: '/Ajman-B-plate.png',
-  ajman_classic: '/ajman-C-plate.png',
-  rak: '/rak-plate.png',
-  rak_bike: '/RAK-B-plate.png',
-  rak_classic: '/RAK-C-Plate.png',
-  fujairah: '/fujariah-plate.png',
-  fujairah_bike: '/FUJ-B-plate.png',
-  sharjah: '/sharjah-plate.png',
-  sharjah_bike: '/SHJ-B-plate.png',
-  sharjah_classic: '/Shj-C-Plate.png',
-  umm_al_quwain: '/umm-al-q-plate.png',
-  umm_al_quwain_bike: '/UAQ-B-plate.png',
+  abudhabi: '/abudhabi-plate.webp',
+  abudhabi_bike: '/AD-B-plate.webp',
+  abudhabi_classic: '/AD-C-Plate.webp',
+  dubai: '/dubai-plate.webp',
+  dubai_bike: '/Dubai-B-plate.webp',
+  dubai_classic: '/Dubai-C-Plate.webp',
+  ajman: '/ajman-plate.webp',
+  ajman_bike: '/Ajman-B-plate.webp',
+  ajman_classic: '/ajman-C-plate.webp',
+  rak: '/rak-plate.webp',
+  rak_bike: '/RAK-B-plate.webp',
+  rak_classic: '/RAK-C-Plate.webp',
+  fujairah: '/fujariah-plate.webp',
+  fujairah_bike: '/FUJ-B-plate.webp',
+  sharjah: '/sharjah-plate.webp',
+  sharjah_bike: '/SHJ-B-plate.webp',
+  sharjah_classic: '/Shj-C-Plate.webp',
+  umm_al_quwain: '/umm-al-q-plate.webp',
+  umm_al_quwain_bike: '/UAQ-B-plate.webp',
 };
 
 export interface EmirateSection {
@@ -74,11 +74,11 @@ export interface EmirateSection {
 }
 
 export const SECTIONS: EmirateSection[] = [
-  { name: 'Abu Dhabi', subtitle: 'Capital Collection', logo: '/Abu_Dhabi-logo.png', emirateKey: 'abudhabi' },
-  { name: 'Dubai', subtitle: 'Premium RTA Series', logo: '/dubai-logo.png', emirateKey: 'dubai' },
-  { name: 'Sharjah', subtitle: 'Exclusive Series', logo: '/SHARJAH-LOGO.png', emirateKey: 'sharjah' },
-  { name: 'Ajman', subtitle: 'Distinctive Codes', logo: '/ajman-logo.png', emirateKey: 'ajman' },
-  { name: 'Umm Al Quwain', subtitle: 'Vintage Selection', logo: '/ummalquein-logo.png', emirateKey: 'umm_al_quwain' },
-  { name: 'Ras Al Khaimah', subtitle: 'Northern Emirates', logo: '/rak-logo.png', emirateKey: 'rak' },
-  { name: 'Fujairah', subtitle: 'Eastern Region Collection', logo: '/fujairah-logo.png', emirateKey: 'fujairah' },
+  { name: 'Abu Dhabi', subtitle: 'Capital Collection', logo: '/Abu_Dhabi-logo.webp', emirateKey: 'abudhabi' },
+  { name: 'Dubai', subtitle: 'Premium RTA Series', logo: '/dubai-logo.webp', emirateKey: 'dubai' },
+  { name: 'Sharjah', subtitle: 'Exclusive Series', logo: '/SHARJAH-LOGO.webp', emirateKey: 'sharjah' },
+  { name: 'Ajman', subtitle: 'Distinctive Codes', logo: '/ajman-logo.webp', emirateKey: 'ajman' },
+  { name: 'Umm Al Quwain', subtitle: 'Vintage Selection', logo: '/ummalquein-logo.webp', emirateKey: 'umm_al_quwain' },
+  { name: 'Ras Al Khaimah', subtitle: 'Northern Emirates', logo: '/rak-logo.webp', emirateKey: 'rak' },
+  { name: 'Fujairah', subtitle: 'Eastern Region Collection', logo: '/fujairah-logo.webp', emirateKey: 'fujairah' },
 ];

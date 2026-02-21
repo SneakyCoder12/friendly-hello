@@ -113,7 +113,7 @@ export default function MobileNumberDetailPage() {
     const sellerName = seller?.full_name || seller?.email || 'Seller';
     const memberYear = seller?.created_at ? new Date(seller.created_at).getFullYear().toString() : '';
     const carrierDisplay = listing?.carrier === 'etisalat' ? 'Etisalat (e&)' : 'Du';
-    const carrierLogo = listing?.carrier === 'etisalat' ? '/Eand_Logo.svg' : '/du-logo.png';
+    const carrierLogo = listing?.carrier === 'etisalat' ? '/Eand_Logo.svg' : '/du-logo.webp';
 
     const handleShare = () => {
         if (navigator.share) {
@@ -178,7 +178,7 @@ export default function MobileNumberDetailPage() {
                             {/* Carrier Logo */}
                             <div className="absolute top-5 left-5 flex items-center gap-2">
                                 <img src={carrierLogo} alt={carrierDisplay} className="h-6 w-6 object-contain" />
-                                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{carrierDisplay}</span>
+                                <span className="text-xs font-bold text-gray-300 uppercase tracking-widest">{carrierDisplay}</span>
                             </div>
 
                             {/* Favorite Button */}
@@ -187,7 +187,7 @@ export default function MobileNumberDetailPage() {
                                 disabled={favLoading}
                                 className="absolute top-5 right-5 h-10 w-10 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:border-red-300 hover:bg-red-50 transition-all shadow-sm disabled:opacity-50"
                             >
-                                <Heart className={`h-5 w-5 transition-colors ${isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
+                                <Heart className={`h-5 w-5 transition-colors ${isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-300'}`} />
                             </button>
 
                             {/* Phone Number */}
@@ -208,17 +208,17 @@ export default function MobileNumberDetailPage() {
                         {/* Number Details */}
                         <div className="mt-6 grid grid-cols-3 gap-4">
                             <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 text-center">
-                                <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">Carrier</p>
+                                <p className="text-[10px] text-gray-300 uppercase tracking-widest font-bold mb-1">Carrier</p>
                                 <p className="text-lg font-bold text-gray-900">{carrierDisplay}</p>
                             </div>
                             <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 text-center">
-                                <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">Listed</p>
+                                <p className="text-[10px] text-gray-300 uppercase tracking-widest font-bold mb-1">Listed</p>
                                 <p className="text-lg font-bold text-gray-900">
                                     {new Date(listing.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                                 </p>
                             </div>
                             <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 text-center">
-                                <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">Type</p>
+                                <p className="text-[10px] text-gray-300 uppercase tracking-widest font-bold mb-1">Type</p>
                                 <p className="text-lg font-bold text-gray-900">VIP</p>
                             </div>
                         </div>
@@ -226,7 +226,7 @@ export default function MobileNumberDetailPage() {
                         {/* Description */}
                         {listing.description && (
                             <div className="mt-6 bg-gray-50 rounded-xl p-5 border border-gray-100">
-                                <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-2">Description</p>
+                                <p className="text-[10px] text-gray-300 uppercase tracking-widest font-bold mb-2">Description</p>
                                 <p className="text-sm text-gray-700 leading-relaxed">{listing.description}</p>
                             </div>
                         )}
@@ -237,7 +237,7 @@ export default function MobileNumberDetailPage() {
 
                         {/* Price */}
                         <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                            <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-2">Price</p>
+                            <p className="text-[10px] text-gray-300 uppercase tracking-widest font-bold mb-2">Price</p>
                             <p className="text-4xl font-black text-gray-900 font-mono tracking-tight">
                                 {listing.price ? `AED ${listing.price.toLocaleString()}` : 'Contact Seller'}
                             </p>
@@ -252,14 +252,14 @@ export default function MobileNumberDetailPage() {
 
                         {/* Seller Info */}
                         <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                            <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-4">Seller Information</p>
+                            <p className="text-[10px] text-gray-300 uppercase tracking-widest font-bold mb-4">Seller Information</p>
                             <div className="flex items-center gap-3 mb-4">
                                 <div className="h-12 w-12 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-500 font-bold text-lg">
                                     {sellerName.charAt(0).toUpperCase()}
                                 </div>
                                 <div>
                                     <p className="font-bold text-gray-900">{sellerName}</p>
-                                    <p className="text-xs text-gray-400">
+                                    <p className="text-xs text-gray-300">
                                         {memberYear && `Member since ${memberYear} · `}UAE
                                     </p>
                                 </div>
@@ -286,7 +286,7 @@ export default function MobileNumberDetailPage() {
 
                         {/* Disclaimer */}
                         <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
-                            <Shield className="h-5 w-5 text-gray-400 flex-shrink-0 mt-0.5" />
+                            <Shield className="h-5 w-5 text-gray-300 flex-shrink-0 mt-0.5" />
                             <p className="text-xs text-gray-500 leading-relaxed">
                                 <span className="font-bold text-gray-700">NOTICE:</span> We facilitate connections but are not liable for private transactions between buyers and sellers.
                             </p>
