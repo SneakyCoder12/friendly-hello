@@ -55,20 +55,71 @@ export default function PlateDetailPage() {
         if (!plateId) return;
         (async () => {
             setLoading(true);
-            // Fetch listing by UUID
-            const { data, error: fetchError } = await supabase
-                .from('listings')
-                .select('*')
-                .eq('id', plateId)
-                .single();
 
-            if (fetchError || !data) {
+            let listingData: ListingDetail | null = null;
+            let fetchError: any = null;
+
+            // Check if it's a legacy exact UUID
+            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(plateId);
+
+            if (isUUID) {
+                const { data, error } = await supabase
+                    .from('listings')
+                    .select('*')
+                    .eq('id', plateId)
+                    .single();
+                fetchError = error;
+                listingData = data as unknown as ListingDetail;
+            } else {
+                // Parse slug: e.g. dubai-e-65246-a1b2c3d4
+                const parts = plateId.split('-');
+                const shortId = parts.pop();
+                const restSlug = parts.join('-');
+
+                const emirateMap: Record<string, string> = {
+                    'abu-dhabi': 'Abu Dhabi',
+                    'dubai': 'Dubai',
+                    'sharjah': 'Sharjah',
+                    'ajman': 'Ajman',
+                    'umm-al-quwain': 'Umm Al Quwain',
+                    'ras-al-khaimah': 'Ras Al Khaimah',
+                    'fujairah': 'Fujairah'
+                };
+
+                let matchedEmirateKey = '';
+                for (const key of Object.keys(emirateMap)) {
+                    if (restSlug.startsWith(key + '-')) {
+                        matchedEmirateKey = key;
+                        break;
+                    }
+                }
+
+                if (matchedEmirateKey && shortId) {
+                    const dbEmirate = emirateMap[matchedEmirateKey];
+                    const rawPlateNumber = restSlug.substring(matchedEmirateKey.length + 1).replace(/-/g, ' ');
+
+                    const { data, error } = await supabase
+                        .from('listings')
+                        .select('*')
+                        .eq('emirate', dbEmirate)
+                        .ilike('plate_number', rawPlateNumber);
+
+                    fetchError = error;
+
+                    if (data && data.length > 0) {
+                        listingData = data.find((p: any) => p.id.startsWith(shortId)) as unknown as ListingDetail || data[0] as unknown as ListingDetail;
+                    }
+                } else {
+                    fetchError = new Error("Invalid URL format");
+                }
+            }
+
+            if (fetchError || !listingData) {
                 setError(t('listingNotFound'));
                 setLoading(false);
                 return;
             }
 
-            const listingData = data as unknown as ListingDetail;
             setListing(listingData);
 
             // Fetch seller profile
@@ -83,7 +134,7 @@ export default function PlateDetailPage() {
             }
             setLoading(false);
         })();
-    }, [plateId]);
+    }, [plateId, t]);
 
     // Derive plate type from DB plate_style
     const isClassic = listing?.plate_style === 'classic';

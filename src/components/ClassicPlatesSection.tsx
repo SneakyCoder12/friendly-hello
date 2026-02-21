@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import PlateCard from './PlateCard';
+import { generatePlateSlug } from '@/utils/plateUrl';
 import { ArrowRight } from 'lucide-react';
 
 interface ClassicListing {
@@ -110,7 +111,7 @@ export default function ClassicPlatesSection() {
                                         code=""
                                         number={number}
                                         price={listing.price ? `AED ${listing.price.toLocaleString()}` : undefined}
-                                        plateUrl={`/plate/${listing.id}`}
+                                        plateUrl={`/plate/${generatePlateSlug(listing)}`}
                                         sellerPhone={listing.contact_phone}
                                         plateNumber={listing.plate_number}
                                         listingId={listing.id}
@@ -143,7 +144,7 @@ export default function ClassicPlatesSection() {
                                     code=""
                                     number={number}
                                     price={listing.price ? `AED ${listing.price.toLocaleString()}` : undefined}
-                                    plateUrl={`/plate/${listing.id}`}
+                                    plateUrl={`/plate/${generatePlateSlug(listing)}`}
                                     sellerPhone={listing.contact_phone}
                                     plateNumber={listing.plate_number}
                                     listingId={listing.id}

@@ -5,6 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Search, ChevronLeft, ChevronRight, Loader2, X, Sparkles, SlidersHorizontal, ChevronDown, Settings } from 'lucide-react';
 import PlateCard from '@/components/PlateCard';
 import ListWithUsBanner from '@/components/ListWithUsBanner';
+import { generatePlateSlug } from '@/utils/plateUrl';
 
 const EMIRATES = ['Abu Dhabi', 'Dubai', 'Sharjah', 'Ajman', 'Umm Al Quwain', 'Ras Al Khaimah', 'Fujairah'];
 const EMIRATE_KEY_MAP: Record<string, string> = {
@@ -487,7 +488,7 @@ export default function MarketplacePage() {
                   code={code}
                   number={number}
                   price={listing.price ? `AED ${listing.price.toLocaleString()}` : undefined}
-                  plateUrl={`/plate/${listing.id}`}
+                  plateUrl={`/plate/${generatePlateSlug(listing)}`}
                   sellerPhone={listing.contact_phone}
                   plateNumber={listing.plate_number}
                   listingId={listing.id}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import PlateCard from './PlateCard';
 import { supabase } from '@/integrations/supabase/client';
+import { generatePlateSlug } from '@/utils/plateUrl';
 
 interface FeaturedListing {
     id: string;
@@ -64,7 +65,7 @@ export default function FeaturedNumbersStrip() {
                                 code={code}
                                 number={number}
                                 price={listing.price ? `AED ${listing.price.toLocaleString()}` : undefined}
-                                plateUrl={`/plate/${listing.id}`}
+                                plateUrl={`/plate/${generatePlateSlug(listing)}`}
                                 sellerPhone={listing.contact_phone}
                                 plateNumber={listing.plate_number}
                                 listingId={listing.id}

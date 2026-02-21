@@ -1,5 +1,7 @@
 import { ArrowRight } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import PlateCard from './PlateCard';
+import { generatePlateSlug } from '@/utils/plateUrl';
 import type { EmirateSection as SectionData } from '@/data/listings';
 
 interface SupabaseListing {
@@ -85,7 +87,7 @@ export default function EmirateSection({ section, listings, loading }: Props) {
                     code={code}
                     number={number}
                     price={listing.price ? `AED ${listing.price.toLocaleString()}` : undefined}
-                    plateUrl={`/plate/${listing.id}`}
+                    plateUrl={`/plate/${generatePlateSlug(listing)}`}
                     sellerPhone={listing.contact_phone}
                     plateNumber={listing.plate_number}
                     listingId={listing.id}
@@ -126,7 +128,7 @@ export default function EmirateSection({ section, listings, loading }: Props) {
                   code={code}
                   number={number}
                   price={listing.price ? `AED ${listing.price.toLocaleString()}` : undefined}
-                  plateUrl={`/plate/${listing.id}`}
+                  plateUrl={`/plate/${generatePlateSlug(listing)}`}
                   sellerPhone={listing.contact_phone}
                   plateNumber={listing.plate_number}
                   listingId={listing.id}
