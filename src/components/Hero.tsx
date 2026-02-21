@@ -84,7 +84,7 @@ export default function Hero() {
             - Move everything Up/Down:    change `top-[25%]`
             ===========================================================
           */}
-          <div className="absolute left-1 sm:left-16 md:left-24 lg:left-22 top-[30%] sm:top-[20%] md:top-[20%] flex flex-col items-start z-10 pointer-events-auto">
+          <div className="absolute left-1 sm:left-16 md:left-10 lg:left-10 top-[30%] sm:top-[20%] md:top-[12%] lg:top-[10%] flex flex-col items-start z-10 pointer-events-auto">
             <div
               className={`transition-all duration-700 ease-out delay-300 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
             >
