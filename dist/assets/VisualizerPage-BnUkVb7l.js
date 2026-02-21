@@ -1,0 +1,1 @@
+import{j as e}from"./index-Bhz5slUc.js";import{P as r}from"./PlateGenerator-BnQY6t10.js";import"./usePlateGenerator-B46GhrFa.js";function i(){return e.jsx("div",{className:"min-h-screen bg-background pt-24 pb-16",children:e.jsx("div",{className:"max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",children:e.jsx(r,{})})})}export{i as default};

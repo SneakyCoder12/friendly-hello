@@ -112,14 +112,14 @@ export default function ContactPage() {
                     <Phone className="h-5 w-5 text-gray-400 mt-0.5" />
                     <div>
                       <p className="text-sm font-bold text-gray-900">{t('phoneNumber')}</p>
-                      <p className="text-sm text-gray-500">Coming soon</p>
+                      <a href="tel:+971509912129" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">+971 50 991 2129</a>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <Mail className="h-5 w-5 text-gray-400 mt-0.5" />
                     <div>
                       <p className="text-sm font-bold text-gray-900">{t('email')}</p>
-                      <a href="mailto:alnuamigroups@gmail.com" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">alnuamigroups@gmail.com</a>
+                      <a href="mailto:bo.mohammad125@gmail.com" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">bo.mohammad125@gmail.com</a>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">

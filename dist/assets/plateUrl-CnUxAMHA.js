@@ -1,0 +1,1 @@
+function o(e){if(!(e!=null&&e.id))return"";if(!e.emirate||!e.plate_number)return e.id;const r=e.emirate.toLowerCase().replace(/\s+/g,"-"),a=e.plate_number.toLowerCase().replace(/\s+/g,"-"),t=e.id.split("-")[0];return`${r}-${a}-${t}`}export{o as g};

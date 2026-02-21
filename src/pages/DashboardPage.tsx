@@ -83,7 +83,7 @@ export default function DashboardPage() {
   const [editForm, setEditForm] = useState({ plate_code: '', plate_number: '', emirate: 'Dubai', price: '', description: '', vehicle_type: 'car' });
 
   // Profile edit
-  const [profileForm, setProfileForm] = useState({ full_name: '', phone_number: '' });
+  const [profileForm, setProfileForm] = useState({ full_name: '', phone_number: '', plate_call_number: '', whatsapp_number: '' });
   const [editingProfile, setEditingProfile] = useState(false);
 
   // Delete
@@ -133,7 +133,14 @@ export default function DashboardPage() {
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
 
   useEffect(() => {
-    if (profile) setProfileForm({ full_name: profile.full_name || '', phone_number: profile.phone_number || '' });
+    if (profile) {
+      setProfileForm({
+        full_name: profile.full_name || '',
+        phone_number: profile.phone_number || '',
+        plate_call_number: profile.plate_call_number || profile.phone_number || '',
+        whatsapp_number: profile.whatsapp_number || profile.phone_number || ''
+      });
+    }
   }, [profile]);
 
   const fetchListings = async () => {
@@ -368,6 +375,8 @@ export default function DashboardPage() {
     const { error } = await supabase.from('profiles').update({
       full_name: profileForm.full_name,
       phone_number: profileForm.phone_number,
+      plate_call_number: profileForm.plate_call_number,
+      whatsapp_number: profileForm.whatsapp_number,
     }).eq('id', user.id);
     if (error) toast.error(error.message);
     else { toast.success('Profile updated'); setEditingProfile(false); refreshProfile(); }
@@ -677,23 +686,49 @@ export default function DashboardPage() {
                 </div>
                 {editingProfile ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-2">
-                    <input value={profileForm.full_name} onChange={e => setProfileForm(p => ({ ...p, full_name: e.target.value }))}
-                      className="bg-surface/80 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-shadow"
-                      placeholder={t('fullName')} />
-                    <PhoneInput value={profileForm.phone_number} onChange={v => setProfileForm(p => ({ ...p, phone_number: v }))} showValidation={false} />
-                    <div className="flex gap-2 col-span-full">
+                    <div className="space-y-1">
+                      <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold ml-1">{t('fullName')}</label>
+                      <input value={profileForm.full_name} onChange={e => setProfileForm(p => ({ ...p, full_name: e.target.value }))}
+                        className="w-full bg-surface/80 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-shadow"
+                        placeholder={t('fullName')} />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold ml-1">Account Phone</label>
+                      <PhoneInput value={profileForm.phone_number} onChange={v => setProfileForm(p => ({ ...p, phone_number: v }))} showValidation={false} />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold ml-1">Public Display Number (Calls)</label>
+                      <PhoneInput value={profileForm.plate_call_number} onChange={v => setProfileForm(p => ({ ...p, plate_call_number: v }))} showValidation={false} />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="block text-[10px] text-muted-foreground uppercase tracking-widest font-bold ml-1">Public Display Number (WhatsApp)</label>
+                      <PhoneInput value={profileForm.whatsapp_number} onChange={v => setProfileForm(p => ({ ...p, whatsapp_number: v }))} showValidation={false} />
+                    </div>
+                    <div className="flex gap-2 col-span-full mt-2">
                       <button onClick={saveProfile} className="bg-primary text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-primary-hover active:scale-[0.97] transition-all">{t('save')}</button>
                       <button onClick={() => setEditingProfile(false)} className="bg-surface border border-border px-5 py-2.5 rounded-xl text-sm font-bold text-foreground hover:bg-surface-accent active:scale-[0.97] transition-all">{t('cancel')}</button>
                     </div>
                   </div>
                 ) : (
-                  <div className="flex items-center justify-between gap-3 pt-1">
-                    <div className="min-w-0 space-y-0.5">
-                      <p className="text-foreground font-semibold text-sm sm:text-base">{profile?.full_name || 'No name set'}</p>
-                      <p className="text-muted-foreground text-xs">{profile?.phone_number || 'No phone set'}</p>
+                  <div className="flex items-start justify-between gap-3 pt-1">
+                    <div className="min-w-0 space-y-3">
+                      <div>
+                        <p className="text-foreground font-semibold text-sm sm:text-base">{profile?.full_name || 'No name set'}</p>
+                        <p className="text-muted-foreground text-xs">{profile?.phone_number || 'No phone set'}</p>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-0.5">Public Call Number</p>
+                          <p className="text-foreground text-sm font-mono">{profile?.plate_call_number || profile?.phone_number || 'Not set'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mb-0.5">WhatsApp Number</p>
+                          <p className="text-foreground text-sm font-mono">{profile?.whatsapp_number || profile?.phone_number || 'Not set'}</p>
+                        </div>
+                      </div>
                     </div>
                     <button onClick={() => setEditingProfile(true)}
-                      className="flex items-center gap-1.5 text-primary text-xs sm:text-sm font-bold bg-primary/5 hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-all active:scale-95">
+                      className="flex items-center gap-1.5 text-primary text-xs sm:text-sm font-bold bg-primary/5 hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-all active:scale-95 flex-shrink-0">
                       <Pencil className="h-3 w-3" /> Edit
                     </button>
                   </div>

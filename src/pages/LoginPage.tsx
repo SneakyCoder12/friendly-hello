@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
-import { Loader2, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Lock, Eye, EyeOff, UserCircle } from 'lucide-react';
+import { isPhoneNumber, formatPhoneAsEmail } from '@/utils/phoneAuth';
 
 export default function LoginPage() {
   const { t } = useLanguage();
@@ -17,7 +18,15 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+    const isPhone = isPhoneNumber(email);
+    const loginIdentifier = isPhone ? formatPhoneAsEmail(email) : email;
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email: loginIdentifier,
+      password
+    });
+
     if (error) toast.error(error.message);
     else { toast.success(t('success')); navigate('/dashboard'); }
     setLoading(false);
@@ -36,16 +45,16 @@ export default function LoginPage() {
           {/* Email Form */}
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('email')}</label>
+              <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('email')} or Phone Number</label>
               <div className="relative">
-                <Mail className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <UserCircle className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <input
-                  type="email"
+                  type="text"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-surface border border-border rounded-xl ps-10 pe-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                  placeholder="you@example.com"
+                  placeholder="you@example.com or +971501234567"
                 />
               </div>
             </div>
