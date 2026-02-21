@@ -44,7 +44,7 @@ export default function App() {
       <AuthProvider>
         <BrowserRouter>
           <ScrollToTop />
-          <div className="flex flex-col min-h-screen overflow-x-hidden w-full max-w-full">
+          <div className="flex flex-col min-h-[100dvh] overflow-x-hidden w-full max-w-full">
             <Navbar />
             <Suspense fallback={<Loading />}>
               <AnimatedPage>

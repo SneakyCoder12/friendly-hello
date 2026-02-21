@@ -228,8 +228,8 @@ export default function MarketplacePage() {
   );
 
   return (
-    <div className="bg-background overflow-x-hidden md:min-h-screen">
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8 pt-20 sm:pt-28">
+    <div className="bg-background flex-1 flex flex-col overflow-x-hidden md:min-h-screen">
+      <div className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-4 py-4 sm:py-8 pt-20 sm:pt-28">
 
         {/* ── HEADER ROW ── */}
         <div className="flex items-center justify-between mb-4">
