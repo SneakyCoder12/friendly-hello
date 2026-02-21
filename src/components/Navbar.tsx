@@ -80,9 +80,9 @@ export default function Navbar() {
               <img
                 src="/Logo.png"
                 alt="Alnuami Groups"
-                className={`h-8 sm:h-14 lg:h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105 self-center translate-x-3 sm:translate-x-0`}
+                className={`h-10 sm:h-14 lg:h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105 self-center`}
               />
-              <div className={`ml-0 sm:ml-1 leading-none transition-colors duration-300`}>
+              <div className={`ml-2 sm:ml-1 leading-none transition-colors duration-300`}>
                 <h1 className={`font-display font-black text-xl sm:text-2xl lg:text-3xl tracking-tighter transition-colors duration-300 group-hover:text-gray-700 text-gray-900`}>
                   ALNUAMI
                 </h1>

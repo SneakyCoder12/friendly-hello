@@ -3,6 +3,7 @@ import { memo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { usePlateImage } from '@/hooks/usePlateGenerator';
 import { Phone, MessageCircle, Heart, Car, Bike } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -68,6 +69,7 @@ export function AedLogo({ className = 'aed-logo' }: { className?: string }) {
 }
 
 function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerPhone, plateNumber, listingId, status, plateStyle = 'private', vehicleType, plateImageUrl }: PlateCardProps) {
+  const { t } = useLanguage();
   const isTouch = useIsTouch();
   const displayType: 'car' | 'bike' | 'classic' = vehicleType ?? (plateStyle === 'bike' ? 'bike' : plateStyle === 'classic' ? 'classic' : 'car');
   const isSold = status === 'sold';
@@ -267,19 +269,27 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
               </div>
               {/* Price section */}
               <div className="mt-2 p-2.5 w-full border-t border-border/50">
-                <div className="flex justify-between items-center">
-                  <div>
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0">
+                  <div className="w-full flex justify-center sm:justify-start">
                     <p className="text-sm font-bold text-foreground font-mono tracking-tight flex items-center gap-1">
                       {price ? (
                         <>
                           <AedLogo />
                           <span>{price.replace(/^AED\s*/, '')}</span>
                         </>
-                      ) : <span className="text-muted-foreground text-xs">Contact for price</span>}
+                      ) : <span className="text-muted-foreground text-xs">{t('contactForPrice')}</span>}
                     </p>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider group-hover:text-primary transition-colors">Hover →</p>
+                  <div className="flex items-center justify-center w-full sm:w-auto">
+                    {isTouch ? (
+                      <p className="w-full text-center text-[10px] text-white bg-[hsl(40,86%,44%)] px-4 py-1.5 rounded-full font-bold uppercase tracking-wider shadow-sm">
+                        {t('viewDetailsBtn')}
+                      </p>
+                    ) : (
+                      <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider group-hover:text-primary transition-colors">
+                        {t('hoverToViewBtn')}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

@@ -23,8 +23,8 @@ export default function Hero() {
 
   return (
     <div className="relative w-full overflow-x-hidden bg-gray-900">
-      {/* Mobile: bigger banner ~45vh, left-aligned | Tablet+: original heights, centered */}
-      <div className="relative h-[45vh] min-h-[300px] max-h-[420px] sm:h-[600px] sm:min-h-0 sm:max-h-none md:h-[700px] w-full overflow-hidden">
+      {/* Mobile: smaller banner ~30vh, left-aligned | Tablet+: original heights, centered */}
+      <div className="relative h-[30vh] min-h-[220px] max-h-[300px] sm:h-[600px] sm:min-h-0 sm:max-h-none md:h-[700px] w-full overflow-hidden">
         {/* Background Image */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -77,29 +77,45 @@ export default function Hero() {
           </div>
 
           {/* Left Side: Main Texts */}
-          <div className="absolute left-4 sm:left-16 md:left-24 lg:left-31 top-[25%] sm:top-[20%] md:top-[20%] flex flex-col items-start z-10 pointer-events-auto">
+          {/* 
+            ===========================================================
+            📱 MOBILE ADJUSTMENTS (Android/iOS)
+            - Move everything Left/Right: change `left-4` (or `left-0`, `-left-4`)
+            - Move everything Up/Down:    change `top-[25%]`
+            ===========================================================
+          */}
+          <div className="absolute left-1 sm:left-16 md:left-24 lg:left-22 top-[30%] sm:top-[20%] md:top-[20%] flex flex-col items-start z-10 pointer-events-auto">
             <div
               className={`transition-all duration-700 ease-out delay-300 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
             >
-              <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2.5 mb-2 sm:mb-4 lg:mb-6 z-20 relative">
+              {/* Force horizontal row on mobile too, but smaller */}
+              <div className="flex flex-row items-center gap-2 sm:gap-2.5 mb-2 sm:mb-4 lg:mb-6 z-20 relative">
                 <img
                   src="/Logo.png"
                   alt="Alnuami Logo"
-                  className="h-[80px] sm:h-[155px] md:h-[185px] lg:h-[215px] w-auto object-contain drop-shadow-lg z-10"
+                  className="h-[55px] sm:h-[155px] md:h-[185px] lg:h-[215px] w-auto object-contain drop-shadow-lg z-10"
                 />
-                <div className="leading-none flex flex-col items-center sm:items-start mt-0 sm:mt-8 md:mt-10 lg:mt-11">
-                  <h1 className="font-display font-black text-3xl sm:text-7xl md:text-4xl lg:text-[4rem] tracking-tighter text-[hsl(40,86%,44%)] uppercase drop-shadow-[0_5px_15px_rgba(0,0,0,0.8)] text-center sm:text-left">
-                    ALNUAMI
+
+                <div className="leading-none flex flex-col items-start mt-1 sm:mt-8 md:mt-10 lg:mt-11 pb-2">
+                  <h1 className="font-display font-black text-[1.25rem] sm:text-7xl md:text-4xl lg:text-[4rem] tracking-tighter text-[hsl(40,86%,44%)] uppercase drop-shadow-[0_5px_15px_rgba(0,0,0,0.8)] text-left">
+                    {t('alnuami')}
                   </h1>
-                  <p className="text-[10px] sm:text-sm md:text-base font-black uppercase tracking-[0.4em] text-gray-100 self-center sm:self-end mt-1 sm:mt-2 drop-shadow-[0_2px_5px_rgba(0,0,0,0.8)] translate-x-[2px] sm:translate-x-[5px]">
-                    GROUPS
+                  <p className="text-[6px] sm:text-sm md:text-base font-black uppercase tracking-[0.4em] text-gray-100 self-end sm:mt-2 drop-shadow-[0_2px_5px_rgba(0,0,0,0.8)] translate-x-[2px] sm:translate-x-[5px]">
+                    {t('groups')}
                   </p>
                 </div>
               </div>
 
-              <h2 className="text-white text-sm sm:text-2xl md:text-3xl lg:text-4xl font-display font-black tracking-wider uppercase leading-[1.15] relative z-10 text-center sm:text-left w-full sm:w-auto mt-4 sm:mt-0" style={{ textShadow: '0 4px 15px rgba(0,0,0,0.8)' }}>
-                BUYING & SELLING<br />
-                <span className="text-white/90">PREMIUM NUMBER PLATES</span>
+              {/* 
+                ===========================================================
+                📱 "BUYING & SELLING" TEXT ADJUSTMENTS (Android/iOS)
+                - To move RIGHT a lot: use positive numbers like `translate-x-16`
+                - To move LEFT: use negative numbers like `-translate-x-4`
+                ===========================================================
+              */}
+              <h2 className="text-white text-[10px] sm:text-2xl md:text-3xl lg:text-4xl font-display font-black tracking-wider uppercase leading-[1.15] relative z-10 text-left w-full sm:w-auto mt-2 sm:mt-0 translate-x-1 sm:translate-x-0" style={{ textShadow: '0 4px 15px rgba(0,0,0,0.8)' }}>
+                {t('buyingSelling')}<br />
+                <span className="text-white/90">{t('premiumNumberPlatesHero')}</span>
               </h2>
             </div>
           </div>

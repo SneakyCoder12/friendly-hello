@@ -239,10 +239,10 @@ export default function MarketplacePage() {
             <div className="flex-1 text-center md:text-start z-10">
               <div className="inline-flex items-center gap-2 mb-4 px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5">
                 <Sparkles className="h-3.5 w-3.5 text-primary" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Premium Collection</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">{t('premiumCollection')}</span>
               </div>
               <h1 className="text-2xl sm:text-3xl md:text-5xl font-display font-black text-foreground tracking-tight mb-3 leading-tight">
-                Number Plate<br />Marketplace
+                {t('marketplace')}
               </h1>
               <p className="text-muted-foreground text-sm md:text-base leading-relaxed max-w-md">
                 Explore exclusive UAE number plates across all Emirates. Find your dream plate today.
@@ -365,9 +365,8 @@ export default function MarketplacePage() {
           className={`sm:hidden fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${filterPanelOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
           onClick={() => setFilterPanelOpen(false)}
         />
-        {/* Panel — full screen overlay */}
         <div
-          className={`sm:hidden fixed inset-0 z-[101] bg-background transition-transform duration-400 ease-[cubic-bezier(0.32,0.72,0,1)] flex flex-col pt-20 sm:pt-0 ${filterPanelOpen ? 'translate-y-0' : 'translate-y-full'}`}
+          className={`sm:hidden fixed inset-0 z-[101] bg-background transition-all duration-400 ease-[cubic-bezier(0.32,0.72,0,1)] flex flex-col pt-20 sm:pt-0 ${filterPanelOpen ? 'translate-y-0 opacity-100 visible' : 'translate-y-full opacity-0 invisible'}`}
         >
           {/* Header */}
           <div className="flex-shrink-0 flex items-center justify-between px-5 py-4 border-b border-border bg-card">

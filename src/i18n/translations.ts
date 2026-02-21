@@ -25,6 +25,12 @@ export const translations = {
     noticeLabel: 'Notice:',
     noticeText: 'We facilitate connections but are not liable for private transactions between buyers and sellers.',
 
+    // Hero Custom
+    alnuami: 'ALNUAMI',
+    groups: 'GROUPS',
+    buyingSelling: 'BUYING & SELLING',
+    premiumNumberPlatesHero: 'PREMIUM NUMBER PLATES',
+
     // Listings / Marketplace
     viewAll: 'VIEW ALL',
     searchPlaceholder: 'Search plate number...',
@@ -59,6 +65,9 @@ export const translations = {
     negotiate: 'Negotiate',
     featured: 'Featured',
     new: 'New',
+    contactForPrice: 'Contact for price',
+    viewDetailsBtn: 'View Details →',
+    hoverToViewBtn: 'Hover To View →',
 
     // Plate Detail
     plateDetails: 'Plate Details',
@@ -263,6 +272,7 @@ export const translations = {
     noticeDisclaimerTitle: 'NOTICE:',
     noticeDisclaimerText: 'We facilitate connections but are not liable for private transactions between buyers and sellers.',
     premiumPlate: 'Premium Plate',
+    premiumCollection: 'Premium Collection',
 
     // Generator (extra)
     plateVisualizer: 'Plate Visualizer',
@@ -323,6 +333,12 @@ export const translations = {
     noticeLabel: 'تنبيه:',
     noticeText: 'نحن نسهّل التواصل بين الأطراف ولا نتحمّل مسؤولية المعاملات الخاصة بين البائع والمشتري.',
 
+    // Hero Custom
+    alnuami: 'النعيمي',
+    groups: 'مجموعة',
+    buyingSelling: 'بيع وشراء',
+    premiumNumberPlatesHero: 'أرقام لوحات مميّزة',
+
     // Listings / Marketplace
     viewAll: 'عرض الكل',
     searchPlaceholder: 'ابحث عن رقم اللوحة...',
@@ -357,6 +373,9 @@ export const translations = {
     negotiate: 'قابل للتفاوض',
     featured: 'مميّز',
     new: 'يديد',
+    contactForPrice: 'تواصل لمعرفة السعر',
+    viewDetailsBtn: 'التفاصيل ←',
+    hoverToViewBtn: 'مرّر للعرض ←',
 
     // Plate Detail
     plateDetails: 'تفاصيل الرقم',
@@ -561,6 +580,7 @@ export const translations = {
     noticeDisclaimerTitle: 'تنبيه:',
     noticeDisclaimerText: 'نحن نسهّل التواصل ولا نتحمّل مسؤولية المعاملات الخاصة بين البائع والمشتري.',
     premiumPlate: 'لوحة مميّزة',
+    premiumCollection: 'مجموعة مميّزة',
 
     // Generator (extra)
     plateVisualizer: 'عارض الأرقام',
