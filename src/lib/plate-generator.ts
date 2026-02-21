@@ -55,14 +55,14 @@ const CONFIGS: Record<string, EmirateConfig> = {
     verticalCenter: true,
     components: [
       { type: 'code', xRatio: 0.09, yRatio: 0.46, align: 'center', fontSizeRatio: 0.12, letterSpacingRatio: 0.0001, baselineOffsetRatio: -0.23, emboss: true },
-      { type: 'number', xRatio: 0.70, yRatio: 0.78, align: 'center', fontSizeRatio: 0.24, emboss: true, letterSpacingRatio: 0.0001, baselineOffsetRatio: -0.03 },
+      { type: 'number', xRatio: 0.70, yRatio: 0.81, align: 'center', fontSizeRatio: 0.24, emboss: true, letterSpacingRatio: 0.0001, baselineOffsetRatio: -0.03 },
     ],
   },
   dubai: {
     hasCode: true,
     fontHeightRatio: 0.20,
     letterSpacingRatio: 0.015,
-  fontFile: '/fonts/Rough Motion.otf',
+    fontFile: '/fonts/Rough Motion.otf',
     verticalCenter: true,
     components: [
       {
@@ -96,34 +96,35 @@ const CONFIGS: Record<string, EmirateConfig> = {
   rak: {
     hasCode: true,
     fontHeightRatio: 0.168,
-    letterSpacingRatio: 0.015,
-    fontFile: '/fonts/DIN-1451.ttf',
+    letterSpacingRatio: 0.001,
+    fontFile: '/fonts/Rough Motion.otf',
     verticalCenter: true,
     components: [
-      { type: 'code', xRatio: 0.31, align: 'center', emboss: true },
-      { type: 'number', xRatio: 0.65, align: 'center', emboss: true },
+      { type: 'code', xRatio: 0.31, yRatio: 0.82, align: 'center', emboss: true, fontSizeRatio: 0.20 },
+      { type: 'number', xRatio: 0.65, yRatio: 0.82, align: 'center', emboss: true, fontSizeRatio: 0.20 },
     ],
   },
   fujairah: {
     hasCode: true,
     fontHeightRatio: 0.18,
-    letterSpacingRatio: 0.015,
+    letterSpacingRatio: 0.001,
+    fontFile: '/fonts/Rough Motion.otf',
     verticalCenter: true,
     components: [
-      { type: 'code', xRatio: 0.13, align: 'center', emboss: true },
-      { type: 'number', xRatio: 0.65, align: 'center', emboss: true },
+      { type: 'code', xRatio: 0.13, yRatio: 0.74, align: 'center', emboss: true, fontSizeRatio: 0.15 },
+      { type: 'number', xRatio: 0.70, yRatio: 0.74, align: 'center', emboss: true, fontSizeRatio: 0.15 },
     ],
   },
   umm_al_quwain: {
     hasCode: true,
     fontHeightRatio: 0.17,
-    letterSpacingRatio: 0.015,
-    fontFile: '/fonts/DIN-1451.ttf',
+    letterSpacingRatio: 0.01,
+    fontFile: '/fonts/Rough Motion.otf',
     baselineRatio: 0.80,
     verticalCenter: false,
     components: [
       { type: 'code', xRatio: 0.124, align: 'center', emboss: true },
-      { type: 'number', xRatio: 0.671, align: 'center', emboss: true },
+      { type: 'number', xRatio: 0.68, align: 'center', emboss: true, letterSpacingRatio: 0.003, },
     ],
   },
 };
@@ -148,8 +149,8 @@ CONFIGS['abudhabi_bike'] = {
   hasCode: true,
   fontFile: '/fonts/GL-Nummernschild-Mtl.ttf',
   components: [
-    { type: 'code', xRatio: 0.87, yRatio: 0.39, align: 'center', emboss: true, fontSizeRatio: 0.155 },
-    { type: 'number', xRatio: 0.51, yRatio: 0.90, align: 'center', emboss: true, fontSizeRatio: 0.15 },
+    { type: 'code', xRatio: 0.87, yRatio: 0.39, align: 'center', emboss: true, fontSizeRatio: 0.19 },
+    { type: 'number', xRatio: 0.51, yRatio: 0.90, align: 'center', emboss: true, fontSizeRatio: 0.22 },
   ],
 };
 
@@ -175,7 +176,7 @@ CONFIGS['sharjah_bike'] = {
   letterSpacingRatio: 0.01,
   components: [
     { type: 'code', xRatio: 0.177, yRatio: 0.44, align: 'center', emboss: true, fontSizeRatio: 0.20 },
-    { type: 'number', xRatio: 0.66, yRatio: 0.815, align: 'center', emboss: true, fontSizeRatio: 0.20 },
+    { type: 'number', xRatio: 0.66, yRatio: 0.885, align: 'center', emboss: true, fontSizeRatio: 0.20 },
   ],
 };
 
@@ -186,7 +187,7 @@ CONFIGS['ajman_bike'] = {
   fontFile: '/fonts/DIN-1451.ttf',
   components: [
     { type: 'code', xRatio: 0.177, yRatio: 0.44, align: 'center', emboss: true, fontSizeRatio: 0.20 },
-    { type: 'number', xRatio: 0.64, yRatio: 0.815, align: 'center', emboss: true, fontSizeRatio: 0.20 },
+    { type: 'number', xRatio: 0.64, yRatio: 0.895, align: 'center', emboss: true, fontSizeRatio: 0.20 },
   ],
 };
 
@@ -287,7 +288,7 @@ CONFIGS['rak_classic'] = {
   fontFile: '/fonts/GL-Nummernschild-Mtl.ttf',
   verticalCenter: true,
   components: [
-    { type: 'number', xRatio: 0.50, yRatio: 0.81, align: 'center', emboss: true, fontSizeRatio: 0.3, color: 'white' },
+    { type: 'number', xRatio: 0.50, yRatio: 0.84, align: 'center', emboss: true, fontSizeRatio: 0.3, color: 'white' },
   ],
 };
 

@@ -48,17 +48,19 @@ const PLATE_FONTS: FontDef[] = [
 
   // ── DIN-1451 ──────────────────────────────────────────────────────────────
   { name: 'PlateFont_rak', url: '/fonts/DIN-1451.ttf', weight: 'bold' },
-  { name: 'PlateFont_umm_al_quwain', url: '/fonts/DIN-1451.ttf', weight: 'bold' },
   { name: 'PlateFont_sharjah_classic', url: '/fonts/DIN-1451.ttf', weight: 'bold' },
   { name: 'PlateFont_sharjah_bike', url: '/fonts/DIN-1451.ttf', weight: 'bold' },
   { name: 'PlateFont_ajman_bike', url: '/fonts/DIN-1451.ttf', weight: 'bold' },
 
   // ── Rough Motion ──────────────────────────────────────────────────────────
   { name: 'PlateFont_dubai', url: '/fonts/Rough Motion.otf', weight: 'bold' },
+  { name: 'PlateFont_rak', url: '/fonts/Rough Motion.otf', weight: 'bold' },
+  { name: 'PlateFont_umm_al_quwain', url: '/fonts/Rough Motion.otf', weight: 'bold' },
   { name: 'PlateFont_dubai_bike', url: '/fonts/Rough Motion.otf', weight: 'bold' },
   { name: 'PlateFont_dubai_classic', url: '/fonts/Rough Motion.otf', weight: 'bold' },
   { name: 'PlateFont_rak_bike', url: '/fonts/Rough Motion.otf', weight: 'bold' },
   { name: 'PlateFont_umm_al_quwain_bike', url: '/fonts/Rough Motion.otf', weight: 'bold' },
+  { name: 'PlateFont_fujairah', url: '/fonts/Rough Motion.otf', weight: 'bold' },
   { name: 'PlateFont_fujairah_bike', url: '/fonts/Rough Motion.otf', weight: 'bold' },
 
   // ── Arabic ────────────────────────────────────────────────────────────────
