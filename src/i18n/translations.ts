@@ -294,6 +294,10 @@ export const translations = {
     abuDhabiPlates: 'Abu Dhabi Plates',
     dubaiPlates: 'Dubai Plates',
     sharjahPlates: 'Sharjah Plates',
+    ajmanPlates: 'Ajman Plates',
+    rakPlates: 'Ras Al Khaimah Plates',
+    fujariahPlates: 'Fujairah Plates',
+    uaqPlates: 'Umm Al Quwain Plates',
   },
   ar: {
     // Nav
@@ -588,6 +592,10 @@ export const translations = {
     abuDhabiPlates: 'لوحات أبوظبي',
     dubaiPlates: 'لوحات دبي',
     sharjahPlates: 'لوحات الشارقة',
+    ajmanPlates: 'لوحات عجمان',
+    rakPlates: 'لوحات رأس الخيمة',
+    fujariahPlates: 'لوحات الفجيرة',
+    uaqPlates: 'لوحات أم القيوين',
   },
 } as const;
 

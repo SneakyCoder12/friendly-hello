@@ -177,7 +177,10 @@ export default function MarketplacePage() {
       .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
 
     if (search.trim()) query = query.ilike('plate_number', `%${search.trim()}%`);
-    if (emirateFilter) query = query.eq('emirate', emirateFilter);
+    if (emirateFilter) {
+      const dbKey = EMIRATE_KEY_MAP[emirateFilter] || emirateFilter;
+      query = query.in('emirate', [emirateFilter, dbKey, emirateFilter.toLowerCase(), emirateFilter.toUpperCase()]);
+    }
     if (vehicleTypeFilter === 'bike') query = query.eq('plate_style', 'bike');
     else if (vehicleTypeFilter === 'classic') query = query.eq('plate_style', 'classic');
     else if (vehicleTypeFilter === 'car') query = query.not('plate_style', 'in', '("bike","classic")');

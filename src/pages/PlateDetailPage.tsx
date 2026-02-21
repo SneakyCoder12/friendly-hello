@@ -46,6 +46,7 @@ export default function PlateDetailPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [showCarPreview, setShowCarPreview] = useState(false);
+    const [showBikePreview, setShowBikePreview] = useState(false);
     const { t } = useLanguage();
     const { user } = useAuth();
     const [isFavorite, setIsFavorite] = useState(false);
@@ -233,6 +234,16 @@ export default function PlateDetailPage() {
                                 {t('viewOnCar')}
                             </button>
                         )}
+                        {/* View on Bike Button — only for bike plates */}
+                        {dataUrl && isBike && (
+                            <button
+                                onClick={() => setShowBikePreview(true)}
+                                className="mt-4 w-full flex items-center justify-center gap-2 py-3.5 rounded-xl border border-border bg-card text-foreground font-bold text-sm hover:bg-surface hover:border-primary/30 hover:shadow-md transition-all duration-200 group"
+                            >
+                                <Car className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+                                View on Bike
+                            </button>
+                        )}
 
                         {/* Car Preview Modal */}
                         {showCarPreview && dataUrl && (
@@ -263,10 +274,59 @@ export default function PlateDetailPage() {
                                             alt={`${emirateDisplay} ${code} ${number} on car`}
                                             className="absolute drop-shadow-lg"
                                             style={{
-                                                width: '17%',
-                                                top: '71%',
+                                                width: '18%',
+                                                top: '80%',
                                                 left: '73%',
                                                 transform: 'translate(-50%, -50%) perspective(600px) rotateX(4deg) rotateY(-3deg) rotateZ(-1deg)',
+                                                filter: 'brightness(0.92) contrast(1.05)',
+                                                imageRendering: '-webkit-optimize-contrast',
+                                            } as React.CSSProperties}
+                                        />
+                                    </div>
+
+                                    {/* Label */}
+                                    <div className="mt-4 text-center">
+                                        <p className="text-white/80 text-sm font-medium">
+                                            {emirateDisplay} · {code} {number}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Bike Preview Modal */}
+                        {showBikePreview && dataUrl && (
+                            <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" onClick={() => setShowBikePreview(false)}>
+                                {/* Backdrop */}
+                                <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+
+                                {/* Modal Content */}
+                                <div className="relative w-full max-w-5xl" onClick={e => e.stopPropagation()}>
+                                    {/* Close Button */}
+                                    <button
+                                        onClick={() => setShowBikePreview(false)}
+                                        className="absolute top-4 right-4 z-10 h-10 w-10 rounded-full bg-black/60 border border-white/20 flex items-center justify-center text-white hover:bg-black/80 transition-all"
+                                    >
+                                        <XIcon className="h-5 w-5" />
+                                    </button>
+
+                                    {/* Bike with Plate */}
+                                    <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+                                        <img
+                                            src="/Preview-Plate-Bike.png"
+                                            alt="Bike Preview"
+                                            className="w-full h-auto"
+                                        />
+                                        {/* Plate overlay — positioned on the back fender */}
+                                        <img
+                                            src={dataUrl}
+                                            alt={`${emirateDisplay} ${code} ${number} on bike`}
+                                            className="absolute drop-shadow-lg"
+                                            style={{
+                                                width: '11%',  // <-- CHANGE THIS TO MAKE THE PLATE WIDER OR THINNER
+                                                top: '63%',    // <-- CHANGE THIS (higher percentage = moves DOWN, lower = moves UP)
+                                                left: '50%',   // <-- CHANGE THIS (higher percentage = moves right, lower = moves left)
+                                                transform: 'translate(-50%, -50%) perspective(600px) ',
                                                 filter: 'brightness(0.92) contrast(1.05)',
                                                 imageRendering: '-webkit-optimize-contrast',
                                             } as React.CSSProperties}

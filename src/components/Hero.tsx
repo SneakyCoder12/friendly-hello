@@ -2,7 +2,16 @@ import { useState, useEffect } from 'react';
 import { ArrowDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import NoticeBanner from './NoticeBanner';
+
+const EMIRATES = [
+  { name: 'Abu Dhabi', image: '/abudhabi-plate.png' },
+  { name: 'Dubai', image: '/dubai-plate.png' },
+  { name: 'Sharjah', image: '/sharjah-plate.png' },
+  { name: 'Ajman', image: '/ajman-plate.png' },
+  { name: 'RAK', image: '/rak-plate.png' },
+  { name: 'Fujairah', image: '/fujariah-plate.png' },
+  { name: 'UAQ', image: '/umm-al-q-plate.png' },
+];
 
 export default function Hero() {
   const { t } = useLanguage();
@@ -16,73 +25,86 @@ export default function Hero() {
     <div className="relative w-full overflow-x-hidden bg-gray-900">
       {/* Mobile: bigger banner ~45vh, left-aligned | Tablet+: original heights, centered */}
       <div className="relative h-[45vh] min-h-[300px] max-h-[420px] sm:h-[600px] sm:min-h-0 sm:max-h-none md:h-[700px] w-full overflow-hidden">
+        {/* Background Image */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage:
-              "url('https://images.unsplash.com/photo-1518684079-3c830dcef090?q=80&w=3000&auto=format&fit=crop')",
+            backgroundImage: "url('/Background-Main.png')",
           }}
         />
-        {/* Mobile: stronger overlay for readability */}
-        <div className="absolute inset-0 bg-black/55 sm:bg-black/30" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent sm:from-black/50 sm:via-transparent sm:to-black/20" />
+        {/* Overlay for readability */}
+        <div className="absolute inset-0 bg-black/30" />
 
-        {/* Mobile: left-aligned layout | Desktop: original centered layout */}
-        <div className="relative z-10 h-full w-full flex flex-col items-start sm:items-center justify-end sm:justify-center text-left sm:text-center px-5 sm:px-6 pb-8 sm:pb-0 pt-10 sm:pt-20">
-          {/* Group 1: Badge + Title */}
+        {/* Content Container */}
+        <div className="absolute inset-0 z-10 w-full h-full pointer-events-none">
+
+          {/* Right Side: Shattered Plates */}
           <div
-            className={`transition-all duration-700 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
+            className={`absolute right-0 sm:right-4 md:right-8 lg:right-12 top-24 sm:top-32 z-20 pointer-events-auto transition-all duration-1000 ease-out delay-200 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
           >
-            {/* Badge: hidden on mobile */}
-            <div className="hidden sm:inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm mb-8">
-              <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-              <span className="text-xs font-mono text-white/90 tracking-widest uppercase font-bold">
-                {t('livePlatform')}
-              </span>
+            <div className="relative w-[180px] sm:w-[250px] md:w-[350px] lg:w-[450px] h-[200px] sm:h-[300px] md:h-[400px]">
+              {EMIRATES.map((emirate, index) => {
+                const positions = [
+                  { top: '5%', right: '5%', rotate: 'rotate-[6deg]', zIndex: 40 }, // Abu Dhabi
+                  { top: '15%', right: '25%', rotate: '-rotate-[4deg]', zIndex: 30 }, // Dubai
+                  { top: '35%', right: '10%', rotate: '-rotate-[6deg]', zIndex: 35 }, // Sharjah
+                  { top: '45%', right: '30%', rotate: 'rotate-[3deg]', zIndex: 25 }, // Ajman
+                  { top: '65%', right: '15%', rotate: 'rotate-[7deg]', zIndex: 20 }, // RAK
+                  { top: '25%', right: '45%', rotate: '-rotate-[9deg]', zIndex: 15 }, // Fujairah
+                  { top: '55%', right: '40%', rotate: '-rotate-[5deg]', zIndex: 10 }, // UAQ
+                ];
+                const pos = positions[index];
+                return (
+                  <Link
+                    key={emirate.name}
+                    to={`/marketplace?emirate=${encodeURIComponent(emirate.name)}`}
+                    className={`absolute group transform transition-all duration-500 hover:scale-110 hover:!z-50 ${pos.rotate}`}
+                    style={{
+                      top: pos.top,
+                      right: pos.right,
+                      zIndex: pos.zIndex,
+                    }}
+                  >
+                    <img
+                      src={emirate.image}
+                      alt={emirate.name}
+                      className="h-5 sm:h-8 md:h-10 lg:h-12 w-auto object-contain outline outline-2 outline-white rounded-[2px] bg-white drop-shadow-[0_15px_25px_rgba(0,0,0,0.5)] group-hover:drop-shadow-[0_30px_40px_rgba(0,0,0,0.8)]"
+                    />
+                  </Link>
+                );
+              })}
             </div>
-            {/* Mobile: left-aligned, bigger title | Desktop: original */}
-            <h2 className="text-white text-2xl sm:text-5xl md:text-6xl lg:text-8xl font-display font-black mb-2 sm:mb-6 tracking-tighter leading-[1.1] sm:leading-[1.05]" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
-              <span className="sm:hidden">Premium UAE<br />Number Plates</span>
-              <span className="hidden sm:inline">
-                {t('heroTitle')} <br />
-                <span className="text-white">{t('heroTitleAccent')}</span>
-              </span>
-            </h2>
           </div>
 
-          {/* Group 2: Subtitle */}
-          <p
-            className={`text-white/80 text-sm sm:text-lg md:text-xl font-medium tracking-wide w-full sm:max-w-2xl sm:mx-auto mb-4 sm:mb-10 transition-all duration-700 ease-out delay-200 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
-          >
-            <span className="sm:hidden">Buy & sell exclusive number plates</span>
-            <span className="hidden sm:inline">{t('heroSubtitle')}</span>
-          </p>
-
-          {/* Group 3: Buttons — mobile: both buttons side by side | Desktop: both buttons */}
-          <div
-            className={`flex flex-row gap-3 sm:gap-4 sm:justify-center w-full sm:w-auto transition-all duration-700 ease-out delay-[400ms] ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
-          >
-            <Link
-              className="flex-1 sm:flex-none bg-white text-gray-900 px-4 sm:px-8 py-2.5 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-lg hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-1.5 whitespace-nowrap"
-              to="/marketplace"
+          {/* Left Side: Main Texts */}
+          <div className="absolute left-4 sm:left-16 md:left-24 lg:left-31 top-[25%] sm:top-[20%] md:top-[20%] flex flex-col items-start z-10 pointer-events-auto">
+            <div
+              className={`transition-all duration-700 ease-out delay-300 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
             >
-              {t('browsePlates')} <ArrowDown className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            </Link>
-            <Link
-              className="flex-1 sm:flex-none bg-white/10 text-white border border-white/30 px-4 sm:px-8 py-2.5 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-lg hover:bg-white/20 hover:border-white/50 backdrop-blur-sm transition-all duration-300 flex items-center justify-center whitespace-nowrap"
-              to="/dashboard"
-            >
-              <span className="sm:hidden">List Your Number</span>
-              <span className="hidden sm:inline">{t('listYourPlate')}</span>
-            </Link>
-          </div>
+              <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2.5 mb-2 sm:mb-4 lg:mb-6 z-20 relative">
+                <img
+                  src="/Logo.png"
+                  alt="Alnuami Logo"
+                  className="h-[80px] sm:h-[155px] md:h-[185px] lg:h-[215px] w-auto object-contain drop-shadow-lg z-10"
+                />
+                <div className="leading-none flex flex-col items-center sm:items-start mt-0 sm:mt-8 md:mt-10 lg:mt-11">
+                  <h1 className="font-display font-black text-3xl sm:text-7xl md:text-4xl lg:text-[4rem] tracking-tighter text-[hsl(40,86%,44%)] uppercase drop-shadow-[0_5px_15px_rgba(0,0,0,0.8)] text-center sm:text-left">
+                    ALNUAMI
+                  </h1>
+                  <p className="text-[10px] sm:text-sm md:text-base font-black uppercase tracking-[0.4em] text-gray-100 self-center sm:self-end mt-1 sm:mt-2 drop-shadow-[0_2px_5px_rgba(0,0,0,0.8)] translate-x-[2px] sm:translate-x-[5px]">
+                    GROUPS
+                  </p>
+                </div>
+              </div>
 
-          {/* Mobile-only: Notice inside banner under buttons */}
-          <div className="sm:hidden w-full mt-3">
-            <NoticeBanner />
+              <h2 className="text-white text-sm sm:text-2xl md:text-3xl lg:text-4xl font-display font-black tracking-wider uppercase leading-[1.15] relative z-10 text-center sm:text-left w-full sm:w-auto mt-4 sm:mt-0" style={{ textShadow: '0 4px 15px rgba(0,0,0,0.8)' }}>
+                BUYING & SELLING<br />
+                <span className="text-white/90">PREMIUM NUMBER PLATES</span>
+              </h2>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }

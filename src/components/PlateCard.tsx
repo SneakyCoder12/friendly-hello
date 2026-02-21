@@ -323,7 +323,7 @@ function PlateCard({ emirate, code, number, price, plateUrl, comingSoon, sellerP
             </div>
 
             {/* Action buttons — horizontal */}
-            <div className="w-full flex gap-2 mb-2">
+            <div className="w-full flex gap-2 mb-5">
               {telUrl && (
                 <a
                   href={telUrl}

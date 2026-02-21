@@ -1,5 +1,5 @@
 import { Menu, X, Globe, ChevronDown, ChevronRight, Phone, LayoutDashboard, PlusCircle } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useState, useEffect } from 'react';
@@ -18,8 +18,22 @@ export default function Navbar() {
   const { user, signOut } = useAuth();
   const { t, locale, setLocale } = useLanguage();
   const navigate = useNavigate();
+  const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [marketplaceOpen, setMarketplaceOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  // Check if on home page
+  const isHomePage = location.pathname === '/';
+
+  // Handle scroll for navbar background
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();
@@ -41,39 +55,51 @@ export default function Navbar() {
 
   const closeMenu = () => setMenuOpen(false);
 
-  const navLinkClass =
-    'relative text-base font-semibold text-gray-500 hover:text-[hsl(40,86%,44%)] transition-colors duration-300 after:content-[""] after:absolute after:left-0 after:bottom-[-4px] after:w-0 after:h-[2px] after:bg-[hsl(40,86%,44%)] after:rounded-full after:transition-all after:duration-300 hover:after:w-full';
+  // Determine if navbar should be in dark mode (home page and not scrolled)
+  const isDarkMode = isHomePage && !scrolled;
+
+  const navLinkClass = (baseClass: string) =>
+    `relative text-base font-semibold transition-colors duration-300 after:content-[""] after:absolute after:left-0 after:bottom-[-4px] after:w-0 after:h-[2px] after:bg-[hsl(40,86%,44%)] after:rounded-full after:transition-all after:duration-300 hover:after:w-full ${isDarkMode ? 'text-white/80 hover:text-white' : 'text-gray-500 hover:text-[hsl(40,86%,44%)]'
+    }`;
 
   return (
     <>
-      <nav className="fixed w-full top-0 z-50 border-b border-border bg-white/90 backdrop-blur-lg transition-all duration-300 shadow-sm">
+      <nav className={`fixed w-full top-0 z-50 border-b transition-all duration-300 shadow-sm ${isDarkMode
+        ? 'bg-black/80 backdrop-blur-sm border-white/20'
+        : 'bg-white/90 backdrop-blur-lg border-border'
+        }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-20 items-center">
 
             {/* Logo + Name */}
-            <Link to="/" className="flex-shrink-0 flex items-center group -ml-2" onClick={closeMenu}>
+            <Link
+              to="/"
+              className={`flex-shrink-0 flex items-center group -ml-2 transition-all duration-300 ${isDarkMode ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+              onClick={closeMenu}
+            >
               <img
                 src="/Logo.png"
                 alt="Alnuami Groups"
-                className="h-16 sm:h-20 lg:h-24 w-auto object-contain transition-transform duration-300 group-hover:scale-105 self-center"
+                className={`h-8 sm:h-14 lg:h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105 self-center translate-x-3 sm:translate-x-0`}
               />
-              <div className="-ml-3 leading-none">
-                <h1 className="font-display font-black text-xl sm:text-2xl lg:text-3xl tracking-tighter text-gray-900 transition-colors duration-300 group-hover:text-gray-700">
+              <div className={`ml-0 sm:ml-1 leading-none transition-colors duration-300`}>
+                <h1 className={`font-display font-black text-xl sm:text-2xl lg:text-3xl tracking-tighter transition-colors duration-300 group-hover:text-gray-700 text-gray-900`}>
                   ALNUAMI
                 </h1>
-                <p className="text-[7px] sm:text-[8px] lg:text-[9px] font-bold uppercase tracking-[0.3em] text-gray-400 -mt-0.5" style={{ paddingLeft: '64.5%' }}>Groups</p>
+                <p className={`text-[7px] sm:text-[8px] lg:text-[9px] font-bold uppercase tracking-[0.3em] -mt-0.5 text-gray-400`} style={{ paddingLeft: '64.5%' }}>Groups</p>
               </div>
             </Link>
 
             {/* Desktop Nav Links */}
             <div className="hidden lg:flex items-center gap-8">
-              <Link className={navLinkClass} to="/">{t('home')}</Link>
+              <Link className={navLinkClass('home')} to="/">{t('home')}</Link>
 
               {/* Marketplace Dropdown */}
               <div className="relative group/market">
                 <Link
                   to="/marketplace"
-                  className="flex items-center gap-1 text-base font-semibold text-gray-500 hover:text-[hsl(40,86%,44%)] transition-colors duration-300"
+                  className={`flex items-center gap-1 text-base font-semibold transition-colors duration-300 ${isDarkMode ? 'text-white/80 hover:text-white' : 'text-gray-500 hover:text-[hsl(40,86%,44%)]'
+                    }`}
                 >
                   {t('marketplace')}
                   <ChevronDown className="h-3.5 w-3.5 transition-transform duration-300 group-hover/market:rotate-180" />
@@ -175,7 +201,17 @@ export default function Navbar() {
                 </div>
               </div>
 
-              <Link className={navLinkClass} to="/contact">{t('contactUs')}</Link>
+              <Link className={navLinkClass('contact')} to="/contact">{t('contactUs')}</Link>
+              <Link
+                to={user ? '/dashboard' : '/login'}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 ${isDarkMode
+                  ? 'bg-white text-black hover:bg-gray-100'
+                  : 'bg-gray-900 text-white hover:bg-gray-800'
+                  }`}
+              >
+                <PlusCircle className="h-4 w-4" />
+                List Your Number
+              </Link>
             </div>
 
             {/* Right Side */}
@@ -184,7 +220,10 @@ export default function Navbar() {
               {user && (
                 <Link
                   to="/dashboard"
-                  className="hidden lg:flex h-10 w-10 rounded-full bg-gray-100 border border-gray-200 items-center justify-center text-gray-500 hover:text-foreground hover:bg-gray-200 transition-all duration-300"
+                  className={`hidden lg:flex h-10 w-10 rounded-full border items-center justify-center transition-all duration-300 ${isDarkMode
+                    ? 'bg-white/10 border-white/30 text-white hover:bg-white/20'
+                    : 'bg-gray-100 border-gray-200 text-gray-500 hover:text-foreground hover:bg-gray-200'
+                    }`}
                   title="Dashboard"
                 >
                   <LayoutDashboard className="h-4 w-4" />
@@ -194,7 +233,10 @@ export default function Navbar() {
               {/* Language toggle — shown on all screen sizes */}
               <button
                 onClick={toggleLang}
-                className="h-10 w-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-500 hover:text-foreground hover:bg-gray-200 transition-all duration-300"
+                className={`h-10 w-10 rounded-full border flex items-center justify-center transition-all duration-300 ${isDarkMode
+                  ? 'bg-white/10 border-white/30 text-white hover:bg-white/20'
+                  : 'bg-gray-100 border-gray-200 text-gray-500 hover:text-foreground hover:bg-gray-200'
+                  }`}
                 title="Toggle language"
               >
                 <Globe className="h-4 w-4" />
@@ -203,16 +245,21 @@ export default function Navbar() {
               {user ? (
                 <button
                   onClick={handleSignOut}
-                  className="hidden lg:block text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors duration-300"
+                  className={`hidden lg:block text-sm font-semibold transition-colors duration-300 ${isDarkMode ? 'text-white/80 hover:text-white' : 'text-gray-500 hover:text-gray-900'
+                    }`}
                 >
                   {t('logout')}
                 </button>
               ) : (
                 <>
-                  <Link to="/login" className="hidden lg:block text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors duration-300">
+                  <Link to="/login" className={`hidden lg:block text-sm font-semibold transition-colors duration-300 ${isDarkMode ? 'text-white/80 hover:text-white' : 'text-gray-500 hover:text-gray-900'
+                    }`}>
                     {t('login')}
                   </Link>
-                  <Link to="/signup" className="hidden lg:block text-sm font-semibold text-gray-900 border border-gray-300 px-4 py-2 rounded-xl hover:bg-gray-100 transition-all duration-300">
+                  <Link to="/signup" className={`hidden lg:block text-sm font-semibold border px-4 py-2 rounded-xl transition-all duration-300 ${isDarkMode
+                    ? 'text-white border-white/30 hover:bg-white/10'
+                    : 'text-gray-900 border-gray-300 hover:bg-gray-100'
+                    }`}>
                     {t('signup')}
                   </Link>
                 </>
@@ -221,7 +268,10 @@ export default function Navbar() {
               {/* Hamburger Button */}
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
-                className="lg:hidden h-10 w-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-foreground hover:bg-gray-200 transition-all duration-300 relative z-[60]"
+                className={`lg:hidden h-10 w-10 rounded-full border flex items-center justify-center transition-all duration-300 relative z-[60] ${isDarkMode
+                  ? 'bg-white/10 border-white/30 text-white hover:bg-white/20'
+                  : 'bg-gray-100 border-gray-200 text-foreground hover:bg-gray-200'
+                  }`}
               >
                 {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </button>
