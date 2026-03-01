@@ -82,8 +82,11 @@ export const translations = {
     km: 'km',
     sqft: 'sqft',
     yr: '/yr',
+    viewFullSpecs: 'View Full Specifications',
+    viewLess: 'View Less',
 
     // Categories Breakdown
+    backToMotors: 'Back to Motors',
     motorsCategory: 'Motors',
     motorsDesc: 'Cars, Bikes & Boats',
     classifiedsCategory: 'Classifieds',
@@ -678,8 +681,11 @@ export const translations = {
     km: 'كم',
     sqft: 'قدم مربع',
     yr: '/سنوياً',
+    viewFullSpecs: 'عرض المواصفات الكاملة',
+    viewLess: 'عرض أقل',
 
     // Categories Breakdown
+    backToMotors: 'العودة إلى السيارات',
     motorsCategory: 'السيارات',
     motorsDesc: 'سيارات، دراجات وقوارب',
     classifiedsCategory: 'إعلانات مبوّبة',

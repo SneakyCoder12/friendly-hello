@@ -187,7 +187,7 @@ export default function ClassifiedListingWizard({ initialForm, initialImages, ed
           </button>
         )}
       </div>
-      <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={e => handleFiles(e.target.files)} />
+      <input ref={fileRef} type="file" accept="image/*,.heic,.heif" multiple className="hidden" onChange={e => handleFiles(e.target.files)} />
     </div>
   );
 }

@@ -190,7 +190,7 @@ export default function MotorsPage() {
                         <p className="text-xs text-muted-foreground mb-4">{total} {total !== 1 ? t('listingsFound' as any) : t('listingFound' as any)}</p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                             {listings.map(l => (
-                                <Link key={l.id} to={`/motors/${l.id}`}
+                                <Link key={l.id} to={`/motors/${l.slug || l.id}`}
                                     className="bg-card border border-border rounded-2xl overflow-hidden hover:border-primary/30 hover:shadow-lg transition-all group">
                                     <div className="aspect-[4/3] bg-surface relative overflow-hidden">
                                         {l.images && l.images.length > 0 ? (

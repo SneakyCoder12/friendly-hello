@@ -252,6 +252,7 @@ export function usePlateGenerator() {
         canvasRef,
         current4kRef,
         downloadPlate,
+        renderPlate,
         isDownloading,
         plateRenderCount,
     };

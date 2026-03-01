@@ -7,7 +7,7 @@ import {
   Car, Motorbike, Truck, Ship, ChevronRight, ChevronLeft, Check,
   Upload, X, Loader2, Image as ImageIcon, MapPin, Phone,
   Gauge, Fuel, Settings2, Palette, Shield, Globe2, DoorOpen,
-  Sparkles, Eye, Tag,
+  Sparkles, Eye, Tag, Star,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -115,6 +115,16 @@ export default function MotorListingWizard({ initialForm, initialImages, editId,
 
   const removeImage = (idx: number) => setImages(prev => prev.filter((_, i) => i !== idx));
 
+  const setAsCover = (idx: number) => {
+    if (idx === 0) return;
+    setImages(prev => {
+      const newImages = [...prev];
+      const selected = newImages.splice(idx, 1)[0];
+      newImages.unshift(selected); // Move to the front
+      return newImages;
+    });
+  };
+
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault(); setDragOver(false);
     handleFiles(e.dataTransfer.files);
@@ -134,6 +144,7 @@ export default function MotorListingWizard({ initialForm, initialImages, editId,
           images={images} uploading={uploading} dragOver={dragOver}
           setDragOver={setDragOver} handleDrop={handleDrop}
           handleFiles={handleFiles} removeImage={removeImage} fileRef={fileRef}
+          setAsCover={setAsCover}
         />
       );
       case 5: return <StepLocation form={form} set={set} />;
@@ -222,7 +233,7 @@ export default function MotorListingWizard({ initialForm, initialImages, editId,
         )}
       </div>
 
-      <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={e => handleFiles(e.target.files)} />
+      <input ref={fileRef} type="file" accept="image/*,.heic,.heif" multiple className="hidden" onChange={e => handleFiles(e.target.files)} />
     </div>
   );
 }
@@ -442,7 +453,7 @@ function StepDetails({ form, set }: { form: Record<string, any>; set: (k: string
 // ═══════════════════════════════════════════════════════════════
 //  Step 4: Photos Upload
 // ═══════════════════════════════════════════════════════════════
-function StepPhotos({ images, uploading, dragOver, setDragOver, handleDrop, handleFiles, removeImage, fileRef }: {
+function StepPhotos({ images, uploading, dragOver, setDragOver, handleDrop, handleFiles, removeImage, setAsCover, fileRef }: {
   images: string[];
   uploading: boolean;
   dragOver: boolean;
@@ -450,6 +461,7 @@ function StepPhotos({ images, uploading, dragOver, setDragOver, handleDrop, hand
   handleDrop: (e: React.DragEvent) => void;
   handleFiles: (files: FileList | null) => Promise<void>;
   removeImage: (i: number) => void;
+  setAsCover: (i: number) => void;
   fileRef: React.RefObject<HTMLInputElement | null>;
 }) {
   const { t } = useLanguage();
@@ -504,12 +516,26 @@ function StepPhotos({ images, uploading, dragOver, setDragOver, handleDrop, hand
                     Cover
                   </span>
                 )}
-                <button
-                  onClick={e => { e.stopPropagation(); removeImage(i); }}
-                  className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-red-500/90 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
+                <div className="absolute top-1.5 right-1.5 flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    type="button"
+                    onClick={e => { e.stopPropagation(); removeImage(i); }}
+                    className="w-6 h-6 rounded-full bg-red-500/90 text-white flex items-center justify-center hover:bg-red-600 transition-colors shadow-sm"
+                    title="Remove Photo"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                  {i > 0 && (
+                    <button
+                      type="button"
+                      onClick={e => { e.stopPropagation(); setAsCover(i); }}
+                      className="w-6 h-6 rounded-full bg-black/50 backdrop-blur-sm text-white flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors shadow-sm"
+                      title="Set as Cover"
+                    >
+                      <Star className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>

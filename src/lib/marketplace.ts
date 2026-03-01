@@ -73,6 +73,13 @@ export const MOTOR_IMAGE_LIMIT = 10;
 export const CLASSIFIED_IMAGE_LIMIT = 10;
 export const PROPERTY_IMAGE_LIMIT = 15;
 
+export function generateMotorSlug(make: string | null, model: string | null, year: number | null | string): string {
+    const safeStr = (s: string) => (s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const shortId = Math.random().toString(16).slice(2, 10);
+    const parts = [safeStr(make || ''), safeStr(model || ''), year, shortId].filter(Boolean);
+    return parts.join('-');
+}
+
 const BUCKET = 'marketplace-images';
 const PAGE_SIZE = 20;
 
@@ -84,14 +91,16 @@ export async function uploadMarketplaceImage(
 ): Promise<string> {
     let processFile = file;
     let ext = file.name.split('.').pop()?.toLowerCase() || '';
-    let contentType = file.type || '';
+    let contentType = (file.type || '').toLowerCase();
 
     // 1. Detect HEIC/HEIF robustly by mime type or extension
     const isHeic =
-        contentType.includes('image/heic') ||
-        contentType.includes('image/heif') ||
+        contentType.includes('heic') ||
+        contentType.includes('heif') ||
         ext === 'heic' ||
-        ext === 'heif';
+        ext === 'heif' ||
+        file.name.toLowerCase().includes('.heic') ||
+        file.name.toLowerCase().includes('.heif');
 
     if (isHeic) {
         try {
@@ -187,6 +196,7 @@ async function compressImage(file: File, maxDim: number, quality: number): Promi
 // ─── Types ──────────────────────────────────────────────────
 export interface MotorListing {
     id: string;
+    slug?: string | null;
     user_id: string;
     title: string;
     category: string;
@@ -289,12 +299,18 @@ export async function fetchMotorsListings(filters: Record<string, any> = {}, pag
     return { data: (data || []) as MotorListing[], count: count || 0 };
 }
 
-export async function fetchMotorListing(id: string) {
-    const { data, error } = await supabase
-        .from('motors_listings')
-        .select('*')
-        .eq('id', id)
-        .single();
+export async function fetchMotorListing(identifier: string) {
+    // Determine if identifier is a UUID (old format) or a slug (new format)
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(identifier);
+
+    let q = supabase.from('motors_listings').select('*');
+    if (isUuid) {
+        q = q.eq('id', identifier);
+    } else {
+        q = q.eq('slug', identifier);
+    }
+
+    const { data, error } = await q.single();
     if (error) throw error;
     return data as MotorListing;
 }

@@ -21,6 +21,7 @@ import PropertyListingWizard from '@/components/PropertyListingWizard';
 import {
     fetchUserMotorsListings, fetchUserClassifiedListings, fetchUserPropertyListings,
     uploadMarketplaceImage, deleteMarketplaceImages, updateListingStatus,
+    generateMotorSlug,
     EMIRATES, MOTOR_CATEGORIES, CLASSIFIED_CATEGORIES, PROPERTY_TYPES,
     CONDITIONS, CLASSIFIED_CONDITIONS, TRANSMISSIONS, FUEL_TYPES, STEERING_SIDES,
     FURNISHING_OPTIONS, LISTING_TYPES,
@@ -98,7 +99,7 @@ function ImageUploader({ images, onChange, maxImages }: {
                     </button>
                 )}
             </div>
-            <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={e => handleFiles(e.target.files)} />
+            <input ref={fileRef} type="file" accept="image/*,.heic,.heif" multiple className="hidden" onChange={e => handleFiles(e.target.files)} />
         </div>
     );
 }
@@ -222,7 +223,8 @@ export function MotorsSection() {
                 if (error) throw error;
                 toast.success(t('listingUpdated' as any));
             } else {
-                const { error } = await supabase.from('motors_listings').insert({ ...payload, user_id: user.id } as any);
+                const slug = generateMotorSlug(payload.make, payload.model, payload.year);
+                const { error } = await supabase.from('motors_listings').insert({ ...payload, slug, user_id: user.id } as any);
                 if (error) throw error;
                 toast.success(t('listingCreated' as any));
             }
@@ -308,7 +310,8 @@ export function MotorsSection() {
                                 if (error) throw error;
                                 toast.success(t('listingUpdated' as any));
                             } else {
-                                const { error } = await supabase.from('motors_listings').insert({ ...payload, user_id: user.id } as any);
+                                const slug = generateMotorSlug(payload.make, payload.model, payload.year);
+                                const { error } = await supabase.from('motors_listings').insert({ ...payload, slug, user_id: user.id } as any);
                                 if (error) throw error;
                                 toast.success(t('listingCreated' as any));
                             }
@@ -354,7 +357,7 @@ export function MotorsSection() {
                                 <p className="text-xs text-muted-foreground truncate">{getMotorCategoryTranslation(item.category || '')} • {item.emirate} {item.price ? `• AED ${item.price.toLocaleString()}` : ''}</p>
                             </div>
                             <div className="flex gap-1.5 flex-shrink-0">
-                                <Link to={`/motors/${item.id}`} className="h-8 w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"><ExternalLink className="h-3.5 w-3.5" /></Link>
+                                <Link to={`/motors/${item.slug || item.id}`} className="h-8 w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"><ExternalLink className="h-3.5 w-3.5" /></Link>
                                 <button onClick={() => openEdit(item)} className="h-8 w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-muted-foreground hover:text-foreground"><Pencil className="h-3.5 w-3.5" /></button>
                                 <button onClick={() => toggleStatus(item, item.status === 'hidden' ? 'active' : 'hidden')} className="h-8 w-8 rounded-lg bg-surface border border-border flex items-center justify-center text-muted-foreground hover:text-foreground">
                                     {item.status === 'hidden' ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Loader2, MapPin, Calendar, Gauge, Fuel, ArrowLeft, Phone, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Loader2, MapPin, Calendar, Gauge, Fuel, ArrowLeft, Phone, ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
 import SEO from '@/components/SEO';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fetchMotorListing, type MotorListing, getMotorCategoryTranslation } from '@/lib/marketplace';
@@ -12,6 +12,7 @@ export default function MotorDetailPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [activeImg, setActiveImg] = useState(0);
+    const [showAllSpecs, setShowAllSpecs] = useState(false);
 
     useEffect(() => {
         if (!id) return;
@@ -51,12 +52,23 @@ export default function MotorDetailPage() {
         listing.trim && { label: t('trim' as any), value: listing.trim },
     ].filter(Boolean) as { label: string; value: string }[];
 
+    const previewSpecKeys = [
+        t('year' as any),
+        t('mileageKm' as any),
+        t('transmission' as any),
+        t('fuelType' as any),
+        t('anyCondition' as any)?.split(' ')[1] || 'Condition',
+        t('regionalSpecs' as any)
+    ];
+    const keySpecs = specs.filter(s => previewSpecKeys.includes(s.label)).slice(0, 6);
+    const displaySpecs = showAllSpecs ? specs : (keySpecs.length >= 4 ? keySpecs : specs.slice(0, 6));
+
     return (
-        <div className="min-h-screen pt-28 sm:pt-32 pb-24 sm:pb-12">
+        <div className="min-h-screen pt-28 sm:pt-32 pb-32 sm:pb-12 bg-surface/30">
             <SEO
                 title={`${listing.title} | Motors`}
                 description={listing.description || `${listing.title} for sale in ${listing.emirate}`}
-                url={`/motors/${listing.id}`}
+                url={`/motors/${listing.slug || listing.id}`}
                 schema={{
                     '@context': 'https://schema.org',
                     '@type': 'Product',
@@ -71,104 +83,186 @@ export default function MotorDetailPage() {
                     image: imgs[0] || undefined,
                 }}
             />
-            <div className="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 relative z-10">
-                <Link to="/motors" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground font-bold hover:text-foreground mb-4">
+            <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 relative z-10">
+                <Link to="/motors" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground font-bold hover:text-foreground mb-6">
                     <ArrowLeft className="h-4 w-4" /> {t('backToMotors' as any)}
                 </Link>
 
-                <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                    {/* Image Gallery */}
-                    <div className="lg:col-span-3">
-                        <div className="aspect-[4/3] bg-surface rounded-2xl overflow-hidden relative">
-                            {imgs.length > 0 ? (
-                                <>
-                                    <img src={imgs[activeImg]} alt={listing.title} className="w-full h-full object-cover" loading="lazy" />
-                                    {imgs.length > 1 && (
-                                        <>
-                                            <button onClick={() => setActiveImg(i => (i - 1 + imgs.length) % imgs.length)}
-                                                className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70">
-                                                <ChevronLeft className="h-4 w-4" />
-                                            </button>
-                                            <button onClick={() => setActiveImg(i => (i + 1) % imgs.length)}
-                                                className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70">
-                                                <ChevronRight className="h-4 w-4" />
-                                            </button>
-                                        </>
-                                    )}
-                                    {listing.status === 'sold' && (
-                                        <div className="absolute top-3 right-3 bg-red-500 text-white px-3 py-1 rounded-lg text-sm font-bold">{t('statusSold' as any) || 'SOLD'}</div>
-                                    )}
-                                </>
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center text-muted-foreground/30">
-                                    <Gauge className="h-16 w-16" />
+                <div className="flex flex-col lg:grid lg:grid-cols-12 gap-4 lg:gap-8 items-start">
+                    {/* ── Left Column Context (Gallery + Specs + Description) ── */}
+                    <div className="contents lg:block lg:col-span-8 lg:space-y-8">
+
+                        {/* Image Gallery */}
+                        <div className="order-1 lg:order-none bg-white border border-gray-200 shadow-sm rounded-xl p-3 sm:p-5">
+                            <div className="aspect-video bg-surface rounded-lg overflow-hidden relative group">
+                                {imgs.length > 0 ? (
+                                    <>
+                                        <img
+                                            src={imgs[activeImg]}
+                                            alt={listing.title}
+                                            className="w-full h-full object-cover animate-in fade-in zoom-in duration-300"
+                                            loading="lazy"
+                                            decoding="async"
+                                        />
+                                        {imgs.length > 1 && (
+                                            <>
+                                                <button onClick={() => setActiveImg(i => (i - 1 + imgs.length) % imgs.length)}
+                                                    className="absolute left-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-white/90 backdrop-blur-sm shadow-md text-foreground flex items-center justify-center hover:bg-white hover:scale-105 transition-all opacity-0 group-hover:opacity-100">
+                                                    <ChevronLeft className="h-5 w-5" />
+                                                </button>
+                                                <button onClick={() => setActiveImg(i => (i + 1) % imgs.length)}
+                                                    className="absolute right-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-white/90 backdrop-blur-sm shadow-md text-foreground flex items-center justify-center hover:bg-white hover:scale-105 transition-all opacity-0 group-hover:opacity-100">
+                                                    <ChevronRight className="h-5 w-5" />
+                                                </button>
+                                            </>
+                                        )}
+                                        {listing.status === 'sold' && (
+                                            <div className="absolute top-4 right-4 bg-red-500 text-white px-4 py-1.5 rounded-lg text-sm font-bold shadow-sm">
+                                                {t('statusSold' as any) || 'SOLD'}
+                                            </div>
+                                        )}
+                                    </>
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-muted-foreground/30 bg-surface">
+                                        <Gauge className="h-16 w-16" />
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Thumbnails */}
+                            {imgs.length > 1 && (
+                                <div className="flex gap-3 mt-4 overflow-x-auto pb-2 custom-scrollbar">
+                                    {imgs.map((img, i) => (
+                                        <button key={i} onClick={() => setActiveImg(i)}
+                                            className={`flex-shrink-0 h-20 w-28 rounded-lg overflow-hidden border-2 transition-all duration-200 ${i === activeImg ? 'border-primary ring-2 ring-primary/20 ring-offset-1' : 'border-transparent opacity-60 hover:opacity-100 hover:border-gray-300'}`}>
+                                            <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" />
+                                        </button>
+                                    ))}
                                 </div>
                             )}
                         </div>
-                        {imgs.length > 1 && (
-                            <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
-                                {imgs.map((img, i) => (
-                                    <button key={i} onClick={() => setActiveImg(i)}
-                                        className={`flex-shrink-0 h-16 w-20 rounded-lg overflow-hidden border-2 transition-all ${i === activeImg ? 'border-primary' : 'border-transparent opacity-60 hover:opacity-100'}`}>
-                                        <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" />
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                    </div>
 
-                    {/* Details */}
-                    <div className="lg:col-span-2 space-y-4">
-                        <div>
-                            <div className="flex items-center gap-2 mb-2">
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2 py-0.5 rounded-lg">{listing.listing_type === 'Rent' ? t('forRent' as any) : t('forSale' as any)}</span>
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-surface px-2 py-0.5 rounded-lg border border-border">{t(getMotorCategoryTranslation(listing.category || '') as any)}</span>
-                            </div>
-                            <h1 className="text-xl sm:text-2xl font-display font-black text-foreground">{listing.title}</h1>
-                            {listing.price ? (
-                                <p className="text-2xl font-mono font-bold text-primary mt-1">AED {listing.price.toLocaleString()}</p>
-                            ) : (
-                                <p className="text-sm text-muted-foreground mt-1">{t('contactForPrice' as any)}</p>
-                            )}
-                        </div>
-
-                        <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                            <span className="flex items-center gap-1 bg-surface rounded-lg px-2 py-1 border border-border"><MapPin className="h-3 w-3" />{listing.emirate}{listing.area ? `, ${listing.area}` : ''}</span>
-                            <span className="bg-surface rounded-lg px-2 py-1 border border-border">
-                                {t('posted' as any)} {new Date(listing.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                            </span>
-                        </div>
-
-                        {/* Contact */}
-                        <a href={`tel:${listing.contact_number}`}
-                            className="flex items-center justify-center gap-2 w-full bg-primary text-primary-foreground py-3 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity">
-                            <Phone className="h-4 w-4" /> {listing.contact_number}
-                        </a>
-
-                        {/* Specs */}
+                        {/* Specs Section */}
                         {specs.length > 0 && (
-                            <div className="bg-card border border-border rounded-2xl p-4">
-                                <h3 className="font-bold text-foreground text-sm mb-3">{t('specifications' as any)}</h3>
-                                <div className="grid grid-cols-2 gap-2">
-                                    {specs.map(s => (
-                                        <div key={s.label} className="text-xs">
-                                            <span className="text-muted-foreground">{s.label}</span>
-                                            <p className="font-medium text-foreground">{s.value}</p>
+                            <div className="order-3 lg:order-none bg-white border border-gray-200 shadow-sm rounded-xl p-5 lg:p-6 transition-all">
+                                <h3 className="font-display font-bold text-base lg:text-lg text-foreground mb-4 lg:mb-6 pb-3 lg:pb-4 border-b border-border flex items-center gap-2">
+                                    <Gauge className="h-5 w-5 text-primary" /> {t('specifications' as any)}
+                                </h3>
+                                <div className="grid grid-cols-2 gap-x-4 lg:gap-x-8 gap-y-4 lg:gap-y-5">
+                                    {displaySpecs.map(s => (
+                                        <div key={s.label} className="flex flex-col gap-1 pb-3 lg:pb-3 border-b border-gray-100 last:border-0 [&:nth-last-child(-n+2)]:border-0">
+                                            <span className="text-xs lg:text-sm font-medium text-muted-foreground">{s.label}</span>
+                                            <span className="text-sm lg:text-base font-bold text-foreground">{s.value}</span>
                                         </div>
                                     ))}
                                 </div>
+                                {specs.length > displaySpecs.length || showAllSpecs ? (
+                                    <button
+                                        onClick={() => setShowAllSpecs(!showAllSpecs)}
+                                        className="mt-5 w-full py-3 bg-surface/50 hover:bg-surface text-primary font-bold text-sm rounded-xl flex items-center justify-center gap-2 transition-colors border border-gray-200/60"
+                                    >
+                                        {showAllSpecs ? (
+                                            <>{t('viewLess' as any) || 'View Less'} <ChevronUp className="h-4 w-4" /></>
+                                        ) : (
+                                            <>{t('viewFullSpecs' as any) || 'View Full Specifications'} <ChevronDown className="h-4 w-4" /></>
+                                        )}
+                                    </button>
+                                ) : null}
                             </div>
                         )}
 
-                        {/* Description */}
+                        {/* Description Section */}
                         {listing.description && (
-                            <div className="bg-card border border-border rounded-2xl p-4">
-                                <h3 className="font-bold text-foreground text-sm mb-2">{t('description' as any)}</h3>
-                                <p className="text-sm text-muted-foreground whitespace-pre-line">{listing.description}</p>
+                            <div className="order-4 lg:order-none bg-white border border-gray-200 shadow-sm rounded-xl p-5 lg:p-6">
+                                <h3 className="font-display font-bold text-base lg:text-lg text-foreground mb-3 lg:mb-4 pb-3 lg:pb-4 border-b border-border flex items-center gap-2">
+                                    <MapPin className="h-5 w-5 text-primary" /> {t('description' as any)}
+                                </h3>
+                                <p className="text-[14.5px] lg:text-[15px] leading-relaxed text-foreground/85 whitespace-pre-line font-medium">
+                                    {listing.description}
+                                </p>
                             </div>
                         )}
                     </div>
+
+                    {/* ── Right Column (Sticky Info Panel) ── */}
+                    <div className="order-2 lg:order-none lg:col-span-4 self-start lg:sticky lg:top-32 w-full">
+                        <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-5 lg:p-6 flex flex-col gap-4 lg:gap-6">
+
+                            {/* Tags */}
+                            <div className="flex items-center gap-2 flex-wrap">
+                                <span className="text-[11px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2.5 py-1 rounded-md">
+                                    {listing.listing_type === 'Rent' ? t('forRent' as any) : t('forSale' as any)}
+                                </span>
+                                <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground bg-surface px-2.5 py-1 rounded-md border border-gray-200">
+                                    {t(getMotorCategoryTranslation(listing.category || '') as any)}
+                                </span>
+                            </div>
+
+                            {/* Title & Price */}
+                            <div className="space-y-2 lg:space-y-3">
+                                <h1 className="text-xl lg:text-3xl font-bold lg:font-display lg:font-black text-gray-900 lg:text-foreground leading-snug">
+                                    {listing.title}
+                                </h1>
+                                {listing.price ? (
+                                    <div className="flex items-baseline gap-1 lg:gap-1.5 mt-1 lg:mt-2">
+                                        <span className="text-xs lg:text-sm font-bold text-primary mb-1">AED</span>
+                                        <span className="text-3xl lg:text-4xl font-black lg:font-display text-primary tracking-tight">
+                                            {listing.price.toLocaleString()}
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <p className="text-lg lg:text-xl font-bold text-muted-foreground mt-2">{t('contactForPrice' as any)}</p>
+                                )}
+                            </div>
+
+                            {/* Divider */}
+                            <div className="h-px bg-gray-100 w-full" />
+
+                            {/* Location & Time */}
+                            <div className="flex flex-col gap-4">
+                                <div className="flex items-start gap-3">
+                                    <div className="mt-0.5 bg-surface text-muted-foreground p-2 rounded-md border border-gray-200">
+                                        <MapPin className="h-4 w-4" />
+                                    </div>
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Location</span>
+                                        <span className="text-sm font-bold text-foreground">
+                                            {listing.emirate}{listing.area ? `, ${listing.area}` : ''}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="flex items-start gap-3">
+                                    <div className="mt-0.5 bg-surface text-muted-foreground p-2 rounded-md border border-gray-200">
+                                        <Calendar className="h-4 w-4" />
+                                    </div>
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Date Posted</span>
+                                        <span className="text-sm font-bold text-foreground">
+                                            {new Date(listing.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Contact CTA */}
+                            <div className="hidden lg:block mt-2 pt-2 border-t border-gray-100">
+                                <a href={`tel:${listing.contact_number}`}
+                                    className="flex items-center justify-center gap-2.5 w-full bg-primary text-primary-foreground py-4 rounded-xl font-bold text-lg hover:bg-primary/90 transition-all shadow-md hover:shadow-lg active:scale-[0.98]">
+                                    <Phone className="h-5 w-5" /> {t('callNow' as any) || 'Call Now'}
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
+            </div>
+
+            {/* Mobile Sticky Bottom CTA */}
+            <div className="lg:hidden fixed bottom-16 sm:bottom-0 left-0 right-0 z-[60] bg-white border-t border-gray-200 p-3 pb-safe shadow-[0_-8px_16px_-4px_rgba(0,0,0,0.05)]">
+                <a href={`tel:${listing.contact_number}`}
+                    className="flex items-center justify-center gap-2 w-full bg-primary text-primary-foreground py-3.5 rounded-xl font-bold text-lg shadow-md active:scale-[0.98] transition-transform">
+                    <Phone className="h-5 w-5" /> {t('callNow' as any) || 'Call Now'}
+                </a>
             </div>
         </div>
     );

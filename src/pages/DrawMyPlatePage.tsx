@@ -31,6 +31,7 @@ export default function DrawMyPlatePage() {
         canvasRef,
         current4kRef,
         downloadPlate,
+        renderPlate,
         isDownloading,
         plateRenderCount,
     } = usePlateGenerator();
@@ -136,8 +137,9 @@ export default function DrawMyPlatePage() {
     };
 
     // Generate Cover Images (variant 1: logo over plate, variant 2: logo behind plate)
-    const generateDownloadGraphic = useCallback(async () => {
-        if (!current4kRef.current) return null;
+    const generateDownloadGraphic = useCallback(async (customPlateCanvas?: HTMLCanvasElement, forceVariant?: 1 | 2) => {
+        const plateSource = customPlateCanvas || current4kRef.current;
+        if (!plateSource) return null;
 
         // Load shared assets once
         const bgImage = new Image();
@@ -148,8 +150,8 @@ export default function DrawMyPlatePage() {
         watermarkImg.crossOrigin = 'anonymous';
         await new Promise((resolve, reject) => { watermarkImg.onload = resolve; watermarkImg.onerror = reject; watermarkImg.src = '/Logo.png'; });
 
-        const plateWidth = current4kRef.current.width;
-        const plateHeight = current4kRef.current.height;
+        const plateWidth = plateSource.width;
+        const plateHeight = plateSource.height;
 
         const targetWidth = 2160 * 0.92;
         const scale = targetWidth / plateWidth;
@@ -179,40 +181,46 @@ export default function DrawMyPlatePage() {
         };
 
         try {
-            // ── Variant 1: Logo OVER plate (current) ──
-            const c1 = document.createElement('canvas');
-            c1.width = 2160; c1.height = 2160;
-            const ctx1 = c1.getContext('2d')!;
-            drawBase(ctx1);
-            ctx1.drawImage(current4kRef.current, plateX, plateY, targetWidth, targetHeight);
-            ctx1.globalAlpha = 0.20;
-            ctx1.globalCompositeOperation = 'multiply';
-            ctx1.drawImage(watermarkImg, wmX, wmY, wmWidth, wmHeight);
-            ctx1.globalCompositeOperation = 'source-over';
-            ctx1.globalAlpha = 1.0;
-            drawBottomOverlay(ctx1);
-            await drawCoverText(ctx1);
-            setCoverImage(c1.toDataURL('image/png', 0.9));
+            if (!forceVariant || forceVariant === 1) {
+                // ── Variant 1: Logo OVER plate (current) ──
+                const c1 = document.createElement('canvas');
+                c1.width = 2160; c1.height = 2160;
+                const ctx1 = c1.getContext('2d')!;
+                drawBase(ctx1);
+                ctx1.drawImage(plateSource, plateX, plateY, targetWidth, targetHeight);
+                ctx1.globalAlpha = 0.20;
+                ctx1.globalCompositeOperation = 'multiply';
+                ctx1.drawImage(watermarkImg, wmX, wmY, wmWidth, wmHeight);
+                ctx1.globalCompositeOperation = 'source-over';
+                ctx1.globalAlpha = 1.0;
+                drawBottomOverlay(ctx1);
+                await drawCoverText(ctx1);
+                if (forceVariant === 1) return c1.toDataURL('image/png', 1.0);
+                setCoverImage(c1.toDataURL('image/png', 0.9));
+            }
 
-            // ── Variant 2: Logo BEHIND plate (non-transparent) ──
-            const c2 = document.createElement('canvas');
-            c2.width = 2160; c2.height = 2160;
-            const ctx2 = c2.getContext('2d')!;
-            drawBase(ctx2);
-            // Draw watermark FIRST (behind everything)
-            ctx2.globalAlpha = 0.20;
-            ctx2.globalCompositeOperation = 'multiply';
-            ctx2.drawImage(watermarkImg, wmX, wmY, wmWidth, wmHeight);
-            ctx2.globalCompositeOperation = 'source-over';
-            ctx2.globalAlpha = 1.0;
-            // Fill white behind the plate area so transparent parts become solid
-            ctx2.fillStyle = '#FFFFFF';
-            ctx2.fillRect(plateX, plateY, targetWidth, targetHeight);
-            // Draw plate on top (covers the logo)
-            ctx2.drawImage(current4kRef.current, plateX, plateY, targetWidth, targetHeight);
-            drawBottomOverlay(ctx2);
-            await drawCoverText(ctx2);
-            setCoverImage2(c2.toDataURL('image/png', 0.9));
+            if (!forceVariant || forceVariant === 2) {
+                // ── Variant 2: Logo BEHIND plate (non-transparent) ──
+                const c2 = document.createElement('canvas');
+                c2.width = 2160; c2.height = 2160;
+                const ctx2 = c2.getContext('2d')!;
+                drawBase(ctx2);
+                // Draw watermark FIRST (behind everything)
+                ctx2.globalAlpha = 0.20;
+                ctx2.globalCompositeOperation = 'multiply';
+                ctx2.drawImage(watermarkImg, wmX, wmY, wmWidth, wmHeight);
+                ctx2.globalCompositeOperation = 'source-over';
+                ctx2.globalAlpha = 1.0;
+                // Fill white behind the plate area so transparent parts become solid
+                ctx2.fillStyle = '#FFFFFF';
+                ctx2.fillRect(plateX, plateY, targetWidth, targetHeight);
+                // Draw plate on top (covers the logo)
+                ctx2.drawImage(plateSource, plateX, plateY, targetWidth, targetHeight);
+                drawBottomOverlay(ctx2);
+                await drawCoverText(ctx2);
+                if (forceVariant === 2) return c2.toDataURL('image/png', 1.0);
+                setCoverImage2(c2.toDataURL('image/png', 0.9));
+            }
         } catch (error) {
             console.error('Error generating graphic:', error);
         }
@@ -260,12 +268,24 @@ export default function DrawMyPlatePage() {
         setIsDownloadingPreview(true);
         try {
             if ((previewIndex === -1 && coverImage) || (previewIndex === -2 && coverImage2)) {
-                const a = document.createElement('a');
-                a.href = previewIndex === -1 ? coverImage! : coverImage2!;
-                a.download = `Plate-${emirate}-${plateCode}-${plateNumber}-Graphic${previewIndex === -2 ? '-v2' : ''}.png`;
-                a.click();
-                setIsDownloadingPreview(false);
-                return;
+                const variant = previewIndex === -1 ? 1 : 2;
+
+                // 1. Generate full 4K plate strictly for this download to ensure crisp edges
+                const highResPlateCanvas = await renderPlate(true);
+
+                if (highResPlateCanvas) {
+                    // 2. Build 2160px cover graphic using the 4K plate instead of the low-res 1200px live preview
+                    const highResCoverDataUrl = await generateDownloadGraphic(highResPlateCanvas as HTMLCanvasElement, variant);
+
+                    if (highResCoverDataUrl) {
+                        const a = document.createElement('a');
+                        a.href = highResCoverDataUrl;
+                        a.download = `Plate-${emirate}-${plateCode}-${plateNumber}-Graphic${variant === 2 ? '-v2' : ''}.png`;
+                        a.click();
+                        setIsDownloadingPreview(false);
+                        return;
+                    }
+                }
             }
 
             if (!previewConfig || !plateDataUrl) return;
@@ -294,7 +314,7 @@ export default function DrawMyPlatePage() {
             toast.error('Failed to download preview.');
         }
         setIsDownloadingPreview(false);
-    }, [emirate, plateCode, plateNumber, previewIndex, coverImage, previewConfig, plateDataUrl, activePreview, plateStyle, plateStylingToUse, price, phone]);
+    }, [emirate, plateCode, plateNumber, previewIndex, coverImage, coverImage2, previewConfig, plateDataUrl, activePreview, plateStyle, plateStylingToUse, plateStyling2ToUse, price, phone, t, renderPlate, generateDownloadGraphic]);
 
     // Reset preview index when switching plate style
     useEffect(() => {
