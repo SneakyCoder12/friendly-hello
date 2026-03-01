@@ -1,5 +1,5 @@
 /**
- * Fetches the Cinzel Decorative font from Google Fonts,
+ * Fetches the Montserrat font from Google Fonts,
  * converts the font files to base64, and returns a CSS string
  * with @font-face declarations that can be used inline with html-to-image.
  *
@@ -9,13 +9,13 @@
 
 let cachedFontCSS: string | null = null;
 
-export async function getCinzelDecorativeFontCSS(): Promise<string> {
+export async function getMontserratFontCSS(): Promise<string> {
     if (cachedFontCSS) return cachedFontCSS;
 
     try {
         // Fetch the CSS from Google Fonts
         const cssResponse = await fetch(
-            'https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&display=swap'
+            'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap'
         );
 
         if (!cssResponse.ok) {

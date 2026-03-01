@@ -99,7 +99,7 @@ export default function PlateDetailPage() {
 
     // Preload font to ensure DOM preview nodes render correctly before canvas download
     useEffect(() => {
-        document.fonts.load('700 240px "Cinzel Decorative"').catch(console.error);
+        document.fonts.load('700 240px "Montserrat"').catch(console.error);
     }, []);
 
     useEffect(() => {
@@ -357,15 +357,15 @@ export default function PlateDetailPage() {
                 const priceText = isSold ? 'SOLD' : (listing?.price ? `AED ${listing.price.toLocaleString()}` : t('contactSeller'));
                 ctx.textAlign = 'center'; ctx.textBaseline = 'top';
                 const goldGradient = ctx.createLinearGradient(0, firstRowY, 0, firstRowY + 220);
-                goldGradient.addColorStop(0, '#FFE875'); goldGradient.addColorStop(0.35, '#E6B830');
-                goldGradient.addColorStop(0.65, '#FFF6A3'); goldGradient.addColorStop(1, '#B38612');
+                goldGradient.addColorStop(0, '#F6D972'); goldGradient.addColorStop(0.4, '#C39A31');
+                goldGradient.addColorStop(0.5, '#F9EEA2'); goldGradient.addColorStop(1, '#8C6C16');
                 ctx.fillStyle = goldGradient;
                 ctx.shadowColor = 'rgba(0, 0, 0, 0.85)'; ctx.shadowBlur = 8;
                 ctx.shadowOffsetX = 4; ctx.shadowOffsetY = 8;
-                await document.fonts.load('700 220px "Cinzel Decorative"');
+                await document.fonts.load('700 220px "Montserrat"');
                 const isContactText = !listing?.price && !isSold;
                 const priceFontSize = isContactText ? 190 : 220;
-                ctx.font = `700 ${priceFontSize}px "Cinzel Decorative", serif`;
+                ctx.font = `700 ${priceFontSize}px "Montserrat", serif`;
                 ctx.fillText(priceText, 1080, firstRowY);
 
                 const secondRowY = 2160 - 300;
@@ -390,10 +390,10 @@ export default function PlateDetailPage() {
                     }
                 }
                 const phoneGoldGradient = ctx.createLinearGradient(0, secondRowY, 0, secondRowY + 180);
-                phoneGoldGradient.addColorStop(0, '#FFE875'); phoneGoldGradient.addColorStop(0.35, '#E6B830');
-                phoneGoldGradient.addColorStop(0.65, '#FFF6A3'); phoneGoldGradient.addColorStop(1, '#B38612');
+                phoneGoldGradient.addColorStop(0, '#F6D972'); phoneGoldGradient.addColorStop(0.4, '#C39A31');
+                phoneGoldGradient.addColorStop(0.5, '#F9EEA2'); phoneGoldGradient.addColorStop(1, '#8C6C16');
                 ctx.fillStyle = phoneGoldGradient;
-                ctx.font = '600 200px "Cinzel Decorative", sans-serif';
+                ctx.font = '600 200px "Montserrat", sans-serif';
                 ctx.shadowBlur = 16; ctx.shadowOffsetY = 6;
                 ctx.fillText(formattedPhone, 1080, secondRowY);
                 ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0;
@@ -1080,9 +1080,9 @@ function BikePreviewModal({ dataUrl, coverImage, coverImage2, onClose, emirateDi
                             <div
                                 className="tracking-tight font-black leading-none whitespace-nowrap"
                                 style={{
-                                    fontFamily: '"Cinzel Decorative", serif',
+                                    fontFamily: '"Montserrat", serif',
                                     fontWeight: 700,
-                                    background: 'linear-gradient(to bottom, #FFE875 0%, #E6B830 35%, #FFF6A3 65%, #B38612 100%)',
+                                    background: 'linear-gradient(to bottom, #F6D972 0%, #C39A31 40%, #F9EEA2 50%, #8C6C16 100%)',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
                                     color: 'transparent',
@@ -1097,9 +1097,9 @@ function BikePreviewModal({ dataUrl, coverImage, coverImage2, onClose, emirateDi
                                 <div
                                     className="tracking-tight font-bold leading-none whitespace-nowrap"
                                     style={{
-                                        fontFamily: '"Cinzel Decorative", serif',
+                                        fontFamily: '"Montserrat", serif',
                                         fontWeight: 700,
-                                        background: 'linear-gradient(to bottom, #FFE875 0%, #E6B830 35%, #FFF6A3 65%, #B38612 100%)',
+                                        background: 'linear-gradient(to bottom, #F6D972 0%, #C39A31 40%, #F9EEA2 50%, #8C6C16 100%)',
                                         WebkitBackgroundClip: 'text',
                                         WebkitTextFillColor: 'transparent',
                                         color: 'transparent',
@@ -2791,9 +2791,9 @@ function CarPreviewModal({ dataUrl, coverImage, coverImage2, onClose, emirateDis
                                 className="absolute tracking-tight font-black leading-none whitespace-nowrap"
                                 style={{
                                     ...activeCar.priceStyling,
-                                    fontFamily: '"Cinzel Decorative", serif',
+                                    fontFamily: '"Montserrat", serif',
                                     fontWeight: 700,
-                                    background: 'linear-gradient(to bottom, #FFE875 0%, #E6B830 35%, #FFF6A3 65%, #B38612 100%)',
+                                    background: 'linear-gradient(to bottom, #F6D972 0%, #C39A31 40%, #F9EEA2 50%, #8C6C16 100%)',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
                                     color: 'transparent',
@@ -2813,9 +2813,9 @@ function CarPreviewModal({ dataUrl, coverImage, coverImage2, onClose, emirateDis
                                 className="absolute tracking-tight font-bold leading-none whitespace-nowrap"
                                 style={{
                                     ...activeCar.mobileStyling,
-                                    fontFamily: '"Cinzel Decorative", serif',
+                                    fontFamily: '"Montserrat", serif',
                                     fontWeight: 700,
-                                    background: 'linear-gradient(to bottom, #FFE875 0%, #E6B830 35%, #FFF6A3 65%, #B38612 100%)',
+                                    background: 'linear-gradient(to bottom, #F6D972 0%, #C39A31 40%, #F9EEA2 50%, #8C6C16 100%)',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
                                     color: 'transparent',
@@ -3503,9 +3503,9 @@ function ClassicPreviewModal({ dataUrl, coverImage, coverImage2, onClose, emirat
                                 className="absolute tracking-tight font-black leading-none whitespace-nowrap"
                                 style={{
                                     ...activeCar.priceStyling,
-                                    fontFamily: '"Cinzel Decorative", serif',
+                                    fontFamily: '"Montserrat", serif',
                                     fontWeight: 700,
-                                    background: 'linear-gradient(to bottom, #FFE875 0%, #E6B830 35%, #FFF6A3 65%, #B38612 100%)',
+                                    background: 'linear-gradient(to bottom, #F6D972 0%, #C39A31 40%, #F9EEA2 50%, #8C6C16 100%)',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
                                     color: 'transparent',
@@ -3525,9 +3525,9 @@ function ClassicPreviewModal({ dataUrl, coverImage, coverImage2, onClose, emirat
                                 className="absolute tracking-tight font-bold leading-none whitespace-nowrap"
                                 style={{
                                     ...activeCar.mobileStyling,
-                                    fontFamily: '"Cinzel Decorative", serif',
+                                    fontFamily: '"Montserrat", serif',
                                     fontWeight: 700,
-                                    background: 'linear-gradient(to bottom, #FFE875 0%, #E6B830 35%, #FFF6A3 65%, #B38612 100%)',
+                                    background: 'linear-gradient(to bottom, #F6D972 0%, #C39A31 40%, #F9EEA2 50%, #8C6C16 100%)',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
                                     color: 'transparent',

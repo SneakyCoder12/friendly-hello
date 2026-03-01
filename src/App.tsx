@@ -51,8 +51,8 @@ export default function App() {
   // Preload luxury font used heavily in canvas overlays early
   useEffect(() => {
     document.fonts.ready.then(() => {
-      document.fonts.load('700 240px "Cinzel Decorative"').catch(() => { });
-      document.fonts.load('600 200px "Cinzel Decorative"').catch(() => { });
+      document.fonts.load('700 240px "Montserrat"').catch(() => { });
+      document.fonts.load('600 200px "Montserrat"').catch(() => { });
     });
   }, []);
 

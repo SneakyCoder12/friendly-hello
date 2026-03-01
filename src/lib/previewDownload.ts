@@ -63,8 +63,8 @@ export async function downloadPreviewAsCanvas(opts: DownloadPreviewOptions): Pro
         await drawPlateOnCanvas(ctx, plateDataUrl, plateStyling2, canvasWidth, canvasHeight);
     }
 
-    // 5. Ensure Cinzel Decorative is loaded
-    await document.fonts.load('700 100px "Cinzel Decorative"');
+    // 5. Ensure Montserrat is loaded
+    await document.fonts.load('700 100px "Montserrat"');
 
     // 6. Draw price and phone text (if not a bike — bikes have different layout)
     if (!isBike && priceStyling) {
@@ -160,7 +160,7 @@ function drawGoldText(
     const fontSize = Math.round(baseFontScale * textScale * (canvasWidth / 100));
 
     ctx.save();
-    ctx.font = `700 ${fontSize}px "Cinzel Decorative", serif`;
+    ctx.font = `700 ${fontSize}px "Montserrat", sans-serif`;
     ctx.textBaseline = 'middle';
 
     // Check if transform contains translate to determine alignment
@@ -173,10 +173,10 @@ function drawGoldText(
 
     // Create gold gradient
     const gradient = ctx.createLinearGradient(0, y - fontSize / 2, 0, y + fontSize / 2);
-    gradient.addColorStop(0, '#FFE875');
-    gradient.addColorStop(0.35, '#E6B830');
-    gradient.addColorStop(0.65, '#FFF6A3');
-    gradient.addColorStop(1, '#B38612');
+    gradient.addColorStop(0, '#F6D972');
+    gradient.addColorStop(0.4, '#C39A31');
+    gradient.addColorStop(0.5, '#F9EEA2');
+    gradient.addColorStop(1, '#8C6C16');
 
     ctx.fillStyle = gradient;
     ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
@@ -205,14 +205,14 @@ function drawBikeText(
     const y = canvasHeight * 0.94;
 
     ctx.save();
-    ctx.font = `700 ${fontSize}px "Cinzel Decorative", serif`;
+    ctx.font = `700 ${fontSize}px "Montserrat", sans-serif`;
     ctx.textBaseline = 'middle';
 
     const gradient = ctx.createLinearGradient(0, y - fontSize / 2, 0, y + fontSize / 2);
-    gradient.addColorStop(0, '#FFE875');
-    gradient.addColorStop(0.35, '#E6B830');
-    gradient.addColorStop(0.65, '#FFF6A3');
-    gradient.addColorStop(1, '#B38612');
+    gradient.addColorStop(0, '#F6D972');
+    gradient.addColorStop(0.4, '#C39A31');
+    gradient.addColorStop(0.5, '#F9EEA2');
+    gradient.addColorStop(1, '#8C6C16');
 
     ctx.fillStyle = gradient;
     ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
