@@ -173,10 +173,10 @@ function drawGoldText(
 
     // Create gold gradient
     const gradient = ctx.createLinearGradient(0, y - fontSize / 2, 0, y + fontSize / 2);
-    gradient.addColorStop(0, '#F6D972');
-    gradient.addColorStop(0.4, '#C39A31');
-    gradient.addColorStop(0.5, '#F9EEA2');
-    gradient.addColorStop(1, '#8C6C16');
+    gradient.addColorStop(0, '#FFE875');
+    gradient.addColorStop(0.35, '#E6B830');
+    gradient.addColorStop(0.65, '#FFF6A3');
+    gradient.addColorStop(1, '#B38612');
 
     ctx.fillStyle = gradient;
     ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
@@ -209,10 +209,10 @@ function drawBikeText(
     ctx.textBaseline = 'middle';
 
     const gradient = ctx.createLinearGradient(0, y - fontSize / 2, 0, y + fontSize / 2);
-    gradient.addColorStop(0, '#F6D972');
-    gradient.addColorStop(0.4, '#C39A31');
-    gradient.addColorStop(0.5, '#F9EEA2');
-    gradient.addColorStop(1, '#8C6C16');
+    gradient.addColorStop(0, '#FFE875');
+    gradient.addColorStop(0.35, '#E6B830');
+    gradient.addColorStop(0.65, '#FFF6A3');
+    gradient.addColorStop(1, '#B38612');
 
     ctx.fillStyle = gradient;
     ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';

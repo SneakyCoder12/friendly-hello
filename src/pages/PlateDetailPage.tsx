@@ -357,8 +357,8 @@ export default function PlateDetailPage() {
                 const priceText = isSold ? 'SOLD' : (listing?.price ? `AED ${listing.price.toLocaleString()}` : t('contactSeller'));
                 ctx.textAlign = 'center'; ctx.textBaseline = 'top';
                 const goldGradient = ctx.createLinearGradient(0, firstRowY, 0, firstRowY + 220);
-                goldGradient.addColorStop(0, '#F6D972'); goldGradient.addColorStop(0.4, '#C39A31');
-                goldGradient.addColorStop(0.5, '#F9EEA2'); goldGradient.addColorStop(1, '#8C6C16');
+                goldGradient.addColorStop(0, '#FFE875'); goldGradient.addColorStop(0.35, '#E6B830');
+                goldGradient.addColorStop(0.65, '#FFF6A3'); goldGradient.addColorStop(1, '#B38612');
                 ctx.fillStyle = goldGradient;
                 ctx.shadowColor = 'rgba(0, 0, 0, 0.85)'; ctx.shadowBlur = 8;
                 ctx.shadowOffsetX = 4; ctx.shadowOffsetY = 8;
@@ -390,8 +390,8 @@ export default function PlateDetailPage() {
                     }
                 }
                 const phoneGoldGradient = ctx.createLinearGradient(0, secondRowY, 0, secondRowY + 180);
-                phoneGoldGradient.addColorStop(0, '#F6D972'); phoneGoldGradient.addColorStop(0.4, '#C39A31');
-                phoneGoldGradient.addColorStop(0.5, '#F9EEA2'); phoneGoldGradient.addColorStop(1, '#8C6C16');
+                phoneGoldGradient.addColorStop(0, '#FFE875'); phoneGoldGradient.addColorStop(0.35, '#E6B830');
+                phoneGoldGradient.addColorStop(0.65, '#FFF6A3'); phoneGoldGradient.addColorStop(1, '#B38612');
                 ctx.fillStyle = phoneGoldGradient;
                 ctx.font = '600 200px "Cinzel Decorative", sans-serif';
                 ctx.shadowBlur = 16; ctx.shadowOffsetY = 6;
@@ -1082,7 +1082,7 @@ function BikePreviewModal({ dataUrl, coverImage, coverImage2, onClose, emirateDi
                                 style={{
                                     fontFamily: '"Cinzel Decorative", serif',
                                     fontWeight: 700,
-                                    background: 'linear-gradient(to bottom, #F6D972 0%, #C39A31 40%, #F9EEA2 50%, #8C6C16 100%)',
+                                    background: 'linear-gradient(to bottom, #FFE875 0%, #E6B830 35%, #FFF6A3 65%, #B38612 100%)',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
                                     color: 'transparent',
@@ -1099,7 +1099,7 @@ function BikePreviewModal({ dataUrl, coverImage, coverImage2, onClose, emirateDi
                                     style={{
                                         fontFamily: '"Cinzel Decorative", serif',
                                         fontWeight: 700,
-                                        background: 'linear-gradient(to bottom, #F6D972 0%, #C39A31 40%, #F9EEA2 50%, #8C6C16 100%)',
+                                        background: 'linear-gradient(to bottom, #FFE875 0%, #E6B830 35%, #FFF6A3 65%, #B38612 100%)',
                                         WebkitBackgroundClip: 'text',
                                         WebkitTextFillColor: 'transparent',
                                         color: 'transparent',
@@ -2793,7 +2793,7 @@ function CarPreviewModal({ dataUrl, coverImage, coverImage2, onClose, emirateDis
                                     ...activeCar.priceStyling,
                                     fontFamily: '"Cinzel Decorative", serif',
                                     fontWeight: 700,
-                                    background: 'linear-gradient(to bottom, #F6D972 0%, #C39A31 40%, #F9EEA2 50%, #8C6C16 100%)',
+                                    background: 'linear-gradient(to bottom, #FFE875 0%, #E6B830 35%, #FFF6A3 65%, #B38612 100%)',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
                                     color: 'transparent',
@@ -2815,7 +2815,7 @@ function CarPreviewModal({ dataUrl, coverImage, coverImage2, onClose, emirateDis
                                     ...activeCar.mobileStyling,
                                     fontFamily: '"Cinzel Decorative", serif',
                                     fontWeight: 700,
-                                    background: 'linear-gradient(to bottom, #F6D972 0%, #C39A31 40%, #F9EEA2 50%, #8C6C16 100%)',
+                                    background: 'linear-gradient(to bottom, #FFE875 0%, #E6B830 35%, #FFF6A3 65%, #B38612 100%)',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
                                     color: 'transparent',
@@ -3505,7 +3505,7 @@ function ClassicPreviewModal({ dataUrl, coverImage, coverImage2, onClose, emirat
                                     ...activeCar.priceStyling,
                                     fontFamily: '"Cinzel Decorative", serif',
                                     fontWeight: 700,
-                                    background: 'linear-gradient(to bottom, #F6D972 0%, #C39A31 40%, #F9EEA2 50%, #8C6C16 100%)',
+                                    background: 'linear-gradient(to bottom, #FFE875 0%, #E6B830 35%, #FFF6A3 65%, #B38612 100%)',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
                                     color: 'transparent',
@@ -3527,7 +3527,7 @@ function ClassicPreviewModal({ dataUrl, coverImage, coverImage2, onClose, emirat
                                     ...activeCar.mobileStyling,
                                     fontFamily: '"Cinzel Decorative", serif',
                                     fontWeight: 700,
-                                    background: 'linear-gradient(to bottom, #F6D972 0%, #C39A31 40%, #F9EEA2 50%, #8C6C16 100%)',
+                                    background: 'linear-gradient(to bottom, #FFE875 0%, #E6B830 35%, #FFF6A3 65%, #B38612 100%)',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
                                     color: 'transparent',
