@@ -164,8 +164,11 @@ export function usePlateGenerator() {
                 version,
                 outputWidth: targetWidth,
             });
+
+            // ALWAYS store the current generated canvas for the Live Preview Gallery (even if 1200px)
+            current4kRef.current = canvas4k;
+
             if (isExport) {
-                current4kRef.current = canvas4k;
                 return canvas4k; // Return it for the download function
             }
 
