@@ -1,0 +1,301 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: 40 86% 44%;
+  --primary-hover: 40 90% 36%;
+  --primary-foreground: 0 0% 100%;
+  --background: 0 0% 100%;
+  --foreground: 0 0% 10%;
+  --card: 0 0% 100%;
+  --border: 0 0% 90%;
+  --surface: 0 0% 98%;
+  --surface-accent: 0 0% 96%;
+  --muted-foreground: 0 0% 45%;
+  --ring: 174 75% 26%;
+
+  /* Legacy tokens kept for existing components */
+  --background-light: 0 0% 100%;
+  --background-pure: 0 0% 100%;
+  --surface-light: 0 0% 100%;
+  --text-main: 0 0% 10%;
+  --text-secondary: 0 0% 45%;
+  --accent-blue: 215 26% 27%;
+  --border-light: 0 0% 90%;
+}
+
+body {
+  @apply bg-background text-foreground font-sans antialiased;
+  overflow-x: hidden;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+::selection {
+  @apply bg-primary text-white;
+}
+
+.hide-scrollbar::-webkit-scrollbar,
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar,
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* 3D Flip animation utilities */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* RTL support */
+[dir="rtl"] .flip-rtl {
+  transform: scaleX(-1);
+}
+
+/* Smooth page transition */
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-transition {
+  animation: pageEnter 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Dashboard Premium Animations ── */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes pulseGlow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 16px 4px hsl(var(--primary) / 0.15);
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.dash-animate {
+  animation: fadeSlideIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.dash-animate-delay-1 {
+  animation-delay: 0.08s;
+}
+
+.dash-animate-delay-2 {
+  animation-delay: 0.16s;
+}
+
+.dash-animate-delay-3 {
+  animation-delay: 0.24s;
+}
+
+.dash-animate-delay-4 {
+  animation-delay: 0.32s;
+}
+
+.glass-card {
+  background: hsl(var(--card) / 0.75);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+}
+
+.btn-glow {
+  animation: pulseGlow 2.5s ease-in-out infinite;
+}
+
+.btn-glow:hover {
+  animation: none;
+}
+
+.shimmer-badge {
+  background: linear-gradient(90deg, hsl(var(--primary) / 0.05) 25%, hsl(var(--primary) / 0.15) 50%, hsl(var(--primary) / 0.05) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+.hover-lift {
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px hsl(var(--foreground) / 0.08);
+}
+
+.modal-enter {
+  animation: scaleIn 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Sold Ribbon ── */
+.sold-ribbon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 50;
+  overflow: hidden;
+  width: 100px;
+  height: 100px;
+  pointer-events: none;
+}
+
+.sold-ribbon span {
+  position: absolute;
+  display: block;
+  width: 150px;
+  padding: 6px 0;
+  background: linear-gradient(135deg, #dc2626, #ef4444);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-align: center;
+  right: -38px;
+  top: 22px;
+  transform: rotate(45deg);
+}
+
+/* ── Mobile-Only Styles (max-width: 768px) ── */
+@media (max-width: 768px) {
+
+  /* Horizontal carousel cards - fixed width for consistent native feel */
+  .mobile-plate-card {
+    width: 240px;
+    min-width: 240px;
+    max-width: 240px;
+  }
+
+  /* Ensure PlateCard inside mobile carousel adapts */
+  .mobile-plate-card .perspective-1000 {
+    height: 210px;
+  }
+
+  /* Smooth native-feeling scroll */
+  .mobile-plate-card {
+    scroll-snap-align: start;
+  }
+
+  /* ── Horizontal scroll carousel ── */
+  .mobile-scroll-row {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x pan-y;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+  }
+
+  /* Bottom nav spacing */
+  .mobile-bottom-spacer {
+    padding-bottom: 72px;
+  }
+
+  /* Mobile slide-up animation for filter panel */
+  @keyframes slideUp {
+    from {
+      transform: translateY(100%);
+    }
+
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out forwards;
+  }
+}
+
+/* Ultra-small screens: slightly smaller carousel cards */
+@media (max-width: 359px) {
+  .mobile-plate-card {
+    width: 220px;
+    min-width: 220px;
+    max-width: 220px;
+  }
+}
