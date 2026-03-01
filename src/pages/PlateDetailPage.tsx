@@ -355,17 +355,18 @@ export default function PlateDetailPage() {
             const drawText = async (ctx: CanvasRenderingContext2D) => {
                 const firstRowY = 160;
                 const priceText = isSold ? 'SOLD' : (listing?.price ? `AED ${listing.price.toLocaleString()}` : t('contactSeller'));
+                const isContactText = !listing?.price && !isSold;
+                const priceFontSize = isContactText ? 190 : 220;
+
                 ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-                const goldGradient = ctx.createLinearGradient(0, firstRowY, 0, firstRowY + 220);
+                const goldGradient = ctx.createLinearGradient(0, firstRowY, 0, firstRowY + priceFontSize);
                 goldGradient.addColorStop(0, '#F6D972'); goldGradient.addColorStop(0.4, '#C39A31');
                 goldGradient.addColorStop(0.5, '#F9EEA2'); goldGradient.addColorStop(1, '#8C6C16');
                 ctx.fillStyle = goldGradient;
                 ctx.shadowColor = 'rgba(0, 0, 0, 0.85)'; ctx.shadowBlur = 8;
                 ctx.shadowOffsetX = 4; ctx.shadowOffsetY = 8;
                 await document.fonts.load('700 220px "Montserrat"');
-                const isContactText = !listing?.price && !isSold;
-                const priceFontSize = isContactText ? 190 : 220;
-                ctx.font = `700 ${priceFontSize}px "Montserrat", serif`;
+                ctx.font = `700 ${priceFontSize}px "Montserrat", sans-serif`;
                 ctx.fillText(priceText, 1080, firstRowY);
 
                 const secondRowY = 2160 - 300;
@@ -389,11 +390,12 @@ export default function PlateDetailPage() {
                         formattedPhone = cleaned.replace(/(\d{3})(?=\d)/g, '$1 ');
                     }
                 }
-                const phoneGoldGradient = ctx.createLinearGradient(0, secondRowY, 0, secondRowY + 180);
+                const phoneFontSize = 200; // Fixed size in this component for now
+                const phoneGoldGradient = ctx.createLinearGradient(0, secondRowY, 0, secondRowY + phoneFontSize);
                 phoneGoldGradient.addColorStop(0, '#F6D972'); phoneGoldGradient.addColorStop(0.4, '#C39A31');
                 phoneGoldGradient.addColorStop(0.5, '#F9EEA2'); phoneGoldGradient.addColorStop(1, '#8C6C16');
                 ctx.fillStyle = phoneGoldGradient;
-                ctx.font = '600 200px "Montserrat", sans-serif';
+                ctx.font = `600 ${phoneFontSize}px "Montserrat", sans-serif`;
                 ctx.shadowBlur = 16; ctx.shadowOffsetY = 6;
                 ctx.fillText(formattedPhone, 1080, secondRowY);
                 ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0;
